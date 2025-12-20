@@ -26,7 +26,7 @@ export default function Practice() {
   const navigate = useNavigate();
   const location = useLocation();
   const { isPaid } = useSubscription();
-  const { refetch, bookmarkedQuestions } = useUserProgress();
+  const { refetch, bookmarkedQuestions, completedQuestions } = useUserProgress();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("all");
   const [selectedFirm, setSelectedFirm] = useState<string | null>(null);
@@ -119,9 +119,19 @@ export default function Practice() {
   };
 
   const handleNextQuestion = () => {
-    const currentIndex = filteredQuestions.findIndex((q) => q.id === activeQuestion?.id);
+    if (!activeQuestion) return;
+    const currentIndex = filteredQuestions.findIndex((q) => q.id === activeQuestion.id);
+    if (currentIndex === -1) return;
     const nextIndex = (currentIndex + 1) % filteredQuestions.length;
     setActiveQuestion(filteredQuestions[nextIndex]);
+  };
+
+  const handlePreviousQuestion = () => {
+    if (!activeQuestion) return;
+    const currentIndex = filteredQuestions.findIndex((q) => q.id === activeQuestion.id);
+    if (currentIndex === -1) return;
+    const prevIndex = currentIndex > 0 ? currentIndex - 1 : filteredQuestions.length - 1;
+    setActiveQuestion(filteredQuestions[prevIndex]);
   };
 
   const handleRandomQuestion = () => {
@@ -175,11 +185,21 @@ export default function Practice() {
             Back to Questions
           </Button>
           
-          <QuestionCard
-            question={activeQuestion}
-            onComplete={handleQuestionComplete}
-            onNext={handleNextQuestion}
-          />
+          {(() => {
+            const currentQuestionIndex = filteredQuestions.findIndex((q) => q.id === activeQuestion.id);
+            return (
+              <QuestionCard
+                key={activeQuestion.id}
+                question={activeQuestion}
+                onComplete={handleQuestionComplete}
+                onNext={handleNextQuestion}
+                onPrevious={handlePreviousQuestion}
+                currentIndex={currentQuestionIndex}
+                totalQuestions={filteredQuestions.length}
+                isCompleted={completedQuestions.has(activeQuestion.id)}
+              />
+            );
+          })()}
         </main>
       </div>
     );

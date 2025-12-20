@@ -20,13 +20,15 @@ import {
   Clock, 
   Lightbulb, 
   ChevronRight, 
+  ChevronLeft,
   Check, 
   RotateCcw,
   X,
   Bookmark,
   BookmarkCheck,
   Eye,
-  Lock
+  Lock,
+  CheckCircle2
 } from "lucide-react";
 import type { Question } from "@/data/questions";
 import { useUserProgress } from "@/hooks/useUserProgress";
@@ -36,9 +38,13 @@ interface QuestionCardProps {
   question: Question;
   onComplete: (correct: boolean, time: number) => void;
   onNext: () => void;
+  onPrevious?: () => void;
+  currentIndex?: number;
+  totalQuestions?: number;
+  isCompleted?: boolean;
 }
 
-export function QuestionCard({ question, onComplete, onNext }: QuestionCardProps) {
+export function QuestionCard({ question, onComplete, onNext, onPrevious, currentIndex, totalQuestions, isCompleted }: QuestionCardProps) {
   const { saveQuestionCompletion, toggleBookmark, bookmarkedQuestions } = useUserProgress();
   const { isPaid } = useSubscription();
   const [timer, setTimer] = useState(0);
@@ -140,6 +146,8 @@ export function QuestionCard({ question, onComplete, onNext }: QuestionCardProps
     setTimer(0);
     setHintsRevealed(0);
     setShowHints(false);
+    setShowSolution(false);
+    setAnswerRevealed(false);
     onNext();
   };
 
@@ -211,12 +219,51 @@ export function QuestionCard({ question, onComplete, onNext }: QuestionCardProps
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
+          {/* Previous/Next Navigation */}
+          {onPrevious && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onPrevious}
+              disabled={currentIndex === undefined || currentIndex === 0}
+              className="h-9 w-9 p-0"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </Button>
+          )}
+          
+          {currentIndex !== undefined && totalQuestions !== undefined && (
+            <span className="text-sm text-muted-foreground font-medium min-w-[3rem] text-center">
+              {currentIndex + 1} / {totalQuestions}
+            </span>
+          )}
+          
+          {onNext && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onNext}
+              disabled={currentIndex !== undefined && totalQuestions !== undefined && currentIndex >= totalQuestions - 1}
+              className="h-9 w-9 p-0"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </Button>
+          )}
+          
+          <div className="h-6 w-px bg-border mx-2" />
+          
           <Badge variant={getDifficultyVariant(question.difficulty) as any}>
             {getDifficultyLabel(question.difficulty)}
           </Badge>
           {question.firm && (
             <Badge variant="outline" className="text-xs">
               {question.firm}
+            </Badge>
+          )}
+          {isCompleted && (
+            <Badge variant="outline" className="text-xs bg-green-500/10 text-green-400 border-green-500/30">
+              <CheckCircle2 className="w-3 h-3 mr-1" />
+              Completed
             </Badge>
           )}
         </div>
@@ -291,21 +338,7 @@ export function QuestionCard({ question, onComplete, onNext }: QuestionCardProps
               disabled={answerRevealed}
             />
           )}
-          <div className="flex justify-end gap-3 mt-4">
-            {submitted && !isCorrect && !answerRevealed && (
-              <Button 
-                variant="outline"
-                onClick={() => {
-                  setSubmitted(false);
-                  setIsCorrect(null);
-                  setAnswer("");
-                  setIsRunning(true);
-                }}
-              >
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Try Again
-              </Button>
-            )}
+          <div className="flex justify-end mt-4">
             {submitted && isCorrect ? (
               <Button variant="hero" onClick={handleNext}>
                 Next Question
@@ -377,7 +410,7 @@ export function QuestionCard({ question, onComplete, onNext }: QuestionCardProps
       )}
 
       {/* Reveal Answer Section */}
-      {!submitted && !answerRevealed && (
+      {!answerRevealed && (
         <Card variant="glass">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">

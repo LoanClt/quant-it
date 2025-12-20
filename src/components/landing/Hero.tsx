@@ -43,11 +43,6 @@ export function Hero() {
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
             </Button>
-            <Button variant="outline" size="xl" asChild>
-              <Link to="/practice">
-                View Questions
-              </Link>
-            </Button>
           </div>
         </div>
 

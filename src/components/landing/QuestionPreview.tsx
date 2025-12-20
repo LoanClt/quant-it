@@ -66,8 +66,8 @@ export function QuestionPreview() {
   };
 
   const revealNextHint = () => {
-    // Free users can only reveal 1 hint
-    const maxHints = 1;
+    // On landing page, allow all users to see all hints
+    const maxHints = previewQuestion.hints.length;
     if (hintsRevealed < maxHints) {
       setHintsRevealed((prev) => prev + 1);
       setShowHints(true);
@@ -204,15 +204,15 @@ export function QuestionPreview() {
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-sm text-muted-foreground">
-                        {hintsRevealed < 1 ? "1 free hint remaining" : "None free hints remaining"}
+                        ({hintsRevealed}/{previewQuestion.hints.length} revealed)
                       </span>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={revealNextHint}
-                        disabled={hintsRevealed >= 1}
+                        disabled={hintsRevealed >= previewQuestion.hints.length}
                       >
-                        {hintsRevealed < 1 ? "Reveal Hint" : "Upgrade for more hints"}
+                        {hintsRevealed < previewQuestion.hints.length ? "Reveal Hint" : "No more hints"}
                       </Button>
                     </div>
                   </div>
