@@ -28,6 +28,42 @@ export interface QuestionCompletion {
   is_correct: boolean;
 }
 
+export interface DailyActivity {
+  date: string; // YYYY-MM-DD format
+  count: number;
+}
+
+// Calculate streak from daily activity - finds longest consecutive sequence ending on targetDate
+function calculateStreak(dailyActivity: DailyActivity[], targetDate: string): number {
+  if (dailyActivity.length === 0) return 0;
+  
+  // Create a set of dates with activity
+  const activityDates = new Set(dailyActivity.map(a => a.date));
+  
+  // Check if target date has activity, if not check yesterday, etc.
+  let currentDate = new Date(targetDate);
+  let streak = 0;
+  
+  // Go backwards from target date to find consecutive days
+  while (true) {
+    const dateStr = currentDate.toISOString().split('T')[0];
+    
+    if (activityDates.has(dateStr)) {
+      streak++;
+      // Go back one day
+      currentDate.setDate(currentDate.getDate() - 1);
+    } else {
+      // No activity on this day, streak ends
+      break;
+    }
+    
+    // Safety check to prevent infinite loop
+    if (streak > 365) break;
+  }
+  
+  return streak;
+}
+
 export function useUserProgress() {
   const { user } = useAuth();
   const [progress, setProgress] = useState<UserProgress | null>(null);
@@ -35,6 +71,7 @@ export function useUserProgress() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [completedQuestions, setCompletedQuestions] = useState<Set<string>>(new Set());
   const [bookmarkedQuestions, setBookmarkedQuestions] = useState<Set<string>>(new Set());
+  const [dailyActivity, setDailyActivity] = useState<DailyActivity[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -44,6 +81,7 @@ export function useUserProgress() {
       setProfile(null);
       setCompletedQuestions(new Set());
       setBookmarkedQuestions(new Set());
+      setDailyActivity([]);
       setLoading(false);
       return;
     }
@@ -76,7 +114,13 @@ export function useUserProgress() {
     
     setLoading(true);
     
-    const [progressRes, skillsRes, profileRes, completionsRes, bookmarksRes] = await Promise.all([
+    // Calculate date range for last 90 days (for streak calculation and calendar view)
+    const today = new Date();
+    const ninetyDaysAgo = new Date(today);
+    ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+    const ninetyDaysAgoStr = ninetyDaysAgo.toISOString().split('T')[0];
+    
+    const [progressRes, skillsRes, profileRes, completionsRes, bookmarksRes, dailyActivityRes] = await Promise.all([
       supabase
         .from('user_progress')
         .select('*')
@@ -100,6 +144,12 @@ export function useUserProgress() {
         .from('bookmarks')
         .select('question_id')
         .eq('user_id', user.id),
+      (supabase as any)
+        .from('question_completions')
+        .select('completed_at')
+        .eq('user_id', user.id)
+        .eq('is_correct', true)
+        .gte('completed_at', ninetyDaysAgoStr),
     ]);
 
     if (progressRes.data) {
@@ -135,6 +185,77 @@ export function useUserProgress() {
       const bookmarkedSet = new Set<string>(bookmarksRes.data.map((b: any) => b.question_id as string));
       setBookmarkedQuestions(bookmarkedSet);
       console.log('Loaded bookmarked questions:', bookmarkedSet.size);
+    }
+
+    // Process daily activity and recalculate streak
+    if (dailyActivityRes.error) {
+      console.error('Error fetching daily activity:', dailyActivityRes.error);
+      setDailyActivity([]);
+    } else if (dailyActivityRes.data && Array.isArray(dailyActivityRes.data)) {
+      // Group by date
+      const activityMap = new Map<string, number>();
+      
+      dailyActivityRes.data.forEach((completion: any) => {
+        if (completion.completed_at) {
+          const dateStr = completion.completed_at.split('T')[0]; // Extract YYYY-MM-DD
+          activityMap.set(dateStr, (activityMap.get(dateStr) || 0) + 1);
+        }
+      });
+      
+      // Convert to array format and sort by date
+      const dailyActivityArray: DailyActivity[] = Array.from(activityMap.entries())
+        .map(([date, count]) => ({
+          date,
+          count,
+        }))
+        .sort((a, b) => a.date.localeCompare(b.date));
+      
+      setDailyActivity(dailyActivityArray);
+      console.log('Loaded daily activity:', dailyActivityArray.length, 'days');
+      
+      // Recalculate streak based on consecutive days ending today
+      if (dailyActivityArray.length > 0) {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const calculatedStreak = calculateStreak(dailyActivityArray, todayStr);
+        
+        // Only update if streak changed and we have progress data
+        if (progressRes.data && calculatedStreak !== progressRes.data.streak_days) {
+          const { error: streakError } = await supabase
+            .from('user_progress')
+            .update({ streak_days: calculatedStreak })
+            .eq('user_id', user.id);
+          
+          if (!streakError) {
+            setProgress(prev => prev ? { ...prev, streak_days: calculatedStreak } : null);
+            console.log('Updated streak to:', calculatedStreak);
+          } else {
+            console.error('Error updating streak:', streakError);
+          }
+        } else if (!progressRes.data && calculatedStreak > 0) {
+          // No progress record exists yet, but we have activity - create one
+          const { error: createError } = await supabase
+            .from('user_progress')
+            .insert({
+              user_id: user.id,
+              streak_days: calculatedStreak,
+              last_activity_date: todayStr,
+            });
+          
+          if (!createError) {
+            const { data: newProgress } = await supabase
+              .from('user_progress')
+              .select('*')
+              .eq('user_id', user.id)
+              .maybeSingle();
+            
+            if (newProgress) {
+              setProgress(newProgress);
+            }
+          }
+        }
+      }
+    } else {
+      setDailyActivity([]);
     }
 
     setLoading(false);
@@ -241,19 +362,22 @@ export function useUserProgress() {
           last_activity_date: today,
         };
 
-        // Update streak if last activity was yesterday or today
+        // Calculate streak based on consecutive days with activity
+        // We'll recalculate it properly after fetching daily activity
+        // For now, use a simple check
         if (progress?.last_activity_date) {
           const lastDate = new Date(progress.last_activity_date);
           const todayDate = new Date(today);
           const diffDays = Math.floor((todayDate.getTime() - lastDate.getTime()) / (1000 * 60 * 60 * 24));
           
           if (diffDays === 0) {
-            // Same day, no change to streak
+            // Same day, keep current streak
+            updates.streak_days = progress.streak_days || 0;
           } else if (diffDays === 1) {
             // Consecutive day, increment streak
             updates.streak_days = (progress.streak_days || 0) + 1;
           } else {
-            // Streak broken, reset to 1
+            // Streak broken (more than 1 day gap), reset to 1
             updates.streak_days = 1;
           }
         } else {
@@ -267,6 +391,51 @@ export function useUserProgress() {
         } else {
           // Update local progress state
           setProgress(prev => prev ? { ...prev, ...updates } : null);
+          
+          // Refresh daily activity to recalculate streak
+          // Fetch recent completions to update daily activity
+          const today = new Date();
+          const ninetyDaysAgo = new Date(today);
+          ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+          const ninetyDaysAgoStr = ninetyDaysAgo.toISOString().split('T')[0];
+          
+          const { data: recentCompletions } = await (supabase as any)
+            .from('question_completions')
+            .select('completed_at')
+            .eq('user_id', user.id)
+            .eq('is_correct', true)
+            .gte('completed_at', ninetyDaysAgoStr);
+          
+          if (recentCompletions && Array.isArray(recentCompletions)) {
+            const activityMap = new Map<string, number>();
+            recentCompletions.forEach((completion: any) => {
+              if (completion.completed_at) {
+                const dateStr = completion.completed_at.split('T')[0];
+                activityMap.set(dateStr, (activityMap.get(dateStr) || 0) + 1);
+              }
+            });
+            
+            const dailyActivityArray: DailyActivity[] = Array.from(activityMap.entries())
+              .map(([date, count]) => ({ date, count }))
+              .sort((a, b) => a.date.localeCompare(b.date));
+            
+            setDailyActivity(dailyActivityArray);
+            
+            // Recalculate streak
+            const todayStr = new Date().toISOString().split('T')[0];
+            const calculatedStreak = calculateStreak(dailyActivityArray, todayStr);
+            
+            if (calculatedStreak !== updates.streak_days) {
+              const { error: streakError } = await supabase
+                .from('user_progress')
+                .update({ streak_days: calculatedStreak })
+                .eq('user_id', user.id);
+              
+              if (!streakError) {
+                setProgress(prev => prev ? { ...prev, streak_days: calculatedStreak } : null);
+              }
+            }
+          }
         }
       }
       
@@ -359,6 +528,7 @@ export function useUserProgress() {
     profile,
     completedQuestions,
     bookmarkedQuestions,
+    dailyActivity,
     loading,
     updateProgress,
     updateProfile,

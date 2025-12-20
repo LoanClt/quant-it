@@ -12,9 +12,10 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { WeeklyProgress } from "@/components/dashboard/WeeklyProgress";
 
 export default function Dashboard() {
-  const { progress, loading, completedQuestions } = useUserProgress();
+  const { progress, loading, completedQuestions, dailyActivity } = useUserProgress();
   const { isPaid, isAdmin, togglePaidStatus, refetch } = useSubscription();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -129,6 +130,12 @@ export default function Dashboard() {
         </div>
 
         <div className="space-y-4">
+          {/* Weekly Progress */}
+          <WeeklyProgress 
+            dailyActivity={dailyActivity} 
+            streakDays={progress?.streak_days || 0} 
+          />
+
           {/* Easy */}
           <Card variant="glass">
             <CardContent className="p-6">

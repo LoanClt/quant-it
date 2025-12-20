@@ -1,13 +1,29 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Navbar } from "@/components/landing/Navbar";
 import { QuestionCard } from "@/components/practice/QuestionCard";
-import { FilterPanel } from "@/components/practice/FilterPanel";
+import { CompactFilters } from "@/components/practice/CompactFilters";
 import { QuestionList } from "@/components/practice/QuestionList";
 import { questions, type Question } from "@/data/questions";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Shuffle, Lock, Search } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+} from "@/components/ui/pagination";
+import { ArrowLeft, Shuffle, Lock, Search, Bookmark, ChevronLeft, ChevronRight } from "lucide-react";
 import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useUserProgress } from "@/hooks/useUserProgress";
@@ -34,7 +50,10 @@ export default function Practice() {
   const [activeQuestion, setActiveQuestion] = useState<Question | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>("default");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const prevLocationKey = useRef<string | undefined>(location.key);
+  
+  const QUESTIONS_PER_PAGE = 30;
 
   // Initialize difficulty from URL params
   useEffect(() => {
@@ -82,7 +101,7 @@ export default function Practice() {
       filtered = filtered.filter((q) => q.category === selectedCategory);
     }
 
-    // Filter by difficulty
+    // Filter by difficulty FIRST (before sorting)
     if (selectedDifficulty !== "all") {
       filtered = filtered.filter((q) => getDifficultyLevel(q.difficulty) === selectedDifficulty);
     }
@@ -92,7 +111,8 @@ export default function Practice() {
       filtered = filtered.filter((q) => q.firm === selectedFirm);
     }
 
-    // Sort by difficulty
+    // Sort by difficulty (only applies to filtered results)
+    // When a single difficulty is selected, sorting still works but only within that difficulty
     if (sortBy === "difficulty-asc") {
       filtered = [...filtered].sort((a, b) => a.difficulty - b.difficulty);
     } else if (sortBy === "difficulty-desc") {
@@ -102,6 +122,19 @@ export default function Practice() {
     return filtered;
   }, [selectedCategory, selectedDifficulty, selectedFirm, sortBy, showBookmarkedOnly, bookmarkedQuestions, searchQuery]);
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredQuestions.length / QUESTIONS_PER_PAGE);
+  const paginatedQuestions = useMemo(() => {
+    const startIndex = (currentPage - 1) * QUESTIONS_PER_PAGE;
+    const endIndex = startIndex + QUESTIONS_PER_PAGE;
+    return filteredQuestions.slice(startIndex, endIndex);
+  }, [filteredQuestions, currentPage]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, selectedDifficulty, selectedFirm, showBookmarkedOnly, searchQuery]);
+
   const handleClearFilters = () => {
     setSelectedCategory(null);
     setSelectedDifficulty("all");
@@ -109,6 +142,7 @@ export default function Practice() {
     setShowBookmarkedOnly(false);
     setSortBy("default");
     setSearchQuery("");
+    setCurrentPage(1);
   };
 
   const handleQuestionComplete = async (correct: boolean, time: number) => {
@@ -220,7 +254,7 @@ export default function Practice() {
         </div>
 
         {/* Search Bar */}
-        <div className="mb-6">
+        <div className="mb-4">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
@@ -233,8 +267,67 @@ export default function Practice() {
           </div>
         </div>
 
-        {/* Filter Panel */}
-        <FilterPanel
+        {/* Quick Filters Below Search */}
+        <div className="mb-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+          {/* Show Bookmarked Only */}
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="bookmarked-only"
+              checked={showBookmarkedOnly}
+              onCheckedChange={(checked) => setShowBookmarkedOnly(checked === true)}
+            />
+            <Label
+              htmlFor="bookmarked-only"
+              className="text-sm font-medium cursor-pointer flex items-center gap-2"
+            >
+              <Bookmark className={`w-4 h-4 ${showBookmarkedOnly ? 'fill-current' : ''}`} />
+              Show Bookmarked Only
+            </Label>
+          </div>
+
+          {/* Difficulty Filter */}
+          <div className="flex items-center gap-2">
+            <Label htmlFor="difficulty-filter" className="text-sm font-medium whitespace-nowrap">
+              Difficulty:
+            </Label>
+            <Select
+              value={selectedDifficulty}
+              onValueChange={setSelectedDifficulty}
+            >
+              <SelectTrigger id="difficulty-filter" className="w-[180px]">
+                {selectedDifficulty === "all" ? (
+                  <SelectValue placeholder="All Difficulties" />
+                ) : (
+                  <div className="flex items-center w-full">
+                    <Badge variant={selectedDifficulty as any} className="text-xs">
+                      {selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1)}
+                    </Badge>
+                  </div>
+                )}
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">
+                  <span className="text-sm">All Difficulties</span>
+                </SelectItem>
+                <SelectItem value="easy">
+                  <Badge variant="easy" className="text-xs">Easy</Badge>
+                </SelectItem>
+                <SelectItem value="medium">
+                  <Badge variant="medium" className="text-xs">Medium</Badge>
+                </SelectItem>
+                <SelectItem value="hard">
+                  <Badge variant="hard" className="text-xs">Hard</Badge>
+                </SelectItem>
+                <SelectItem value="extreme">
+                  <Badge variant="extreme" className="text-xs">Extreme</Badge>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        {/* Compact Filters Dropdown */}
+        <CompactFilters
           selectedCategory={selectedCategory}
           selectedDifficulty={selectedDifficulty}
           selectedFirm={selectedFirm}
@@ -248,11 +341,202 @@ export default function Practice() {
           onClear={handleClearFilters}
         />
 
+        {/* Results Count */}
+        <div className="mb-4 text-sm text-muted-foreground">
+          Showing {paginatedQuestions.length > 0 ? (currentPage - 1) * QUESTIONS_PER_PAGE + 1 : 0} - {Math.min(currentPage * QUESTIONS_PER_PAGE, filteredQuestions.length)} of {filteredQuestions.length} problems
+        </div>
+
+        {/* Pagination - Top */}
+        {totalPages > 1 && (
+          <div className="mb-6">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <Button
+                    variant="ghost"
+                    size="default"
+                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    className="gap-1"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    <span>Previous</span>
+                  </Button>
+                </PaginationItem>
+                
+                {/* Page Numbers */}
+                {(() => {
+                  const pages: (number | 'ellipsis')[] = [];
+                  
+                  if (totalPages <= 7) {
+                    // Show all pages if 7 or fewer
+                    for (let i = 1; i <= totalPages; i++) {
+                      pages.push(i);
+                    }
+                  } else {
+                    // Always show first page
+                    pages.push(1);
+                    
+                    if (currentPage > 3) {
+                      pages.push('ellipsis');
+                    }
+                    
+                    // Show pages around current
+                    const start = Math.max(2, currentPage - 1);
+                    const end = Math.min(totalPages - 1, currentPage + 1);
+                    
+                    for (let i = start; i <= end; i++) {
+                      if (i !== 1 && i !== totalPages) {
+                        pages.push(i);
+                      }
+                    }
+                    
+                    if (currentPage < totalPages - 2) {
+                      pages.push('ellipsis');
+                    }
+                    
+                    // Always show last page
+                    pages.push(totalPages);
+                  }
+                  
+                  return pages.map((page, index) => {
+                    if (page === 'ellipsis') {
+                      return (
+                        <PaginationItem key={`ellipsis-${index}`}>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      );
+                    }
+                    return (
+                      <PaginationItem key={page}>
+                        <Button
+                          variant={currentPage === page ? "outline" : "ghost"}
+                          size="icon"
+                          onClick={() => setCurrentPage(page)}
+                          className="h-9 w-9"
+                        >
+                          {page}
+                        </Button>
+                      </PaginationItem>
+                    );
+                  });
+                })()}
+
+                <PaginationItem>
+                  <Button
+                    variant="ghost"
+                    size="default"
+                    onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                    className="gap-1"
+                  >
+                    <span>Next</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
+
         {/* Question List */}
         <QuestionList
-          questions={filteredQuestions}
+          questions={paginatedQuestions}
           onSelect={setActiveQuestion}
         />
+
+        {/* Pagination - Bottom */}
+        {totalPages > 1 && (
+          <div className="mt-6">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <Button
+                    variant="ghost"
+                    size="default"
+                    onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                    className="gap-1"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                    <span>Previous</span>
+                  </Button>
+                </PaginationItem>
+                
+                {/* Page Numbers */}
+                {(() => {
+                  const pages: (number | 'ellipsis')[] = [];
+                  
+                  if (totalPages <= 7) {
+                    // Show all pages if 7 or fewer
+                    for (let i = 1; i <= totalPages; i++) {
+                      pages.push(i);
+                    }
+                  } else {
+                    // Always show first page
+                    pages.push(1);
+                    
+                    if (currentPage > 3) {
+                      pages.push('ellipsis');
+                    }
+                    
+                    // Show pages around current
+                    const start = Math.max(2, currentPage - 1);
+                    const end = Math.min(totalPages - 1, currentPage + 1);
+                    
+                    for (let i = start; i <= end; i++) {
+                      if (i !== 1 && i !== totalPages) {
+                        pages.push(i);
+                      }
+                    }
+                    
+                    if (currentPage < totalPages - 2) {
+                      pages.push('ellipsis');
+                    }
+                    
+                    // Always show last page
+                    pages.push(totalPages);
+                  }
+                  
+                  return pages.map((page, index) => {
+                    if (page === 'ellipsis') {
+                      return (
+                        <PaginationItem key={`ellipsis-${index}`}>
+                          <PaginationEllipsis />
+                        </PaginationItem>
+                      );
+                    }
+                    return (
+                      <PaginationItem key={page}>
+                        <Button
+                          variant={currentPage === page ? "outline" : "ghost"}
+                          size="icon"
+                          onClick={() => setCurrentPage(page)}
+                          className="h-9 w-9"
+                        >
+                          {page}
+                        </Button>
+                      </PaginationItem>
+                    );
+                  });
+                })()}
+
+                <PaginationItem>
+                  <Button
+                    variant="ghost"
+                    size="default"
+                    onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                    className="gap-1"
+                  >
+                    <span>Next</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </main>
     </div>
   );
