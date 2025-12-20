@@ -44,7 +44,7 @@ export function Navbar() {
             <div className="p-2 rounded-lg gradient-primary">
               <Brain className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-xl">BrainForge</span>
+            <span className="font-bold text-xl">QuantIt</span>
           </Link>
 
           {/* Desktop Nav */}

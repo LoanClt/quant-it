@@ -106,7 +106,7 @@ export default function Auth() {
               <Brain className="w-8 h-8 text-primary-foreground" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">BrainForge</CardTitle>
+          <CardTitle className="text-2xl font-bold">QuantIt</CardTitle>
           <CardDescription>Sharpen your mind for top-tier interviews</CardDescription>
         </CardHeader>
         

@@ -201,3 +201,20 @@
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-muted-foreground/50;
 }
+
+/* KaTeX styling for dark theme */
+.katex {
+  color: hsl(var(--foreground));
+}
+
+.katex .mathnormal {
+  color: hsl(var(--foreground));
+}
+
+.katex-display {
+  margin: 1em 0;
+}
+
+.katex-display > .katex {
+  text-align: left;
+}

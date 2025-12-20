@@ -6,7 +6,8 @@ import { QuestionList } from "@/components/practice/QuestionList";
 import { questions, type Question } from "@/data/questions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Shuffle, Lock } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { ArrowLeft, Shuffle, Lock, Search } from "lucide-react";
 import { useSearchParams, useNavigate, useLocation } from "react-router-dom";
 import { useSubscription } from "@/hooks/useSubscription";
 import { useUserProgress } from "@/hooks/useUserProgress";
@@ -32,6 +33,7 @@ export default function Practice() {
   const [showBookmarkedOnly, setShowBookmarkedOnly] = useState(false);
   const [activeQuestion, setActiveQuestion] = useState<Question | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>("default");
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const prevLocationKey = useRef<string | undefined>(location.key);
 
   // Initialize difficulty from URL params
@@ -60,6 +62,14 @@ export default function Practice() {
 
   const filteredQuestions = useMemo(() => {
     let filtered = questions;
+
+    // Filter by search query (by title)
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter((q) => 
+        q.title.toLowerCase().includes(query)
+      );
+    }
 
     // Filter by bookmarked only
     if (showBookmarkedOnly) {
@@ -90,7 +100,7 @@ export default function Practice() {
     }
 
     return filtered;
-  }, [selectedCategory, selectedDifficulty, selectedFirm, sortBy, showBookmarkedOnly, bookmarkedQuestions]);
+  }, [selectedCategory, selectedDifficulty, selectedFirm, sortBy, showBookmarkedOnly, bookmarkedQuestions, searchQuery]);
 
   const handleClearFilters = () => {
     setSelectedCategory(null);
@@ -98,6 +108,7 @@ export default function Practice() {
     setSelectedFirm(null);
     setShowBookmarkedOnly(false);
     setSortBy("default");
+    setSearchQuery("");
   };
 
   const handleQuestionComplete = async (correct: boolean, time: number) => {
@@ -186,6 +197,20 @@ export default function Practice() {
             <Shuffle className="w-4 h-4 mr-2" />
             Random
           </Button>
+        </div>
+
+        {/* Search Bar */}
+        <div className="mb-6">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+            <Input
+              type="text"
+              placeholder="Search problems by name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
         </div>
 
         {/* Filter Panel */}

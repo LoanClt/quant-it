@@ -3,17 +3,28 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Lightbulb, Check } from "lucide-react";
+import { Lightbulb, Check, Eye, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { questions } from "@/data/questions";
+import { LatexRenderer } from "@/components/LatexRenderer";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
-// Get a medium difficulty question (difficulty 5-7)
-const getMediumQuestion = () => {
-  return questions.find(q => q.difficulty >= 5 && q.difficulty <= 7) || questions[10];
+// Get the Ants on a Square question
+const getAntsQuestion = () => {
+  return questions.find(q => q.id === "q37") || questions[0];
 };
 
-const previewQuestion = getMediumQuestion();
+const previewQuestion = getAntsQuestion();
 
 export function QuestionPreview() {
   const [answer, setAnswer] = useState("");
@@ -21,6 +32,9 @@ export function QuestionPreview() {
   const [showHints, setShowHints] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+  const [showRevealDialog, setShowRevealDialog] = useState(false);
+  const [answerRevealed, setAnswerRevealed] = useState(false);
+  const [showSolution, setShowSolution] = useState(false);
 
   const checkAnswer = (userAnswer: string): boolean => {
     if (previewQuestion.answerType === 'number' && previewQuestion.numericAnswer !== undefined) {
@@ -52,10 +66,23 @@ export function QuestionPreview() {
   };
 
   const revealNextHint = () => {
-    if (hintsRevealed < previewQuestion.hints.length) {
+    // Free users can only reveal 1 hint
+    const maxHints = 1;
+    if (hintsRevealed < maxHints) {
       setHintsRevealed((prev) => prev + 1);
       setShowHints(true);
     }
+  };
+
+  const handleRevealAnswer = () => {
+    setShowRevealDialog(true);
+  };
+
+  const confirmRevealAnswer = () => {
+    setAnswerRevealed(true);
+    setShowSolution(true);
+    setShowRevealDialog(false);
+    toast.info("Answer revealed", { duration: 2000 });
   };
 
   const getDifficultyVariant = (difficulty: number) => {
@@ -103,13 +130,26 @@ export function QuestionPreview() {
               <CardTitle className="text-2xl">{previewQuestion.title}</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-lg leading-relaxed text-foreground/90 mb-6">
-                {previewQuestion.content}
-              </p>
+              <div className="text-lg leading-relaxed text-foreground/90 mb-6">
+                <LatexRenderer content={previewQuestion.content} />
+              </div>
 
               {/* Answer Input */}
               <div className="mb-6">
-                <label className="block mb-3 font-medium">Your Answer</label>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block font-medium">Your Answer</label>
+                  {!submitted && !answerRevealed && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleRevealAnswer}
+                      className="text-yellow-500 border-yellow-500/50 hover:bg-yellow-500/10"
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      Reveal Answer
+                    </Button>
+                  )}
+                </div>
                 <Input
                   type="number"
                   value={answer}
@@ -125,11 +165,11 @@ export function QuestionPreview() {
                     submitted && !isCorrect ? 'border-destructive/50' : ''
                   }`}
                   step="any"
-                  disabled={submitted && isCorrect}
+                  disabled={(submitted && isCorrect) || answerRevealed}
                 />
-                {submitted && !isCorrect && (
+                {submitted && !isCorrect && !answerRevealed && (
                   <p className="text-sm text-destructive mt-2">
-                    Incorrect. Try again or sign up to see the solution.
+                    Incorrect. Try again or reveal the answer.
                   </p>
                 )}
                 {submitted && isCorrect && (
@@ -145,7 +185,7 @@ export function QuestionPreview() {
                   <Button 
                     variant="hero" 
                     onClick={handleSubmit}
-                    disabled={!answer || answer.trim() === ''}
+                    disabled={(!answer || answer.trim() === '') || answerRevealed}
                     className="w-full"
                   >
                     <Check className="w-4 h-4 mr-2" />
@@ -161,18 +201,20 @@ export function QuestionPreview() {
                     <div className="flex items-center gap-2">
                       <Lightbulb className="w-5 h-5 text-difficulty-medium" />
                       <span className="font-medium">Hints</span>
-                      <span className="text-sm text-muted-foreground">
-                        ({hintsRevealed}/{previewQuestion.hints.length} revealed)
-                      </span>
                     </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={revealNextHint}
-                      disabled={hintsRevealed >= previewQuestion.hints.length}
-                    >
-                      {hintsRevealed < previewQuestion.hints.length ? "Reveal Hint" : "No more hints"}
-                    </Button>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm text-muted-foreground">
+                        {hintsRevealed < 1 ? "1 free hint remaining" : "None free hints remaining"}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={revealNextHint}
+                        disabled={hintsRevealed >= 1}
+                      >
+                        {hintsRevealed < 1 ? "Reveal Hint" : "Upgrade for more hints"}
+                      </Button>
+                    </div>
                   </div>
                   
                   {showHints && hintsRevealed > 0 && (
@@ -182,13 +224,41 @@ export function QuestionPreview() {
                           key={index} 
                           className="p-3 rounded-lg bg-difficulty-medium/10 text-sm animate-fade-in"
                         >
-                          💡 {hint}
+                          💡 <LatexRenderer content={hint} />
                         </li>
                       ))}
                     </ul>
                   )}
                 </CardContent>
               </Card>
+
+              {/* Solution (if revealed) */}
+              {answerRevealed && showSolution && (
+                <Card variant="glass" className="border-yellow-500/30 bg-yellow-500/5 mb-6">
+                  <CardHeader>
+                    <CardTitle className="text-xl flex items-center gap-2">
+                      <Eye className="w-5 h-5 text-yellow-500" />
+                      Answer Revealed
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <p className="font-semibold mb-2">Correct Answer:</p>
+                      <p className="text-lg text-yellow-400"><LatexRenderer content={previewQuestion.solution} /></p>
+                    </div>
+                    {previewQuestion.solutionSteps && previewQuestion.solutionSteps.length > 0 && (
+                      <div>
+                        <p className="font-semibold mb-2">Solution Steps:</p>
+                        <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
+                          {previewQuestion.solutionSteps.map((step, index) => (
+                            <li key={index}><LatexRenderer content={step} /></li>
+                          ))}
+                        </ol>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
 
               {/* CTA */}
               <div className="flex flex-col sm:flex-row gap-3">
@@ -198,16 +268,32 @@ export function QuestionPreview() {
                     <Check className="w-4 h-4 ml-2" />
                   </Link>
                 </Button>
-                <Button variant="outline" className="flex-1" asChild>
-                  <Link to="/practice">
-                    View All Questions
-                  </Link>
-                </Button>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
+
+      {/* Reveal Answer Confirmation Dialog */}
+      <AlertDialog open={showRevealDialog} onOpenChange={setShowRevealDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reveal Answer?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to reveal the answer? This will show you the solution and you won't be able to submit your own answer for this attempt.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmRevealAnswer}
+              className="bg-yellow-500 hover:bg-yellow-600"
+            >
+              Yes, Reveal Answer
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 }

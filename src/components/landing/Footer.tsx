@@ -12,7 +12,7 @@ export function Footer() {
               <div className="p-2 rounded-lg gradient-primary">
                 <Brain className="w-5 h-5 text-primary-foreground" />
               </div>
-              <span className="font-bold text-xl">BrainForge</span>
+              <span className="font-bold text-xl">QuantIt</span>
             </Link>
           </div>
 
@@ -24,11 +24,14 @@ export function Footer() {
             <Link to="/dashboard" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Dashboard
             </Link>
+            <Link to="/pricing" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              Pricing
+            </Link>
           </div>
         </div>
 
         <div className="border-t border-border mt-12 pt-8 text-center text-sm text-muted-foreground">
-          © {new Date().getFullYear()} BrainForge. All rights reserved.
+          © {new Date().getFullYear()} QuantIt. All rights reserved.
         </div>
       </div>
     </footer>

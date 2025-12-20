@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { LatexRenderer } from "@/components/LatexRenderer";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,10 +25,12 @@ import {
   X,
   Bookmark,
   BookmarkCheck,
-  Eye
+  Eye,
+  Lock
 } from "lucide-react";
 import type { Question } from "@/data/questions";
 import { useUserProgress } from "@/hooks/useUserProgress";
+import { useSubscription } from "@/hooks/useSubscription";
 
 interface QuestionCardProps {
   question: Question;
@@ -37,6 +40,7 @@ interface QuestionCardProps {
 
 export function QuestionCard({ question, onComplete, onNext }: QuestionCardProps) {
   const { saveQuestionCompletion, toggleBookmark, bookmarkedQuestions } = useUserProgress();
+  const { isPaid } = useSubscription();
   const [timer, setTimer] = useState(0);
   const [isRunning, setIsRunning] = useState(true);
   const [answer, setAnswer] = useState("");
@@ -140,9 +144,15 @@ export function QuestionCard({ question, onComplete, onNext }: QuestionCardProps
   };
 
   const revealNextHint = () => {
-    if (hintsRevealed < question.hints.length) {
+    // Unpaid users can only reveal 1 hint, paid users can reveal all
+    const maxHints = isPaid ? question.hints.length : 1;
+    if (hintsRevealed < maxHints) {
       setHintsRevealed((prev) => prev + 1);
       setShowHints(true);
+    } else if (!isPaid && hintsRevealed >= 1) {
+      toast.error("Upgrade to Premium to unlock all hints", {
+        duration: 3000,
+      });
     }
   };
 
@@ -161,6 +171,12 @@ export function QuestionCard({ question, onComplete, onNext }: QuestionCardProps
   };
 
   const handleRevealAnswer = () => {
+    if (!isPaid) {
+      toast.error("Upgrade to Premium to reveal answers", {
+        duration: 3000,
+      });
+      return;
+    }
     setShowRevealDialog(true);
   };
 
@@ -234,95 +250,18 @@ export function QuestionCard({ question, onComplete, onNext }: QuestionCardProps
           <CardTitle className="text-2xl">{question.title}</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-lg leading-relaxed text-foreground/90">
-            {question.content}
-          </p>
+          <div className="text-lg leading-relaxed text-foreground/90">
+            <LatexRenderer content={question.content} />
+          </div>
           
         </CardContent>
       </Card>
 
-      {/* Hints */}
-      {(!submitted || !isCorrect) && (
-        <Card variant="glass">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-difficulty-medium" />
-                <span className="font-medium">Hints</span>
-                <span className="text-sm text-muted-foreground">
-                  ({hintsRevealed}/{question.hints.length} revealed)
-                </span>
-              </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={revealNextHint}
-                disabled={hintsRevealed >= question.hints.length}
-              >
-                {hintsRevealed < question.hints.length ? "Reveal Hint" : "No more hints"}
-              </Button>
-            </div>
-            
-            {showHints && hintsRevealed > 0 && (
-              <ul className="space-y-2">
-                {question.hints.slice(0, hintsRevealed).map((hint, index) => (
-                  <li 
-                    key={index} 
-                    className="p-3 rounded-lg bg-difficulty-medium/10 text-sm animate-fade-in"
-                  >
-                    💡 {hint}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Solution (if revealed) */}
-      {answerRevealed && showSolution && (
-        <Card variant="glass" className="border-yellow-500/30 bg-yellow-500/5">
-          <CardHeader>
-            <CardTitle className="text-xl flex items-center gap-2">
-              <Eye className="w-5 h-5 text-yellow-500" />
-              Answer Revealed
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <p className="font-semibold mb-2">Correct Answer:</p>
-              <p className="text-lg text-yellow-400">{question.solution}</p>
-            </div>
-            {question.solutionSteps && question.solutionSteps.length > 0 && (
-              <div>
-                <p className="font-semibold mb-2">Solution Steps:</p>
-                <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-                  {question.solutionSteps.map((step, index) => (
-                    <li key={index}>{step}</li>
-                  ))}
-                </ol>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
-
       {/* Answer Area */}
       <Card variant="glass">
         <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-3">
+          <div className="mb-3">
             <label className="font-medium">Your Answer</label>
-            {!submitted && !answerRevealed && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRevealAnswer}
-                className="text-yellow-500 border-yellow-500/50 hover:bg-yellow-500/10"
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                Reveal Answer
-              </Button>
-            )}
           </div>
           {question.answerType === 'number' ? (
             <Input
@@ -390,6 +329,115 @@ export function QuestionCard({ question, onComplete, onNext }: QuestionCardProps
           </div>
         </CardContent>
       </Card>
+
+      {/* Hints */}
+      {(!submitted || !isCorrect) && (
+        <Card variant="glass">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Lightbulb className="w-5 h-5 text-difficulty-medium" />
+                <span className="font-medium">Hints</span>
+              </div>
+              <div className="flex items-center gap-3">
+                {!isPaid && (
+                  <span className="text-sm text-muted-foreground">
+                    {hintsRevealed < 1 ? "1 free hint remaining" : "None free hints remaining"}
+                  </span>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={revealNextHint}
+                  disabled={hintsRevealed >= (isPaid ? question.hints.length : 1)}
+                >
+                  {hintsRevealed < (isPaid ? question.hints.length : 1) 
+                    ? "Reveal Hint" 
+                    : isPaid 
+                      ? "No more hints" 
+                      : "Upgrade for more hints"}
+                </Button>
+              </div>
+            </div>
+            
+            {showHints && hintsRevealed > 0 && (
+              <ul className="space-y-2">
+                {question.hints.slice(0, hintsRevealed).map((hint, index) => (
+                  <li 
+                    key={index} 
+                    className="p-3 rounded-lg bg-difficulty-medium/10 text-sm animate-fade-in"
+                  >
+                    💡 <LatexRenderer content={hint} />
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Reveal Answer Section */}
+      {!submitted && !answerRevealed && (
+        <Card variant="glass">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Eye className="w-5 h-5 text-yellow-500" />
+                <span className="font-medium">Reveal Answer</span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRevealAnswer}
+                className={isPaid 
+                  ? "text-yellow-500 border-yellow-500/50 hover:bg-yellow-500/10" 
+                  : "text-muted-foreground border-muted hover:bg-muted/10"}
+                disabled={!isPaid}
+              >
+                {isPaid ? (
+                  <>
+                    <Eye className="w-4 h-4 mr-2" />
+                    Reveal Answer
+                  </>
+                ) : (
+                  <>
+                    <Lock className="w-4 h-4 mr-2" />
+                    Premium Only
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Solution (if revealed) */}
+      {answerRevealed && showSolution && (
+        <Card variant="glass" className="border-yellow-500/30 bg-yellow-500/5">
+          <CardHeader>
+            <CardTitle className="text-xl flex items-center gap-2">
+              <Eye className="w-5 h-5 text-yellow-500" />
+              Answer Revealed
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <p className="font-semibold mb-2">Correct Answer:</p>
+              <p className="text-lg text-yellow-400"><LatexRenderer content={question.solution} /></p>
+            </div>
+            {question.solutionSteps && question.solutionSteps.length > 0 && (
+              <div>
+                <p className="font-semibold mb-2">Solution Steps:</p>
+                <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
+                  {question.solutionSteps.map((step, index) => (
+                    <li key={index}><LatexRenderer content={step} /></li>
+                  ))}
+                </ol>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Reveal Answer Confirmation Dialog */}
       <AlertDialog open={showRevealDialog} onOpenChange={setShowRevealDialog}>
