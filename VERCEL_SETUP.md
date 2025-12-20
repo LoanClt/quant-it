@@ -11,12 +11,15 @@ For your app to work on Vercel, you need to set the following environment variab
 
 ### 2. Add Supabase Environment Variables
 
-Add these two variables:
+Add these three variables:
 
 ```
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=your-anon-key-here
+VITE_SITE_URL=https://your-app.vercel.app
 ```
+
+**Important:** Replace `https://your-app.vercel.app` with your actual Vercel deployment URL (e.g., `https://quantit.vercel.app`). This ensures email verification links redirect to your production site instead of localhost.
 
 **Where to find these values:**
 - Go to your [Supabase Dashboard](https://supabase.com/dashboard)
@@ -47,12 +50,32 @@ After adding the environment variables:
 - After adding variables, you **must redeploy** for them to take effect
 - The `VITE_` prefix is required for Vite to expose these variables to the client-side code
 
+## Step 5: Configure Supabase Redirect URLs
+
+After setting up your environment variables, you also need to configure Supabase to allow your Vercel URL:
+
+1. Go to your [Supabase Dashboard](https://supabase.com/dashboard)
+2. Select your project
+3. Go to **Authentication** → **URL Configuration**
+4. Under **Redirect URLs**, add your Vercel URL:
+   - `https://your-app.vercel.app/**`
+   - `https://your-app.vercel.app`
+5. Under **Site URL**, set it to: `https://your-app.vercel.app`
+6. Click **Save**
+
+This ensures that email verification links redirect to your Vercel deployment instead of localhost.
+
 ## Troubleshooting
 
 ### "load failed" error when logging in
 - ✅ Check that `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` are set in Vercel
 - ✅ Verify the values are correct (no extra spaces, correct format)
 - ✅ Make sure you've redeployed after adding the variables
+
+### Email verification redirects to localhost
+- ✅ Set `VITE_SITE_URL` environment variable in Vercel to your production URL
+- ✅ Configure Supabase redirect URLs (see Step 5 above)
+- ✅ Make sure you've redeployed after adding the variable
 
 ### Blank page on Vercel
 - ✅ Check browser console for errors
