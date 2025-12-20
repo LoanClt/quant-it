@@ -19,7 +19,11 @@ VITE_SUPABASE_PUBLISHABLE_KEY=your-anon-key-here
 VITE_SITE_URL=https://your-app.vercel.app
 ```
 
-**Important:** Replace `https://your-app.vercel.app` with your actual Vercel deployment URL (e.g., `https://quantit.vercel.app`). This ensures email verification links redirect to your production site instead of localhost.
+**Important:** 
+- Replace `https://your-app.vercel.app` with your actual Vercel deployment URL (e.g., `https://quantit.vercel.app`)
+- **This is REQUIRED** - Without `VITE_SITE_URL`, email verification links will redirect to localhost even when users sign up from production
+- Make sure to add this for **Production** environment (and optionally Preview/Development)
+- After adding, you **must redeploy** for it to take effect
 
 **Where to find these values:**
 - Go to your [Supabase Dashboard](https://supabase.com/dashboard)
@@ -52,18 +56,19 @@ After adding the environment variables:
 
 ## Step 5: Configure Supabase Redirect URLs
 
-After setting up your environment variables, you also need to configure Supabase to allow your Vercel URL:
+**CRITICAL:** You must configure Supabase to allow your Vercel URL, otherwise email verification will fail:
 
 1. Go to your [Supabase Dashboard](https://supabase.com/dashboard)
 2. Select your project
-3. Go to **Authentication** → **URL Configuration**
+3. Go to **Authentication** → **URL Configuration** (or **Settings** → **Auth** → **URL Configuration**)
 4. Under **Redirect URLs**, add your Vercel URL:
-   - `https://your-app.vercel.app/**`
-   - `https://your-app.vercel.app`
+   - `https://your-app.vercel.app/**` (allows all paths)
+   - `https://your-app.vercel.app` (root path)
 5. Under **Site URL**, set it to: `https://your-app.vercel.app`
-6. Click **Save**
+6. **Important:** Also add `http://localhost:3000/**` and `http://localhost:5173/**` if you want to test locally
+7. Click **Save**
 
-This ensures that email verification links redirect to your Vercel deployment instead of localhost.
+**Why this matters:** Even if you set `VITE_SITE_URL` correctly, Supabase will reject redirect URLs that aren't in this allowlist. This is a security feature.
 
 ## Troubleshooting
 
@@ -73,9 +78,11 @@ This ensures that email verification links redirect to your Vercel deployment in
 - ✅ Make sure you've redeployed after adding the variables
 
 ### Email verification redirects to localhost
-- ✅ Set `VITE_SITE_URL` environment variable in Vercel to your production URL
-- ✅ Configure Supabase redirect URLs (see Step 5 above)
-- ✅ Make sure you've redeployed after adding the variable
+- ✅ **Set `VITE_SITE_URL` environment variable in Vercel** to your production URL (e.g., `https://your-app.vercel.app`)
+- ✅ **Configure Supabase redirect URLs** (see Step 5 above) - This is REQUIRED
+- ✅ **Redeploy your Vercel app** after adding the variable
+- ✅ **Test by signing up from your production site** (not localhost) - if you sign up from localhost, the email will have localhost in the URL
+- ✅ If you already signed up from localhost, you'll need to sign up again from production after fixing the configuration
 
 ### Blank page on Vercel
 - ✅ Check browser console for errors

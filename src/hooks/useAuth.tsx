@@ -110,9 +110,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     
     try {
-      // Use environment variable for site URL (set in Vercel), fallback to current origin
-      const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
-      const redirectUrl = `${siteUrl}/`;
+      // Always use environment variable for email redirects (production URL)
+      // This ensures emails redirect to production even if user signs up from localhost
+      const siteUrl = import.meta.env.VITE_SITE_URL;
+      
+      if (!siteUrl) {
+        console.warn('VITE_SITE_URL not set. Email verification links may not work correctly in production.');
+      }
+      
+      // Use production URL if set, otherwise fallback to current origin (for development)
+      const redirectUrl = siteUrl ? `${siteUrl}/` : `${window.location.origin}/`;
       
       const { error } = await supabase.auth.signUp({
         email,
