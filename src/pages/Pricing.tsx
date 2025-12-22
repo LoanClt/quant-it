@@ -2,11 +2,12 @@ import { Navbar } from "@/components/landing/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Zap, Star, X } from "lucide-react";
+import { Check, Brain, Star, X, BookOpen, User, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useStripe } from "@/hooks/useStripe";
 import { useSubscription } from "@/hooks/useSubscription";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 export default function Pricing() {
   const { user } = useAuth();
@@ -45,18 +46,197 @@ export default function Pricing() {
             <p className="text-xl text-muted-foreground">
               Choose the plan that works for you
             </p>
+            {isPaid && user && (
+              <div className="mt-4">
+                <Badge variant="glow" className="px-4 py-2 text-sm">
+                  <Star className="w-4 h-4 mr-2" />
+                  Your Current Plan: Premium
+                </Badge>
+              </div>
+            )}
           </div>
+
+          {/* Comparison Table */}
+          <Card className="mb-12">
+            <CardHeader>
+              <CardTitle className="text-2xl text-center">QuantIt vs. Traditional Methods</CardTitle>
+              <p className="text-center text-muted-foreground mt-2">
+                See how we compare to books and coaches
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[200px]">Feature</TableHead>
+                      <TableHead className="text-center">
+                        <div className="flex flex-col items-center gap-2">
+                          <BookOpen className="w-5 h-5" />
+                          <span>Books</span>
+                        </div>
+                      </TableHead>
+                      <TableHead className="text-center">
+                        <div className="flex flex-col items-center gap-2">
+                          <User className="w-5 h-5" />
+                          <span>Coaches</span>
+                        </div>
+                      </TableHead>
+                      <TableHead className="text-center relative border-l-4 border-r-4 border-green-500">
+                        <div className="flex flex-col items-center gap-2 py-2">
+                          <div className="p-2 rounded-lg">
+                            <Brain className="w-6 h-6 text-primary" />
+                          </div>
+                          <span className="font-bold">QuantIt</span>
+                          <Badge variant="glow" className="text-xs">
+                            Premium
+                          </Badge>
+                        </div>
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell className="font-medium">Real Interview Questions</TableCell>
+                      <TableCell className="text-center">
+                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Check className="w-5 h-5 text-green-500 mx-auto" />
+                      </TableCell>
+                      <TableCell className="text-center border-l-4 border-r-4 border-green-500">
+                        <Check className="w-5 h-5 text-green-500 mx-auto" />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Interactive Practice</TableCell>
+                      <TableCell className="text-center">
+                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Check className="w-5 h-5 text-green-500 mx-auto" />
+                      </TableCell>
+                      <TableCell className="text-center border-l-4 border-r-4 border-green-500">
+                        <Check className="w-5 h-5 text-green-500 mx-auto" />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Instant Feedback</TableCell>
+                      <TableCell className="text-center">
+                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Check className="w-5 h-5 text-green-500 mx-auto" />
+                      </TableCell>
+                      <TableCell className="text-center border-l-4 border-r-4 border-green-500">
+                        <Check className="w-5 h-5 text-green-500 mx-auto" />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Progressive Hints</TableCell>
+                      <TableCell className="text-center">
+                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Check className="w-5 h-5 text-green-500 mx-auto" />
+                      </TableCell>
+                      <TableCell className="text-center border-l-4 border-r-4 border-green-500">
+                        <Check className="w-5 h-5 text-green-500 mx-auto" />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Progress Tracking</TableCell>
+                      <TableCell className="text-center">
+                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
+                      </TableCell>
+                      <TableCell className="text-center border-l-4 border-r-4 border-green-500">
+                        <Check className="w-5 h-5 text-green-500 mx-auto" />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Filter by Difficulty/Firm</TableCell>
+                      <TableCell className="text-center">
+                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
+                      </TableCell>
+                      <TableCell className="text-center border-l-4 border-r-4 border-green-500">
+                        <Check className="w-5 h-5 text-green-500 mx-auto" />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">24/7 Availability</TableCell>
+                      <TableCell className="text-center">
+                        <Check className="w-5 h-5 text-green-500 mx-auto" />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
+                      </TableCell>
+                      <TableCell className="text-center border-l-4 border-r-4 border-green-500">
+                        <Check className="w-5 h-5 text-green-500 mx-auto" />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Affordable Price</TableCell>
+                      <TableCell className="text-center">
+                        <Check className="w-5 h-5 text-green-500 mx-auto" />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
+                      </TableCell>
+                      <TableCell className="text-center border-l-4 border-r-4 border-green-500">
+                        <Check className="w-5 h-5 text-green-500 mx-auto" />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">Self-Paced Learning</TableCell>
+                      <TableCell className="text-center">
+                        <Check className="w-5 h-5 text-green-500 mx-auto" />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
+                      </TableCell>
+                      <TableCell className="text-center border-l-4 border-r-4 border-green-500">
+                        <Check className="w-5 h-5 text-green-500 mx-auto" />
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell className="font-medium">LaTeX Rendering</TableCell>
+                      <TableCell className="text-center">
+                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
+                      </TableCell>
+                      <TableCell className="text-center border-l-4 border-r-4 border-green-500">
+                        <Check className="w-5 h-5 text-green-500 mx-auto" />
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Pricing Cards */}
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
             {/* Free Plan */}
-            <Card variant="glass">
+            <Card variant="glass" className={!isPaid && user ? "ring-2 ring-primary" : ""}>
               <CardHeader className="text-center pb-6">
                 <CardTitle className="text-2xl mb-2">Free</CardTitle>
                 <div className="flex items-baseline justify-center gap-2">
                   <span className="text-4xl font-bold">$0</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
+                {!isPaid && user && (
+                  <Badge variant="outline" className="mt-2">
+                    Your Current Plan
+                  </Badge>
+                )}
               </CardHeader>
               <CardContent className="space-y-4">
                 <ul className="space-y-3">
@@ -77,22 +257,33 @@ export default function Pricing() {
                   <Button variant="outline" className="w-full" size="lg" asChild>
                     <Link to="/auth">Get Started</Link>
                   </Button>
-                ) : (
+                ) : !isPaid ? (
                   <Button variant="outline" className="w-full" size="lg" disabled>
                     Current Plan
+                  </Button>
+                ) : (
+                  <Button variant="outline" className="w-full" size="lg" disabled>
+                    Downgrade
                   </Button>
                 )}
               </CardContent>
             </Card>
 
             {/* Premium Plan */}
-            <Card variant="glow">
+            <Card variant="glow" className={isPaid && user ? "ring-2 ring-primary" : ""}>
               <CardHeader className="text-center pb-6">
                 <div className="flex items-center justify-center gap-2 mb-4">
-                  <Badge variant="glow" className="px-3 py-1">
-                    <Star className="w-4 h-4 mr-1" />
-                    Most Popular
-                  </Badge>
+                  {isPaid && user ? (
+                    <Badge variant="glow" className="px-3 py-1">
+                      <Star className="w-4 h-4 mr-1" />
+                      Your Current Plan
+                    </Badge>
+                  ) : (
+                    <Badge variant="glow" className="px-3 py-1">
+                      <Star className="w-4 h-4 mr-1" />
+                      Most Popular
+                    </Badge>
+                  )}
                 </div>
                 <CardTitle className="text-2xl mb-2">Premium</CardTitle>
                 <div className="flex items-baseline justify-center gap-2">

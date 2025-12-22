@@ -206,14 +206,14 @@ export function QuestionPreview() {
                       <span className="text-sm text-muted-foreground">
                         ({hintsRevealed}/{previewQuestion.hints.length} revealed)
                       </span>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={revealNextHint}
-                        disabled={hintsRevealed >= previewQuestion.hints.length}
-                      >
-                        {hintsRevealed < previewQuestion.hints.length ? "Reveal Hint" : "No more hints"}
-                      </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={revealNextHint}
+                      disabled={hintsRevealed >= previewQuestion.hints.length}
+                    >
+                      {hintsRevealed < previewQuestion.hints.length ? "Reveal Hint" : "No more hints"}
+                    </Button>
                     </div>
                   </div>
                   

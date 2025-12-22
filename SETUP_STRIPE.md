@@ -47,19 +47,35 @@ CREATE INDEX IF NOT EXISTS idx_profiles_stripe_subscription ON public.profiles(s
 
 ## Step 4: Set Up Environment Variables
 
+### For Local Development
+
 1. Create a `.env` file in your project root (if it doesn't exist)
 2. Add your Stripe keys:
 
 ```env
 VITE_STRIPE_PUBLISHABLE_KEY=pk_test_your_publishable_key_here
+VITE_STRIPE_PRICE_ID=price_your_price_id_here
 STRIPE_SECRET_KEY=sk_test_your_secret_key_here
-STRIPE_PRICE_ID=price_your_price_id_here
 ```
 
 **Important:**
-- The `VITE_` prefix makes the key available in the frontend
+- The `VITE_` prefix makes the key available in the frontend (required for `VITE_STRIPE_PRICE_ID`)
+- `STRIPE_SECRET_KEY` is only used in Supabase Edge Functions (backend)
 - Never commit `.env` to git (it should be in `.gitignore`)
 - Use test keys for development, production keys for production
+
+### For Vercel Deployment
+
+You also need to add these to Vercel environment variables:
+
+1. Go to [Vercel Dashboard](https://vercel.com/dashboard) → Your Project → Settings → Environment Variables
+2. Add:
+   - `VITE_STRIPE_PUBLISHABLE_KEY` = `pk_test_...` (or `pk_live_...` for production)
+   - `VITE_STRIPE_PRICE_ID` = `price_...` (the Price ID from Step 2)
+3. Make sure to add for **Production** environment (and Preview/Development if needed)
+4. **Redeploy** your app after adding the variables
+
+**Note:** The `VITE_STRIPE_PRICE_ID` is required for the "Upgrade to Premium" button to work!
 
 ## Step 5: Install Stripe Dependencies
 
@@ -118,6 +134,28 @@ supabase --version
 ```
 
 ### 6.2: Link to Your Supabase Project
+
+**First, authenticate with Supabase:**
+
+```bash
+supabase login
+```
+
+This will open your browser to authenticate. After logging in, you'll be able to link your project.
+
+**Alternative: Use Access Token**
+
+If you prefer to use an access token instead:
+
+1. Go to [Supabase Dashboard → Account → Access Tokens](https://supabase.com/dashboard/account/tokens)
+2. Create a new access token
+3. Set it as an environment variable:
+
+```bash
+export SUPABASE_ACCESS_TOKEN=your-access-token-here
+```
+
+**Then link your project:**
 
 1. Get your project reference ID from Supabase Dashboard → Settings → General → Reference ID
 2. Link your local project:
@@ -188,6 +226,19 @@ Replace `your-project-ref` with your actual Supabase project reference ID.
 2. Click on `stripe-webhook`
 3. Copy the function URL
 
+**⚠️ Important: Testing the URL**
+If you visit the webhook URL in your browser, you'll see:
+```json
+{"code":401,"message":"Missing authorization header"}
+```
+
+**This is normal and expected!** The webhook endpoint:
+- Only accepts POST requests (browsers send GET)
+- Requires a Stripe signature header (which only Stripe provides)
+- Is designed to receive webhooks from Stripe, not browser requests
+
+The endpoint is working correctly. Continue to Step 7 to configure it in Stripe.
+
 ## Step 7: Configure Stripe Webhook
 
 1. In Stripe Dashboard, go to **"Developers"** → **"Webhooks"**
@@ -203,6 +254,8 @@ Replace `your-project-ref` with your actual Supabase project reference ID.
    - `invoice.payment_failed`
 5. Click **"Add endpoint"**
 6. Copy the **Webhook signing secret** (starts with `whsec_...`) - you'll need this
+
+whsec_RKnvbTtgec9nhWJN3Q4ZY4CBfqhYlMQ4
 
 ## Step 8: Add Webhook Secret to Supabase
 
@@ -319,7 +372,8 @@ The code has been updated with:
 **"Failed to start checkout" error:**
 - Verify `create-checkout-session` function is deployed
 - Check that `STRIPE_SECRET_KEY` is set in Supabase secrets
-- Verify `VITE_STRIPE_PRICE_ID` is set in `.env`
+- Verify `VITE_STRIPE_PRICE_ID` is set in `.env` (for local) and Vercel (for production)
+- Check that the Price ID matches the one in your Stripe Dashboard
 - Check Edge Function logs for specific errors
 
 ## Security Notes

@@ -48,19 +48,103 @@ serve(async (req) => {
       case 'checkout.session.completed': {
         const session = event.data.object as any;
         const userId = session.metadata?.user_id;
+        const customerId = session.customer;
 
+        console.log('Processing checkout.session.completed:', {
+          userId,
+          customerId,
+          subscription: session.subscription,
+          payment_status: session.payment_status,
+          mode: session.mode,
+        });
+
+        // Handle subscription checkout
         if (userId && session.subscription) {
           // Get subscription details
           const subscription = await stripeClient.subscriptions.retrieve(session.subscription);
           
-          await supabase
+          const { data, error } = await supabase
             .from('profiles')
             .update({
               is_paid: true,
+              stripe_customer_id: customerId,
               stripe_subscription_id: subscription.id,
               stripe_price_id: subscription.items.data[0]?.price.id,
             })
-            .eq('user_id', userId);
+            .eq('user_id', userId)
+            .select();
+
+          if (error) {
+            console.error('Error updating profile for subscription:', error);
+          } else {
+            console.log('Profile updated successfully for subscription:', data);
+          }
+        } 
+        // Handle one-time payment (if mode is 'payment' instead of 'subscription')
+        else if (userId && session.payment_status === 'paid') {
+          // For one-time payments, also mark as paid
+          const { data, error } = await supabase
+            .from('profiles')
+            .update({
+              is_paid: true,
+              stripe_customer_id: customerId,
+            })
+            .eq('user_id', userId)
+            .select();
+
+          if (error) {
+            console.error('Error updating profile for one-time payment:', error);
+          } else {
+            console.log('Profile updated successfully for one-time payment:', data);
+          }
+        }
+        // Fallback: if we have customer ID but no userId in metadata, find user by customer
+        else if (customerId) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('user_id')
+            .eq('stripe_customer_id', customerId)
+            .single();
+
+          if (profile) {
+            const subscriptionId = session.subscription;
+            if (subscriptionId) {
+              const subscription = await stripeClient.subscriptions.retrieve(subscriptionId);
+              const { data, error } = await supabase
+                .from('profiles')
+                .update({
+                  is_paid: true,
+                  stripe_subscription_id: subscription.id,
+                  stripe_price_id: subscription.items.data[0]?.price.id,
+                })
+                .eq('user_id', profile.user_id)
+                .select();
+
+              if (error) {
+                console.error('Error updating profile via customer ID:', error);
+              } else {
+                console.log('Profile updated successfully via customer ID:', data);
+              }
+            } else {
+              const { data, error } = await supabase
+                .from('profiles')
+                .update({
+                  is_paid: true,
+                })
+                .eq('user_id', profile.user_id)
+                .select();
+
+              if (error) {
+                console.error('Error updating profile (no subscription):', error);
+              } else {
+                console.log('Profile updated successfully (no subscription):', data);
+              }
+            }
+          } else {
+            console.warn('No profile found for customer ID:', customerId);
+          }
+        } else {
+          console.warn('No userId or customerId found in checkout session:', session);
         }
         break;
       }

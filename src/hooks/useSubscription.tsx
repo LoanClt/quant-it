@@ -32,6 +32,33 @@ export function useSubscription() {
     }
 
     fetchSubscription();
+
+    // Set up real-time subscription to listen for profile changes
+    const channel = supabase
+      .channel(`profile-changes-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'profiles',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          // Silently update subscription state without logging
+          const newIsPaid = (payload.new as any)?.is_paid ?? false;
+          const newIsAdmin = (payload.new as any)?.is_admin ?? false;
+          setSubscription({
+            is_paid: newIsPaid,
+            is_admin: newIsAdmin,
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   const fetchSubscription = async () => {
@@ -65,7 +92,10 @@ export function useSubscription() {
       // Default to true for testing if column doesn't exist, otherwise use DB value
       const isAdmin = dbIsAdmin !== undefined ? dbIsAdmin : true; // Default to true for testing
       
-      console.log('Subscription state:', { isPaid, isAdmin, dbIsPaid, dbIsAdmin, data });
+      // Only log in development mode to avoid spam
+      if (import.meta.env.DEV) {
+        console.log('Subscription state:', { isPaid, isAdmin, dbIsPaid, dbIsAdmin });
+      }
       
       setSubscription({
         is_paid: isPaid,

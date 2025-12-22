@@ -2869,39 +2869,839 @@ export const questions: Question[] = [
   },
   {
     "id": "q110",
-    "title": "Three Points Convex",
+    "title": "Poisson Thinning I",
     "category": "probability",
-    "subcategory": "Geometric Probability",
-    "difficulty": 9,
-    "content": "Five points are chosen in a unit square. What is the probability that they form a convex pentagon?",
+    "subcategory": "Stochastic Processes",
+    "difficulty": 6,
+    "content": "Orders arrive according to a Poisson process with rate $10$ per hour. Each order is independently classified as large with probability $0.3$. What is the probability that exactly $2$ large orders arrive in one hour?",
     "hints": [
-      "This is a specific case of Sylvester's problem for a square.",
-      "It is extremely unlikely and has a complex closed form."
+      "Use Poisson thinning.",
+      "Large orders form a Poisson process."
     ],
-    "solution": "0",
+    "solution": "0.224",
     "solutionSteps": [
-      "Wait, the probability is not 0, but it is small.",
-      "Actually, there is a known result for $n$ points in a parallelogram: Prob of convex hull being n-gon.",
-      "For $n=5$ in a square: Valtr's formula gives probability $\\frac{25 (4!)^2}{(2n-2)!}?$ No.",
-      "Let's simplify: 5 points form a convex pentagon iff no point is inside the hull of others.",
-      "Exact answer is $1 - \\text{Prob(one inside)}$.",
-      "For 5 points in square, Prob is $171/210$? No that's triangle.",
-      "Let's assume the question asks for something simpler: **5 points in a triangle**.",
-      "If 5 points in triangle, Prob(Convex 5-gon) is known to be 0?",
-      "Let's pivot to a standard hard problem: **Sylvester's 4-point problem for a square**.",
-      "Content: 4 points in square, prob convex hull is quadrilateral.",
-      "Solution: $25/36 \\approx 0.694$."
+      "Large orders arrive with rate $10 \\times 0.3 = 3$ per hour.",
+      "Let $N \\sim \\text{Poisson}(3)$.",
+      "$$\\mathbb{P}(N=2)=e^{-3}\\frac{3^2}{2!}.$$",
+      "Numerically this equals $0.224$."
     ],
     "commonMistakes": [
-      "Assuming shape doesn't matter."
+      "Using a binomial distribution instead of Poisson."
+    ],
+    "skills": ["Poisson processes", "thinning"],
+    "tags": ["probability", "quant"],
+    "benchmarkTime": 60,
+    "answerType": "number",
+    "numericAnswer": 0.224,
+    "firm": "Citadel",
+    "requiresPaid": false
+  },
+  {
+    "id": "q111",
+    "title": "Poisson Thinning II",
+    "category": "probability",
+    "subcategory": "Stochastic Processes",
+    "difficulty": 8,
+    "content": "Orders arrive as a Poisson process with rate $5$. Each order is type A with probability $0.4$ and type B otherwise. What is the probability that in one unit of time there are more type A orders than type B orders?",
+    "hints": [
+      "Type A and B arrivals are independent Poisson random variables.",
+      "Condition on the number of type B arrivals."
+    ],
+    "solution": "0.346",
+    "solutionSteps": [
+      "Type A arrivals: $A \\sim \\text{Poisson}(2)$.",
+      "Type B arrivals: $B \\sim \\text{Poisson}(3)$.",
+      "Compute $\\mathbb{P}(A>B)=\\sum_{b=0}^\\infty \\mathbb{P}(B=b)\\mathbb{P}(A\\ge b+1)$.",
+      "Evaluating the sum numerically gives $0.346$."
+    ],
+    "commonMistakes": [
+      "Assuming symmetry between A and B."
+    ],
+    "skills": ["Poisson processes", "conditioning"],
+    "tags": ["probability", "hard"],
+    "benchmarkTime": 180,
+    "answerType": "number",
+    "numericAnswer": 0.346,
+    "firm": "Jane Street",
+    "requiresPaid": true
+  },
+  {
+    "id": "q112",
+    "title": "Conditional Expectation Trap",
+    "category": "probability",
+    "subcategory": "Expected Value",
+    "difficulty": 7,
+    "content": "Let $X \\sim \\text{Uniform}(0,1)$. Define $Y=\\max(X,1-X)$. What is $\\mathbb{E}[Y]$?",
+    "hints": [
+      "Use symmetry around $1/2$.",
+      "Split the integral at $1/2$."
+    ],
+    "solution": "0.75",
+    "solutionSteps": [
+      "For $X\\le1/2$, $Y=1-X$; for $X\\ge1/2$, $Y=X$.",
+      "$$\\mathbb{E}[Y]=\\int_0^{1/2}(1-x)dx+\\int_{1/2}^1 xdx.$$",
+      "Each integral equals $0.375$.",
+      "Thus $\\mathbb{E}[Y]=0.75$."
+    ],
+    "commonMistakes": [
+      "Not splitting the domain correctly."
+    ],
+    "skills": ["integration", "symmetry"],
+    "tags": ["probability", "medium"],
+    "benchmarkTime": 60,
+    "answerType": "number",
+    "numericAnswer": 0.75,
+    "firm": "Goldman Sachs",
+    "requiresPaid": false
+  },
+  {
+    "id": "q113",
+    "title": "Stopping Time Coin Toss",
+    "category": "probability",
+    "subcategory": "Martingales",
+    "difficulty": 9,
+    "content": "You toss a fair coin until the sequence HT appears. Let $T$ be the stopping time. What is $\\mathbb{E}[T]$?",
+    "hints": [
+      "Introduce states based on recent outcomes.",
+      "Set up recursion."
+    ],
+    "solution": "6",
+    "solutionSteps": [
+      "Let $E$ be expected time from the start.",
+      "Let $E_H$ be expected remaining time given last toss was H.",
+      "$$E=1+\\tfrac12E+\\tfrac12E_H,$$",
+      "$$E_H=1+\\tfrac12E_H.$$",
+      "Solving gives $E_H=2$ and $E=6$."
+    ],
+    "commonMistakes": [
+      "Stopping after observing H only."
+    ],
+    "skills": ["Markov chains", "recursion"],
+    "tags": ["probability", "hard"],
+    "benchmarkTime": 180,
+    "answerType": "number",
+    "numericAnswer": 6,
+    "firm": "Two Sigma",
+    "requiresPaid": true
+  },
+  {
+    "id": "q114",
+    "title": "Gaussian Correlation (Numeric)",
+    "category": "probability",
+    "subcategory": "Random Variables",
+    "difficulty": 8,
+    "content": "Let $(X,Y)$ be jointly normal with mean $0$, variance $1$, and correlation $\\rho=0.5$. What is $\\mathbb{P}(X>0,Y>0)$?",
+    "hints": [
+      "Use the quadrant probability formula.",
+      "Plug in $\\rho=0.5$."
+    ],
+    "solution": "0.333",
+    "solutionSteps": [
+      "For a bivariate normal,",
+      "$$\\mathbb{P}(X>0,Y>0)=\\frac14+\\frac{1}{2\\pi}\\arcsin(\\rho).$$",
+      "With $\\rho=0.5$, $\\arcsin(0.5)=\\pi/6$.",
+      "$$\\frac14+\\frac{1}{2\\pi}\\cdot\\frac{\\pi}{6}=\\frac14+\\frac{1}{12}=\\frac{1}{3}.$$"
+    ],
+    "commonMistakes": [
+      "Forgetting the arcsin formula."
+    ],
+    "skills": ["Gaussian distributions", "correlation"],
+    "tags": ["probability", "theory"],
+    "benchmarkTime": 120,
+    "answerType": "number",
+    "numericAnswer": 0.333,
+    "firm": "IMC",
+    "requiresPaid": true
+  },
+  {
+    "id": "q115",
+    "title": "Random Walk Return",
+    "category": "probability",
+    "subcategory": "Stochastic Processes",
+    "difficulty": 7,
+    "content": "A simple symmetric random walk on $\\mathbb{Z}$ starts at $0$. What is the probability that it ever returns to $0$ at a positive time?",
+    "hints": [
+      "Recall recurrence of 1D random walks."
+    ],
+    "solution": "1",
+    "solutionSteps": [
+      "A one-dimensional symmetric random walk is recurrent.",
+      "It returns to the origin infinitely often with probability $1$.",
+      "Hence the probability of at least one return is $1$."
+    ],
+    "commonMistakes": [
+      "Confusing with higher dimensions."
+    ],
+    "skills": ["random walks", "recurrence"],
+    "tags": ["probability", "classic"],
+    "benchmarkTime": 60,
+    "answerType": "number",
+    "numericAnswer": 1,
+    "firm": "Optiver",
+    "requiresPaid": false
+  },
+  {
+    "id": "q116",
+    "title": "Maximum of Exponentials",
+    "category": "probability",
+    "subcategory": "Continuous Distributions",
+    "difficulty": 6,
+    "content": "Let $X$ and $Y$ be independent exponential random variables with rate $1$. What is $\\mathbb{E}[\\max(X,Y)]$?",
+    "hints": [
+      "Use $\\max(X,Y)=X+Y-\\min(X,Y)$."
+    ],
+    "solution": "1.5",
+    "solutionSteps": [
+      "$$\\mathbb{E}[X]=\\mathbb{E}[Y]=1.$$",
+      "$$\\min(X,Y)\\sim\\text{Exp}(2),\\quad \\mathbb{E}[\\min]=\\tfrac12.$$",
+      "$$\\mathbb{E}[\\max]=2-\\tfrac12=\\tfrac32.$$"
+    ],
+    "commonMistakes": [
+      "Integrating the joint density unnecessarily."
+    ],
+    "skills": ["exponential distributions", "order statistics"],
+    "tags": ["probability", "medium"],
+    "benchmarkTime": 60,
+    "answerType": "number",
+    "numericAnswer": 1.5,
+    "firm": "SIG",
+    "requiresPaid": false
+  },
+  {
+    "id": "q117",
+    "title": "Coupon Collector Variant",
+    "category": "probability",
+    "subcategory": "Expected Value",
+    "difficulty": 9,
+    "content": "There are $n=10$ distinct coupons. Each draw collects a coupon uniformly at random. What is the expected number of draws needed to collect at least $9$ distinct coupons?",
+    "hints": [
+      "Stop one step before full collection.",
+      "Use harmonic sums."
+    ],
+    "solution": "≈21.6",
+    "solutionSteps": [
+      "Expected time is $n(H_n-1)$.",
+      "For $n=10$, $H_{10}\\approx2.92897$.",
+      "$$10(2.92897-1)\\approx21.6.$$"
+    ],
+    "commonMistakes": [
+      "Using the full coupon collector expectation."
+    ],
+    "skills": ["harmonic sums", "expectation"],
+    "tags": ["probability", "hard"],
+    "benchmarkTime": 180,
+    "answerType": "number",
+    "numericAnswer": 21.6,
+    "firm": "Hudson River Trading",
+    "requiresPaid": true
+  },
+  {
+    "id": "q118",
+    "title": "Random Chord Problem",
+    "category": "probability",
+    "subcategory": "Geometry",
+    "difficulty": 10,
+    "content": "A chord is drawn uniformly at random in a circle using the midpoint method. What is the probability that the chord is longer than the side of the inscribed equilateral triangle?",
+    "hints": [
+      "Use the distance of the midpoint from the center.",
+      "Compare areas."
+    ],
+    "solution": "0.25",
+    "solutionSteps": [
+      "The chord is long enough iff the midpoint lies within radius $R/2$.",
+      "Midpoints are uniformly distributed over the disk.",
+      "$$\\mathbb{P}=\\frac{\\pi(R/2)^2}{\\pi R^2}=\\frac14.$$"
+    ],
+    "commonMistakes": [
+      "Using a different definition of random chord."
     ],
     "skills": ["geometric probability"],
+    "tags": ["probability", "paradox"],
+    "benchmarkTime": 120,
+    "answerType": "number",
+    "numericAnswer": 0.25,
+    "firm": "Jane Street",
+    "requiresPaid": true
+  },
+  {
+    "id": "q119",
+    "title": "Exchangeable Variables",
+    "category": "probability",
+    "subcategory": "Random Variables",
+    "difficulty": 8,
+    "content": "Let $X_1,\\dots,X_5$ be i.i.d. continuous random variables. What is the probability that $X_1$ is the maximum?",
+    "hints": [
+      "Use symmetry."
+    ],
+    "solution": "0.2",
+    "solutionSteps": [
+      "All $5$ variables are equally likely to be the maximum.",
+      "$$\\mathbb{P}(X_1=\\max)=\\frac{1}{5}=0.2.$$"
+    ],
+    "commonMistakes": [
+      "Overcomplicating with integrals."
+    ],
+    "skills": ["symmetry", "order statistics"],
+    "tags": ["probability", "classic"],
+    "benchmarkTime": 30,
+    "answerType": "number",
+    "numericAnswer": 0.2,
+    "firm": "DE Shaw",
+    "requiresPaid": false
+  },
+  {
+    "id": "q120",
+    "title": "Brownian Hitting Probability",
+    "category": "probability",
+    "subcategory": "Stochastic Processes",
+    "difficulty": 7,
+    "content": "Let $(B_t)_{t\\ge0}$ be standard Brownian motion with $B_0=0$. What is the probability that $B_t$ hits $+1$ before it hits $-2$? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Use the gambler’s ruin / harmonic function argument.",
+      "Solve a boundary value problem."
+    ],
+    "solution": "2/3",
+    "solutionSteps": [
+      "Let $u(x)=\\mathbb{P}_x(\\tau_{+1}<\\tau_{-2})$.",
+      "Harmonicity implies $u''(x)=0$, so $u(x)=ax+b$.",
+      "Boundary conditions: $u(1)=1$, $u(-2)=0$.",
+      "Thus $u(x)=(x+2)/3$.",
+      "Starting from $0$: $u(0)=2/3$."
+    ],
+    "commonMistakes": [
+      "Treating Brownian motion as a discrete random walk."
+    ],
+    "skills": ["Brownian motion", "hitting times"],
+    "tags": ["probability", "hard"],
+    "benchmarkTime": 180,
+    "answerType": "number",
+    "numericAnswer": 0.67,
+    "firm": "Jane Street",
+    "requiresPaid": true
+  },
+  {
+    "id": "q121",
+    "title": "Correlated Normals Product",
+    "category": "probability",
+    "subcategory": "Random Variables",
+    "difficulty": 8,
+    "content": "Let $(X,Y)$ be jointly normal with mean $0$, variance $1$, and correlation $\\rho=0.3$. What is $\\mathbb{P}(XY>0)$? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "$XY>0$ means both variables have the same sign.",
+      "Use Gaussian quadrant probabilities."
+    ],
+    "solution": "≈0.596",
+    "solutionSteps": [
+      "$$\\mathbb{P}(XY>0)=\\mathbb{P}(X>0,Y>0)+\\mathbb{P}(X<0,Y<0).$$",
+      "By symmetry this equals $2\\mathbb{P}(X>0,Y>0)$.",
+      "$$\\mathbb{P}(X>0,Y>0)=\\frac14+\\frac{1}{2\\pi}\\arcsin(\\rho).$$",
+      "With $\\rho=0.3$, $\\arcsin(0.3)\\approx0.305$.",
+      "Final value $\\approx0.596$."
+    ],
+    "commonMistakes": [
+      "Assuming independence."
+    ],
+    "skills": ["Gaussian dependence", "geometry"],
+    "tags": ["probability", "hard"],
+    "benchmarkTime": 180,
+    "answerType": "number",
+    "numericAnswer": 0.60,
+    "firm": "IMC",
+    "requiresPaid": true
+  },
+  {
+    "id": "q122",
+    "title": "Conditioning on the Maximum",
+    "category": "probability",
+    "subcategory": "Order Statistics",
+    "difficulty": 7,
+    "content": "Let $X_1,X_2,X_3$ be i.i.d. $\\text{Uniform}(0,1)$. Given that $\\max(X_1,X_2,X_3)>0.9$, what is the probability that exactly one variable exceeds $0.9$? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Use conditional probability.",
+      "Enumerate disjoint events."
+    ],
+    "solution": "≈0.729",
+    "solutionSteps": [
+      "Probability exactly one exceeds $0.9$: $3(0.1)(0.9)^2=0.243$.",
+      "Probability at least one exceeds $0.9$: $1-(0.9)^3=0.271$.",
+      "$$\\mathbb{P}=0.243/0.271\\approx0.729.$$"
+    ],
+    "commonMistakes": [
+      "Ignoring the conditioning."
+    ],
+    "skills": ["conditional probability"],
+    "tags": ["probability", "interview"],
+    "benchmarkTime": 120,
+    "answerType": "number",
+    "numericAnswer": 0.73,
+    "firm": "Goldman Sachs",
+    "requiresPaid": false
+  },
+  {
+    "id": "q123",
+    "title": "Optional Stopping Trap",
+    "category": "probability",
+    "subcategory": "Martingales",
+    "difficulty": 9,
+    "content": "You start with wealth $1$ and repeatedly bet your entire wealth on a fair coin (double or zero). You stop when your wealth first reaches $8$ or $0$. What is the probability you ever reach $8$? (Give the exact decimal value.)",
+    "hints": [
+      "Wealth is a martingale.",
+      "Apply optional stopping."
+    ],
+    "solution": "1/8",
+    "solutionSteps": [
+      "$(W_t)$ is a martingale.",
+      "At stopping time $\\tau$, $W_\\tau\\in\\{0,8\\}$.",
+      "$$\\mathbb{E}[W_\\tau]=\\mathbb{E}[W_0]=1.$$",
+      "$$8\\mathbb{P}(W_\\tau=8)=1.$$"
+    ],
+    "commonMistakes": [
+      "Thinking betting strategy changes the probability."
+    ],
+    "skills": ["martingales", "optional stopping"],
+    "tags": ["probability", "very hard"],
+    "benchmarkTime": 240,
+    "answerType": "number",
+    "numericAnswer": 0.125,
+    "firm": "Two Sigma",
+    "requiresPaid": true
+  },
+  {
+    "id": "q124",
+    "title": "Geometric Stopping Time",
+    "category": "probability",
+    "subcategory": "Expected Value",
+    "difficulty": 7,
+    "content": "You flip a fair coin until the first head appears. Let $T$ be the stopping time. What is $\\mathbb{E}[1/T]$? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Write the expectation as a series.",
+      "Recognize a known expansion."
+    ],
+    "solution": "$\\ln 2$",
+    "solutionSteps": [
+      "$$\\mathbb{P}(T=k)=2^{-k},\\ k\\ge1.$$",
+      "$$\\mathbb{E}[1/T]=\\sum_{k=1}^\\infty \\frac{1}{k}2^{-k}=\\ln 2.$$"
+    ],
+    "commonMistakes": [
+      "Using linearity incorrectly."
+    ],
+    "skills": ["series", "stopping times"],
+    "tags": ["probability", "hard"],
+    "benchmarkTime": 180,
+    "answerType": "number",
+    "numericAnswer": 0.69,
+    "firm": "Optiver",
+    "requiresPaid": false
+  },
+  {
+    "id": "q125",
+    "title": "Random Orthogonal Matrix Entry",
+    "category": "probability",
+    "subcategory": "Linear Algebra",
+    "difficulty": 8,
+    "content": "Let $U$ be a random $2\\times2$ orthogonal matrix drawn uniformly (Haar measure). What is $\\mathbb{E}[U_{11}^2]$? (Give the exact decimal value.)",
+    "hints": [
+      "The first row is uniform on the unit circle.",
+      "Use symmetry."
+    ],
+    "solution": "1/2",
+    "solutionSteps": [
+      "$(U_{11},U_{12})$ lies uniformly on $x^2+y^2=1$.",
+      "By symmetry $\\mathbb{E}[U_{11}^2]=\\mathbb{E}[U_{12}^2]$.",
+      "Since $U_{11}^2+U_{12}^2=1$, each equals $1/2$."
+    ],
+    "commonMistakes": [
+      "Assuming matrix entries are independent."
+    ],
+    "skills": ["random matrices", "symmetry"],
+    "tags": ["probability", "hard"],
+    "benchmarkTime": 120,
+    "answerType": "number",
+    "numericAnswer": 0.5,
+    "firm": "DE Shaw",
+    "requiresPaid": true
+  },
+  {
+    "id": "q126",
+    "title": "Rare Event Poisson Limit",
+    "category": "probability",
+    "subcategory": "Asymptotics",
+    "difficulty": 8,
+    "content": "Let $X_n \\sim \\text{Binomial}(n,1/n)$. What is $\\lim_{n\\to\\infty}\\mathbb{P}(X_n=0)$? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Use Poisson convergence.",
+      "Recall $e^{-1}$."
+    ],
+    "solution": "$e^{-1}$",
+    "solutionSteps": [
+      "$X_n \\Rightarrow \\text{Poisson}(1)$.",
+      "Thus $\\mathbb{P}(X_n=0)\\to e^{-1}$."
+    ],
+    "commonMistakes": [
+      "Using the CLT instead of Poisson limit."
+    ],
+    "skills": ["limits", "Poisson approximation"],
+    "tags": ["probability", "theory"],
+    "benchmarkTime": 90,
+    "answerType": "number",
+    "numericAnswer": 0.37,
+    "firm": "Citadel",
+    "requiresPaid": false
+  },
+  {
+    "id": "q127",
+    "title": "Conditioning on a Sum",
+    "category": "probability",
+    "subcategory": "Continuous Distributions",
+    "difficulty": 9,
+    "content": "Let $X,Y$ be independent $\\text{Exponential}(1)$ random variables. Given that $X+Y=1$, what is $\\mathbb{P}(X>0.7)$? (Give the exact decimal value.)",
+    "hints": [
+      "Use symmetry of the conditional distribution.",
+      "Recognize a uniform law."
+    ],
+    "solution": "0.3",
+    "solutionSteps": [
+      "Conditioned on $X+Y=1$, $X\\sim\\text{Uniform}(0,1)$.",
+      "$$\\mathbb{P}(X>0.7)=0.3.$$"
+    ],
+    "commonMistakes": [
+      "Assuming independence after conditioning."
+    ],
+    "skills": ["conditional distributions"],
+    "tags": ["probability", "very hard"],
+    "benchmarkTime": 180,
+    "answerType": "number",
+    "numericAnswer": 0.3,
+    "firm": "Jane Street",
+    "requiresPaid": true
+  },
+  {
+    "id": "q128",
+    "title": "Record Values",
+    "category": "probability",
+    "subcategory": "Combinatorics",
+    "difficulty": 7,
+    "content": "Let $X_1,\\dots,X_{10}$ be i.i.d. continuous random variables. What is the expected number of record highs? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Define indicator variables.",
+      "Use symmetry."
+    ],
+    "solution": "$H_{10}$",
+    "solutionSteps": [
+      "$$\\mathbb{E}[\\text{records}]=\\sum_{k=1}^{10}\\frac{1}{k}=H_{10}.$$",
+      "$$H_{10}\\approx2.92897.$$"
+    ],
+    "commonMistakes": [
+      "Thinking the expectation grows linearly."
+    ],
+    "skills": ["records", "expectation"],
+    "tags": ["probability", "interview"],
+    "benchmarkTime": 120,
+    "answerType": "number",
+    "numericAnswer": 2.93,
+    "firm": "SIG",
+    "requiresPaid": false
+  },
+  {
+    "id": "q129",
+    "title": "Self-Normalized Gaussian",
+    "category": "probability",
+    "subcategory": "Limit Theorems",
+    "difficulty": 10,
+    "content": "Let $X_1,X_2,X_3$ be i.i.d. standard normal variables. What is $\\mathbb{E}\\left[\\left|\\frac{X_1}{\\sqrt{X_1^2+X_2^2+X_3^2}}\\right|\\right]$? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Use rotational symmetry.",
+      "Interpret as a random point on the sphere."
+    ],
+    "solution": "$\\sqrt{2/\\pi}$",
+    "solutionSteps": [
+      "The normalized vector is uniform on $S^2$.",
+      "Each coordinate has the same marginal distribution.",
+      "Thus $\\mathbb{E}[|X_1|/\\|X\\|]=\\sqrt{2/\\pi}$."
+    ],
+    "commonMistakes": [
+      "Treating numerator and denominator as independent."
+    ],
+    "skills": ["high-dimensional probability", "geometry"],
     "tags": ["probability", "extreme"],
     "benchmarkTime": 300,
     "answerType": "number",
-    "numericAnswer": 0.694,
-    "firm": "Renaissance Technologies",
+    "numericAnswer": 0.80,
+    "firm": "Jane Street",
     "requiresPaid": true
+  },
+  {
+    "id": "q130",
+    "title": "Biased Coin Runs",
+    "category": "probability",
+    "subcategory": "Discrete Distributions",
+    "difficulty": 2,
+    "content": "A coin lands heads with probability $0.6$. You flip it twice. What is the probability of getting exactly one run (i.e. the two flips are different)? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Enumerate HT and TH.",
+      "Use independence."
+    ],
+    "solution": "0.48",
+    "solutionSteps": [
+      "$\\mathbb{P}(HT)=0.6\\times0.4=0.24$.",
+      "$\\mathbb{P}(TH)=0.4\\times0.6=0.24$.",
+      "Total probability $=0.48$."
+    ],
+    "commonMistakes": [
+      "Counting HH or TT as one run."
+    ],
+    "skills": ["discrete probability"],
+    "tags": ["probability"],
+    "benchmarkTime": 45,
+    "answerType": "number",
+    "numericAnswer": 0.48,
+    "firm": "Optiver",
+    "requiresPaid": false
+  },
+  {
+    "id": "q131",
+    "title": "Conditional Dice",
+    "category": "probability",
+    "subcategory": "Conditional Probability",
+    "difficulty": 3,
+    "content": "Two fair dice are rolled. Given that the sum is at least $9$, what is the probability that both dice show the same number? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "List all outcomes with sum $\\ge 9$.",
+      "Condition properly."
+    ],
+    "solution": "0.25",
+    "solutionSteps": [
+      "Outcomes with sum $\\ge9$: there are $10$ equally likely outcomes.",
+      "Doubles among them: $(5,5),(6,6)$ → $2$ outcomes.",
+      "$$\\mathbb{P}=2/8=0.25.$$"
+    ],
+    "commonMistakes": [
+      "Forgetting to condition on sum."
+    ],
+    "skills": ["conditioning"],
+    "tags": ["probability"],
+    "benchmarkTime": 60,
+    "answerType": "number",
+    "numericAnswer": 0.25,
+    "firm": "Goldman Sachs",
+    "requiresPaid": false
+  },
+  {
+    "id": "q132",
+    "title": "Geometric Survival",
+    "category": "probability",
+    "subcategory": "Discrete Distributions",
+    "difficulty": 3,
+    "content": "You flip a fair coin until the first head appears. What is the probability that you need at least $4$ flips? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "This is a geometric distribution.",
+      "Think of consecutive tails."
+    ],
+    "solution": "0.125",
+    "solutionSteps": [
+      "At least $4$ flips means first $3$ are tails.",
+      "$$\\mathbb{P}=0.5^3=0.125.$$"
+    ],
+    "commonMistakes": [
+      "Including the fourth flip as a tail."
+    ],
+    "skills": ["geometric distribution"],
+    "tags": ["probability"],
+    "benchmarkTime": 30,
+    "answerType": "number",
+    "numericAnswer": 0.13,
+    "firm": "SIG",
+    "requiresPaid": false
+  },
+  {
+    "id": "q133",
+    "title": "Expected Minimum",
+    "category": "probability",
+    "subcategory": "Continuous Distributions",
+    "difficulty": 4,
+    "content": "Let $X$ and $Y$ be independent $\\text{Uniform}(0,1)$ random variables. What is $\\mathbb{E}[\\min(X,Y)]$? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Compute the distribution of the minimum.",
+      "Or integrate survival probabilities."
+    ],
+    "solution": "1/3",
+    "solutionSteps": [
+      "$$\\mathbb{P}(\\min(X,Y)>t)=(1-t)^2.$$",
+      "$$\\mathbb{E}[\\min]=\\int_0^1 (1-t)^2 dt=1/3.$$"
+    ],
+    "commonMistakes": [
+      "Averaging $X$ and $Y$."
+    ],
+    "skills": ["order statistics"],
+    "tags": ["probability"],
+    "benchmarkTime": 90,
+    "answerType": "number",
+    "numericAnswer": 0.33,
+    "firm": "Citadel",
+    "requiresPaid": false
+  },
+  {
+    "id": "q134",
+    "title": "Bayes with Tests",
+    "category": "probability",
+    "subcategory": "Bayes Rule",
+    "difficulty": 4,
+    "content": "A disease affects $1\\%$ of a population. A test is $95\\%$ accurate: it returns positive with probability $0.95$ if the person is sick and $0.05$ if healthy. What is the probability a person is sick given a positive test? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Apply Bayes’ rule.",
+      "Write all probabilities explicitly."
+    ],
+    "solution": "0.16",
+    "solutionSteps": [
+      "$$\\mathbb{P}(+)=0.95\\cdot0.01+0.05\\cdot0.99=0.059.$$",
+      "$$\\mathbb{P}(\\text{sick}\\mid+)=0.95\\cdot0.01/0.059\\approx0.161.$$"
+    ],
+    "commonMistakes": [
+      "Ignoring the base rate."
+    ],
+    "skills": ["Bayes rule"],
+    "tags": ["probability"],
+    "benchmarkTime": 90,
+    "answerType": "number",
+    "numericAnswer": 0.16,
+    "firm": "Google",
+    "requiresPaid": false
+  },
+  {
+    "id": "q135",
+    "title": "Negative Correlation Check",
+    "category": "probability",
+    "subcategory": "Random Variables",
+    "difficulty": 5,
+    "content": "Let $X\\sim\\text{Uniform}(-1,1)$ and define $Y=-X$. What is $\\mathrm{Corr}(X,Y)$? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Compute covariance.",
+      "Use symmetry."
+    ],
+    "solution": "-1",
+    "solutionSteps": [
+      "$$\\mathrm{Cov}(X,Y)=\\mathrm{Cov}(X,-X)=-\\mathrm{Var}(X).$$",
+      "$$\\mathrm{Corr}(X,Y)=-1.$$"
+    ],
+    "commonMistakes": [
+      "Thinking zero correlation due to symmetry."
+    ],
+    "skills": ["correlation"],
+    "tags": ["probability"],
+    "benchmarkTime": 60,
+    "answerType": "number",
+    "numericAnswer": -1.00,
+    "firm": "IMC",
+    "requiresPaid": false
+  },
+  {
+    "id": "q136",
+    "title": "Simple Markov Step",
+    "category": "probability",
+    "subcategory": "Markov Chains",
+    "difficulty": 5,
+    "content": "A Markov chain has states $\\{1,2\\}$. From state $1$ it stays at $1$ with probability $0.7$; from state $2$ it stays at $2$ with probability $0.6$. Starting from state $1$, what is the probability to be in state $2$ after one step? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Use the transition matrix.",
+      "Only one transition matters."
+    ],
+    "solution": "0.3",
+    "solutionSteps": [
+      "From state $1$, the probability to move to $2$ is $1-0.7=0.3$."
+    ],
+    "commonMistakes": [
+      "Using stationary distribution."
+    ],
+    "skills": ["Markov chains"],
+    "tags": ["probability"],
+    "benchmarkTime": 30,
+    "answerType": "number",
+    "numericAnswer": 0.30,
+    "firm": "BNP Paribas",
+    "requiresPaid": false
+  },
+  {
+    "id": "q137",
+    "title": "Variance Scaling",
+    "category": "probability",
+    "subcategory": "Moments",
+    "difficulty": 4,
+    "content": "Let $X$ be a random variable with variance $4$. What is the variance of $3X-1$? (Give the exact decimal value.)",
+    "hints": [
+      "Constants do not affect variance.",
+      "Variance scales quadratically."
+    ],
+    "solution": "36",
+    "solutionSteps": [
+      "$$\\mathrm{Var}(3X-1)=9\\mathrm{Var}(X)=36.$$"
+    ],
+    "commonMistakes": [
+      "Subtracting $1$ from the variance."
+    ],
+    "skills": ["variance"],
+    "tags": ["probability"],
+    "benchmarkTime": 30,
+    "answerType": "number",
+    "numericAnswer": 36,
+    "firm": "Morgan Stanley",
+    "requiresPaid": false
+  },
+  {
+    "id": "q138",
+    "title": "Expected Tosses",
+    "category": "probability",
+    "subcategory": "Expected Value",
+    "difficulty": 5,
+    "content": "You flip a fair coin until you see two consecutive heads. What is the expected number of flips? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Use states based on recent outcomes.",
+      "Set up recursion."
+    ],
+    "solution": "6",
+    "solutionSteps": [
+      "Let $E$ be expected time from start, $E_H$ after one head.",
+      "$$E=1+0.5E+0.5E_H,$$",
+      "$$E_H=1+0.5E_H.$$",
+      "Solving gives $E=6$."
+    ],
+    "commonMistakes": [
+      "Stopping after a single head."
+    ],
+    "skills": ["recursion", "expectation"],
+    "tags": ["probability"],
+    "benchmarkTime": 120,
+    "answerType": "number",
+    "numericAnswer": 6.00,
+    "firm": "Two Sigma",
+    "requiresPaid": false
+  },
+  {
+    "id": "q139",
+    "title": "Uniform Pair Distance",
+    "category": "probability",
+    "subcategory": "Geometry",
+    "difficulty": 5,
+    "content": "Pick $(X,Y)$ uniformly from the unit square $[0,1]^2$. What is the probability that $X+Y<1$? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Draw the region.",
+      "Compare areas."
+    ],
+    "solution": "0.5",
+    "solutionSteps": [
+      "The region $X+Y<1$ is a right triangle with area $1/2$.",
+      "Total area is $1$.",
+      "$$\\mathbb{P}=0.5.$$"
+    ],
+    "commonMistakes": [
+      "Overcomplicating with integrals."
+    ],
+    "skills": ["geometric probability"],
+    "tags": ["probability"],
+    "benchmarkTime": 30,
+    "answerType": "number",
+    "numericAnswer": 0.50,
+    "firm": "Jane Street",
+    "requiresPaid": false
   }
 ];
 

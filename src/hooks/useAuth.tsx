@@ -30,25 +30,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Set up auth state listener FIRST
     try {
-      const { data: { subscription } } = supabase.auth.onAuthStateChange(
-        (event, session) => {
-          setSession(session);
-          setUser(session?.user ?? null);
-          setLoading(false);
-        }
-      );
-
-      // THEN check for existing session
-      supabase.auth.getSession().then(({ data: { session } }) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+      }
+    );
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
       }).catch((error) => {
         console.error('Error getting session:', error);
         setLoading(false);
-      });
+    });
 
-      return () => subscription.unsubscribe();
+    return () => subscription.unsubscribe();
     } catch (error) {
       console.error('Error setting up auth:', error);
       setLoading(false);
@@ -66,10 +66,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     
     try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
       
       if (error) {
         // Handle network errors more gracefully
@@ -83,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       }
       
-      return { error };
+    return { error };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       if (errorMessage.includes('fetch') || errorMessage.includes('network')) {
@@ -120,17 +120,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       // Use production URL if set, otherwise fallback to current origin (for development)
       const redirectUrl = siteUrl ? `${siteUrl}/` : `${window.location.origin}/`;
-      
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            display_name: displayName,
-          },
+    
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: redirectUrl,
+        data: {
+          display_name: displayName,
         },
-      });
+      },
+    });
       
       if (error) {
         // Handle network errors more gracefully
@@ -144,7 +144,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       }
       
-      return { error };
+    return { error };
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
       if (errorMessage.includes('fetch') || errorMessage.includes('network')) {

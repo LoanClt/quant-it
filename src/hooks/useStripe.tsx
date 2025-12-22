@@ -34,8 +34,14 @@ export function useStripe() {
     }
 
     try {
+      // Verify user is authenticated
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Please sign in to upgrade');
+        return;
+      }
+
       // Create checkout session via Supabase Edge Function
-      // If you don't have Edge Functions set up, you can use a regular API endpoint
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: {
           userId: user.id,
@@ -46,26 +52,35 @@ export function useStripe() {
 
       if (error) {
         console.error('Error creating checkout session:', error);
-        toast.error('Failed to start checkout. Please try again.');
+        console.error('Error details:', JSON.stringify(error, null, 2));
+        
+        // Provide more specific error messages
+        if (error.message?.includes('Function not found') || error.message?.includes('404')) {
+          toast.error('Checkout function not deployed. Please deploy the create-checkout-session function.');
+        } else if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+          toast.error('Authentication failed. Please check your Supabase configuration.');
+        } else {
+          toast.error(`Failed to start checkout: ${error.message || 'Unknown error'}`);
+        }
         return;
       }
 
-      if (data?.sessionId) {
-        // Redirect to Stripe Checkout
-        const stripe = await getStripe();
-        if (stripe) {
-          const { error: redirectError } = await stripe.redirectToCheckout({
-            sessionId: data.sessionId,
-          });
-
-          if (redirectError) {
-            console.error('Stripe redirect error:', redirectError);
-            toast.error('Failed to redirect to checkout');
-          }
-        }
+      if (data?.url) {
+        // Redirect to Stripe Checkout using the session URL
+        window.location.href = data.url;
+      } else if (data?.sessionId) {
+        // Fallback: If only sessionId is provided, construct the checkout URL
+        // This shouldn't happen with the updated Edge Function, but kept for compatibility
+        const checkoutUrl = `https://checkout.stripe.com/c/pay/${data.sessionId}`;
+        window.location.href = checkoutUrl;
+      } else if (data?.error) {
+        // Edge Function returned an error
+        console.error('Edge Function error:', data.error);
+        toast.error(`Checkout failed: ${data.error}`);
       } else {
         // Fallback: Create checkout session directly (requires backend)
-        toast.error('Checkout session creation failed. Please contact support.');
+        console.error('No sessionId in response:', data);
+        toast.error('Checkout session creation failed. Please check Edge Function logs.');
       }
     } catch (err) {
       console.error('Exception creating checkout session:', err);

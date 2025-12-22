@@ -8,16 +8,19 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Brain, Menu, X, User, Settings, LogOut } from "lucide-react";
+import { Brain, Menu, X, User, Settings, LogOut, Crown } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserProgress } from "@/hooks/useUserProgress";
+import { useSubscription } from "@/hooks/useSubscription";
+import { Badge } from "@/components/ui/badge";
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, signOut } = useAuth();
   const { profile } = useUserProgress();
+  const { isPaid } = useSubscription();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -55,6 +58,12 @@ export function Navbar() {
             >
               Practice
             </button>
+            <button
+              onClick={() => navigate('/challenge', { replace: false })}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Challenge
+            </button>
             <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
               Dashboard
             </Link>
@@ -67,6 +76,16 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-4">
             {user ? (
               <div className="flex items-center gap-3">
+                {isPaid ? (
+                  <Badge variant="glow" className="px-3 py-1">
+                    <Crown className="w-3 h-3 mr-1.5" />
+                    Premium
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="px-3 py-1">
+                    Free
+                  </Badge>
+                )}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-10 w-10 rounded-full">
@@ -135,6 +154,20 @@ export function Navbar() {
         {isOpen && (
           <div className="md:hidden py-4 border-t border-border">
             <div className="flex flex-col gap-4">
+              {user && (
+                <div className="pb-2">
+                  {isPaid ? (
+                    <Badge variant="glow" className="px-3 py-1">
+                      <Crown className="w-3 h-3 mr-1.5" />
+                      Premium
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="px-3 py-1">
+                      Free
+                    </Badge>
+                  )}
+                </div>
+              )}
               <button
                 onClick={() => {
                   navigate('/practice', { replace: false });
@@ -143,6 +176,15 @@ export function Navbar() {
                 className="text-left text-muted-foreground hover:text-foreground transition-colors"
               >
                 Practice
+              </button>
+              <button
+                onClick={() => {
+                  navigate('/challenge', { replace: false });
+                  setIsOpen(false);
+                }}
+                className="text-left text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Challenge
               </button>
               <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
                 Dashboard
