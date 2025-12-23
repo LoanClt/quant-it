@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
 const companies = [
-  { name: "Citadel", logo: "/public/slides/citadel.png" },
-  { name: "Jane Street", logo: "/public/slides/jane street.png" },
-  { name: "Susquehanna", logo: "/public/slides/susquehanna.png" },
+  { name: "Citadel", logo: "/slides/citadel.png" },
+  { name: "Jane Street", logo: "/slides/jane-street.png" },
+  { name: "Susquehanna", logo: "/slides/susquehanna.png" },
 ];
 
 export function CompanyLogos() {
