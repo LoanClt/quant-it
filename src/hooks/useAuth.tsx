@@ -7,7 +7,7 @@ interface AuthContextType {
   session: Session | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signUp: (email: string, password: string, displayName?: string) => Promise<{ error: Error | null }>;
+  signUp: (email: string, password: string, displayName?: string, studyLevel?: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -99,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signUp = async (email: string, password: string, displayName?: string) => {
+  const signUp = async (email: string, password: string, displayName?: string, studyLevel?: string) => {
     const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
     const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
     
@@ -128,6 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         emailRedirectTo: redirectUrl,
         data: {
           display_name: displayName,
+          study_level: studyLevel,
         },
       },
     });

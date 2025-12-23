@@ -135,7 +135,7 @@ export function Navbar() {
                   <Link to="/auth">Sign In</Link>
                 </Button>
                 <Button variant="default" asChild>
-                  <Link to="/auth">Get Started</Link>
+                  <Link to="/auth?tab=signup">Get Started</Link>
                 </Button>
               </>
             )}
@@ -203,7 +203,7 @@ export function Navbar() {
                       <Link to="/auth">Sign In</Link>
                     </Button>
                     <Button variant="default" className="flex-1" asChild>
-                      <Link to="/auth">Get Started</Link>
+                      <Link to="/auth?tab=signup">Get Started</Link>
                     </Button>
                   </>
                 )}

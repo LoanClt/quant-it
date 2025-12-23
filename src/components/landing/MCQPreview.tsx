@@ -2,8 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Lightbulb, Check, Eye, Lock, ArrowRight } from "lucide-react";
+import { Lightbulb, Check, Eye, X, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { questions } from "@/data/questions";
@@ -19,15 +18,15 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-// Get the Ants on a Square question
-const getAntsQuestion = () => {
-  return questions.find(q => q.id === "q37") || questions[0];
+// Get an MCQ question (market-oriented)
+const getMcqQuestion = () => {
+  return questions.find(q => q.id === "st4" || (q.answerType === "mcq" && q.category === "sales-and-trading")) || questions.find(q => q.answerType === "mcq") || questions[0];
 };
 
-const previewQuestion = getAntsQuestion();
+const mcqQuestion = getMcqQuestion();
 
-export function QuestionPreview() {
-  const [answer, setAnswer] = useState("");
+export function MCQPreview() {
+  const [selectedMcqOption, setSelectedMcqOption] = useState<string | null>(null);
   const [hintsRevealed, setHintsRevealed] = useState(0);
   const [showHints, setShowHints] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -36,20 +35,20 @@ export function QuestionPreview() {
   const [answerRevealed, setAnswerRevealed] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
 
-  const checkAnswer = (userAnswer: string): boolean => {
-    if (previewQuestion.answerType === 'number' && previewQuestion.numericAnswer !== undefined) {
-      const userNum = parseFloat(userAnswer);
-      if (isNaN(userNum)) return false;
-      const correctNum = previewQuestion.numericAnswer;
-      // Allow small tolerance for floating point comparisons
-      return Math.abs(userNum - correctNum) < 0.0001;
+  const checkAnswer = (userAnswer: string | null): boolean => {
+    if (mcqQuestion.answerType === 'mcq' && mcqQuestion.correctAnswerId !== undefined) {
+      return userAnswer === mcqQuestion.correctAnswerId;
     }
     return false;
   };
 
   const handleSubmit = () => {
-    if (previewQuestion.answerType === 'number') {
-      const correct = checkAnswer(answer);
+    if (mcqQuestion.answerType === 'mcq') {
+      if (!selectedMcqOption) {
+        toast.error("Please select an answer");
+        return;
+      }
+      const correct = checkAnswer(selectedMcqOption);
       setIsCorrect(correct);
       setSubmitted(true);
       
@@ -67,7 +66,7 @@ export function QuestionPreview() {
 
   const revealNextHint = () => {
     // On landing page, allow all users to see all hints
-    const maxHints = previewQuestion.hints.length;
+    const maxHints = mcqQuestion.hints.length;
     if (hintsRevealed < maxHints) {
       setHintsRevealed((prev) => prev + 1);
       setShowHints(true);
@@ -107,39 +106,46 @@ export function QuestionPreview() {
       <div className="container px-4">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12 relative">
-            {/* White blur blinking effect for "Try a Question" */}
+            {/* White blur blinking effect */}
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-white/10 rounded-full blur-3xl animate-pulse pointer-events-none" />
             <h2 className="text-3xl md:text-4xl font-bold mb-4 relative z-10">
-              Try a Question
+              Market-Oriented Question
             </h2>
             <p className="text-lg text-muted-foreground">
-              Experience our platform with a real interview question
+              Try a multiple-choice question from sales & trading interviews
             </p>
           </div>
 
-          <Card variant="glass" className="mb-6">
-            <CardHeader>
+          <Card variant="glass" className="mb-6 relative overflow-hidden">
+            {/* Subtle neon blur effects in background only */}
+            {submitted && isCorrect && (
+              <div className="absolute -inset-20 bg-green-500/10 blur-3xl animate-pulse pointer-events-none opacity-50" />
+            )}
+            {submitted && isCorrect === false && (
+              <div className="absolute -inset-20 bg-red-500/10 blur-3xl animate-pulse pointer-events-none opacity-50" />
+            )}
+            <CardHeader className="relative z-10">
               <div className="flex items-center gap-3 mb-2">
-                <Badge variant={getDifficultyVariant(previewQuestion.difficulty) as any}>
-                  {getDifficultyLabel(previewQuestion.difficulty)}
+                <Badge variant={getDifficultyVariant(mcqQuestion.difficulty) as any}>
+                  {getDifficultyLabel(mcqQuestion.difficulty)}
                 </Badge>
-                {previewQuestion.firm && (
+                {mcqQuestion.firm && (
                   <Badge variant="outline" className="text-xs">
-                    {previewQuestion.firm}
+                    {mcqQuestion.firm}
                   </Badge>
                 )}
-                <Badge variant={previewQuestion.category as any}>
-                  {previewQuestion.category === 'probability' ? 'Probability' : 'Brain Teaser'}
+                <Badge variant="sales-and-trading" className="text-xs">
+                  Markets
                 </Badge>
               </div>
-              <CardTitle className="text-2xl">{previewQuestion.title}</CardTitle>
+              <CardTitle className="text-2xl">{mcqQuestion.title}</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="relative z-10">
               <div className="text-lg leading-relaxed text-foreground/90 mb-6">
-                <LatexRenderer content={previewQuestion.content} />
+                <LatexRenderer content={mcqQuestion.content} />
               </div>
 
-              {/* Answer Input */}
+              {/* MCQ Options */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-3">
                   <label className="block font-medium">Your Answer</label>
@@ -155,23 +161,75 @@ export function QuestionPreview() {
                     </Button>
                   )}
                 </div>
-                <Input
-                  type="number"
-                  value={answer}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value === '' || /^-?\d*\.?\d*([eE][-+]?\d+)?$/.test(value)) {
-                      setAnswer(value);
-                    }
-                  }}
-                  placeholder="Enter a number..."
-                  className={`bg-secondary/50 border-border/50 text-lg ${
-                    submitted && isCorrect ? 'border-green-500/50' : 
-                    submitted && !isCorrect ? 'border-destructive/50' : ''
-                  }`}
-                  step="any"
-                  disabled={(submitted && isCorrect) || answerRevealed}
-                />
+                {mcqQuestion.answerType === 'mcq' && mcqQuestion.mcqOptions ? (
+                  <div className="space-y-3">
+                    {mcqQuestion.mcqOptions.map((option) => {
+                      const isSelected = selectedMcqOption === option.id;
+                      const isCorrectOption = option.id === mcqQuestion.correctAnswerId;
+                      const showResult = submitted || answerRevealed;
+                      
+                      return (
+                        <button
+                          key={option.id}
+                          type="button"
+                          onClick={() => {
+                            if (!submitted && !answerRevealed) {
+                              setSelectedMcqOption(option.id);
+                            }
+                          }}
+                          disabled={submitted || answerRevealed}
+                          className={`
+                            w-full p-4 rounded-lg border-2 text-left transition-all duration-300
+                            ${
+                              showResult && isCorrectOption
+                                ? 'border-green-500 bg-green-500/10'
+                                : showResult && isSelected && !isCorrectOption
+                                ? 'border-red-500 bg-red-500/10'
+                                : isSelected
+                                ? 'border-primary bg-primary/10'
+                                : 'border-border bg-secondary/50 hover:border-primary/50 hover:bg-secondary'
+                            }
+                            ${submitted || answerRevealed ? 'cursor-not-allowed' : 'cursor-pointer'}
+                          `}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`
+                              w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
+                              ${
+                                showResult && isCorrectOption
+                                  ? 'border-green-500 bg-green-500'
+                                  : showResult && isSelected && !isCorrectOption
+                                  ? 'border-red-500 bg-red-500'
+                                  : isSelected
+                                  ? 'border-primary bg-primary'
+                                  : 'border-border'
+                              }
+                            `}>
+                              {isSelected && (
+                                <div className={`
+                                  w-3 h-3 rounded-full
+                                  ${showResult && !isCorrectOption ? 'bg-white' : 'bg-background'}
+                                `} />
+                              )}
+                              {showResult && isCorrectOption && !isSelected && (
+                                <Check className="w-4 h-4 text-white" />
+                              )}
+                              {showResult && isSelected && !isCorrectOption && (
+                                <X className="w-4 h-4 text-white" />
+                              )}
+                            </div>
+                            <span className="font-medium">{option.id.toUpperCase()}. {option.label}</span>
+                            {showResult && isCorrectOption && (
+                              <Badge variant="outline" className="ml-auto bg-green-500/10 text-green-400 border-green-500/30">
+                                Correct
+                              </Badge>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : null}
                 {submitted && !isCorrect && !answerRevealed && (
                   <p className="text-sm text-destructive mt-2">
                     Incorrect. Try again or reveal the answer.
@@ -190,7 +248,7 @@ export function QuestionPreview() {
                   <Button 
                     variant="hero" 
                     onClick={handleSubmit}
-                    disabled={(!answer || answer.trim() === '') || answerRevealed}
+                    disabled={!selectedMcqOption || answerRevealed}
                     className="w-full"
                   >
                     <Check className="w-4 h-4 mr-2" />
@@ -209,22 +267,22 @@ export function QuestionPreview() {
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-sm text-muted-foreground">
-                        ({hintsRevealed}/{previewQuestion.hints.length} revealed)
+                        ({hintsRevealed}/{mcqQuestion.hints.length} revealed)
                       </span>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={revealNextHint}
-                      disabled={hintsRevealed >= previewQuestion.hints.length}
+                      disabled={hintsRevealed >= mcqQuestion.hints.length}
                     >
-                      {hintsRevealed < previewQuestion.hints.length ? "Reveal Hint" : "No more hints"}
+                      {hintsRevealed < mcqQuestion.hints.length ? "Reveal Hint" : "No more hints"}
                     </Button>
                     </div>
                   </div>
                   
                   {showHints && hintsRevealed > 0 && (
                     <ul className="space-y-2">
-                      {previewQuestion.hints.slice(0, hintsRevealed).map((hint, index) => (
+                      {mcqQuestion.hints.slice(0, hintsRevealed).map((hint, index) => (
                         <li 
                           key={index} 
                           className="p-3 rounded-lg bg-difficulty-medium/10 text-sm animate-fade-in"
@@ -249,13 +307,13 @@ export function QuestionPreview() {
                   <CardContent className="space-y-4">
                     <div>
                       <p className="font-semibold mb-2">Correct Answer:</p>
-                      <p className="text-lg text-yellow-400"><LatexRenderer content={previewQuestion.solution} /></p>
+                      <p className="text-lg text-yellow-400"><LatexRenderer content={mcqQuestion.solution} /></p>
                     </div>
-                    {previewQuestion.solutionSteps && previewQuestion.solutionSteps.length > 0 && (
+                    {mcqQuestion.solutionSteps && mcqQuestion.solutionSteps.length > 0 && (
                       <div>
                         <p className="font-semibold mb-2">Solution Steps:</p>
                         <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground">
-                          {previewQuestion.solutionSteps.map((step, index) => (
+                          {mcqQuestion.solutionSteps.map((step, index) => (
                             <li key={index}><LatexRenderer content={step} /></li>
                           ))}
                         </ol>
@@ -303,4 +361,3 @@ export function QuestionPreview() {
     </section>
   );
 }
-

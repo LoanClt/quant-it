@@ -50,6 +50,7 @@ export function QuestionCard({ question, onComplete, onNext, onPrevious, current
   const [timer, setTimer] = useState(0);
   const [isRunning, setIsRunning] = useState(true);
   const [answer, setAnswer] = useState("");
+  const [selectedMcqOption, setSelectedMcqOption] = useState<string | null>(null);
   const [showHints, setShowHints] = useState(false);
   const [hintsRevealed, setHintsRevealed] = useState(0);
   const [showSolution, setShowSolution] = useState(false);
@@ -89,51 +90,70 @@ export function QuestionCard({ question, onComplete, onNext, onPrevious, current
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const checkAnswer = (userAnswer: string): boolean => {
+  const checkAnswer = (userAnswer: string | string | null): boolean => {
     if (question.answerType === 'number' && question.numericAnswer !== undefined) {
-      const userNum = parseFloat(userAnswer);
+      const userNum = parseFloat(userAnswer as string);
       if (isNaN(userNum)) return false;
       const correctNum = question.numericAnswer;
       // Allow small tolerance for floating point comparisons
       return Math.abs(userNum - correctNum) < 0.0001;
     }
+    if (question.answerType === 'mcq' && question.correctAnswerId !== undefined) {
+      return userAnswer === question.correctAnswerId;
+    }
     return false;
   };
 
   const handleSubmit = async () => {
+    let correct = false;
+    let userAnswer: string | null = null;
+
     if (question.answerType === 'number') {
-      const correct = checkAnswer(answer);
-      setIsCorrect(correct);
-      setSubmitted(true);
-      
-      // Save completion to database
-      try {
-        const result = await saveQuestionCompletion(question.id, correct, timer);
-        if (result?.error) {
-          console.error('Error saving question completion:', result.error);
-          toast.error("Failed to save progress. Please try again.", {
-            duration: 3000,
-          });
-        }
-      } catch (error) {
-        console.error('Error saving question completion:', error);
+      if (!answer.trim()) {
+        toast.error("Please enter an answer");
+        return;
+      }
+      userAnswer = answer;
+      correct = checkAnswer(answer);
+    } else if (question.answerType === 'mcq') {
+      if (!selectedMcqOption) {
+        toast.error("Please select an answer");
+        return;
+      }
+      userAnswer = selectedMcqOption;
+      correct = checkAnswer(selectedMcqOption);
+    }
+
+    setIsCorrect(correct);
+    setSubmitted(true);
+    
+    // Save completion to database
+    try {
+      const result = await saveQuestionCompletion(question.id, correct, timer);
+      if (result?.error) {
+        console.error('Error saving question completion:', result.error);
         toast.error("Failed to save progress. Please try again.", {
           duration: 3000,
         });
       }
-      
-      if (correct) {
-        setIsRunning(false);
-        toast.success("Correct!", {
-          duration: 2000,
-        });
-        onComplete(true, timer);
-      } else {
-        toast.error("Incorrect. Try again.", {
-          duration: 2000,
-        });
-        onComplete(false, timer);
-      }
+    } catch (error) {
+      console.error('Error saving question completion:', error);
+      toast.error("Failed to save progress. Please try again.", {
+        duration: 3000,
+      });
+    }
+    
+    if (correct) {
+      setIsRunning(false);
+      toast.success("Correct!", {
+        duration: 2000,
+      });
+      onComplete(true, timer);
+    } else {
+      toast.error("Incorrect. Try again.", {
+        duration: 2000,
+      });
+      onComplete(false, timer);
     }
   };
 
@@ -142,6 +162,7 @@ export function QuestionCard({ question, onComplete, onNext, onPrevious, current
     setSubmitted(false);
     setIsCorrect(null);
     setAnswer("");
+    setSelectedMcqOption(null);
     setIsRunning(true);
     setTimer(0);
     setHintsRevealed(0);
@@ -292,11 +313,18 @@ export function QuestionCard({ question, onComplete, onNext, onPrevious, current
       </div>
 
       {/* Question */}
-      <Card variant="glass">
-        <CardHeader>
+      <Card variant="glass" className="relative overflow-hidden">
+        {/* Subtle neon blur effects in background only */}
+        {submitted && isCorrect && (
+          <div className="absolute -inset-20 bg-green-500/10 blur-3xl animate-pulse pointer-events-none opacity-50" />
+        )}
+        {submitted && isCorrect === false && (
+          <div className="absolute -inset-20 bg-red-500/10 blur-3xl animate-pulse pointer-events-none opacity-50" />
+        )}
+        <CardHeader className="relative z-10">
           <CardTitle className="text-2xl">{question.title}</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="relative z-10">
           <div className="text-lg leading-relaxed text-foreground/90">
             <LatexRenderer content={question.content} />
           </div>
@@ -305,8 +333,15 @@ export function QuestionCard({ question, onComplete, onNext, onPrevious, current
       </Card>
 
       {/* Answer Area */}
-      <Card variant="glass">
-        <CardContent className="p-6">
+      <Card variant="glass" className="relative overflow-hidden">
+        {/* Subtle neon blur effects in background only */}
+        {submitted && isCorrect && (
+          <div className="absolute -inset-20 bg-green-500/10 blur-3xl animate-pulse pointer-events-none opacity-50" />
+        )}
+        {submitted && isCorrect === false && (
+          <div className="absolute -inset-20 bg-red-500/10 blur-3xl animate-pulse pointer-events-none opacity-50" />
+        )}
+        <CardContent className="p-6 relative z-10">
           <div className="mb-3">
             <label className="font-medium">Your Answer</label>
           </div>
@@ -322,13 +357,81 @@ export function QuestionCard({ question, onComplete, onNext, onPrevious, current
                 }
               }}
               placeholder="Enter a number..."
-              className={`bg-secondary/50 border-border/50 text-lg ${
-                submitted && isCorrect ? 'border-green-500/50' : 
-                submitted && !isCorrect ? 'border-destructive/50' : ''
+              className={`bg-secondary/50 border-2 text-lg transition-all duration-500 ${
+                submitted && isCorrect ? 'border-green-500' : 
+                submitted && !isCorrect ? 'border-red-500' : 'border-border/50'
               }`}
               step="any"
               disabled={(submitted && isCorrect) || answerRevealed}
             />
+          ) : question.answerType === 'mcq' && question.mcqOptions ? (
+            <div className="space-y-3">
+              {question.mcqOptions.map((option) => {
+                const isSelected = selectedMcqOption === option.id;
+                const isCorrectOption = option.id === question.correctAnswerId;
+                const showResult = submitted || answerRevealed;
+                
+                return (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => {
+                      if (!submitted && !answerRevealed) {
+                        setSelectedMcqOption(option.id);
+                      }
+                    }}
+                    disabled={submitted || answerRevealed}
+                    className={`
+                      w-full p-4 rounded-lg border-2 text-left transition-all duration-300
+                      ${
+                        showResult && isCorrectOption
+                          ? 'border-green-500 bg-green-500/10'
+                          : showResult && isSelected && !isCorrectOption
+                          ? 'border-red-500 bg-red-500/10'
+                          : isSelected
+                          ? 'border-primary bg-primary/10'
+                          : 'border-border bg-secondary/50 hover:border-primary/50 hover:bg-secondary'
+                      }
+                      ${submitted || answerRevealed ? 'cursor-not-allowed' : 'cursor-pointer'}
+                    `}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`
+                        w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
+                        ${
+                          showResult && isCorrectOption
+                            ? 'border-green-500 bg-green-500'
+                            : showResult && isSelected && !isCorrectOption
+                            ? 'border-red-500 bg-red-500'
+                            : isSelected
+                            ? 'border-primary bg-primary'
+                            : 'border-border'
+                        }
+                      `}>
+                        {isSelected && (
+                          <div className={`
+                            w-3 h-3 rounded-full
+                            ${showResult && !isCorrectOption ? 'bg-white' : 'bg-background'}
+                          `} />
+                        )}
+                        {showResult && isCorrectOption && !isSelected && (
+                          <Check className="w-4 h-4 text-white" />
+                        )}
+                        {showResult && isSelected && !isCorrectOption && (
+                          <X className="w-4 h-4 text-white" />
+                        )}
+                      </div>
+                      <span className="font-medium">{option.id.toUpperCase()}. {option.label}</span>
+                      {showResult && isCorrectOption && (
+                        <Badge variant="outline" className="ml-auto bg-green-500/10 text-green-400 border-green-500/30">
+                          Correct
+                        </Badge>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           ) : (
             <Textarea
               value={answer}
@@ -353,7 +456,10 @@ export function QuestionCard({ question, onComplete, onNext, onPrevious, current
               <Button 
                 variant="hero" 
                 onClick={handleSubmit}
-                disabled={question.answerType === 'number' && (!answer || answer.trim() === '')}
+                disabled={
+                  (question.answerType === 'number' && (!answer || answer.trim() === '')) ||
+                  (question.answerType === 'mcq' && !selectedMcqOption)
+                }
               >
                 <Check className="w-4 h-4 mr-2" />
                 Submit Answer

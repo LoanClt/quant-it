@@ -9,22 +9,25 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { questions, type Question } from "@/data/questions";
 import { LatexRenderer } from "@/components/LatexRenderer";
-import { Clock, Heart, Lightbulb, Trophy, ArrowLeft, CheckCircle2, XCircle, Zap, Lock } from "lucide-react";
+import { Clock, Heart, Lightbulb, Trophy, ArrowLeft, CheckCircle2, XCircle, Zap, Lock, Check, X } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
 
 type DifficultyLevel = "easy" | "medium" | "hard" | "extreme";
 
+type ChallengeType = 'probability' | 'markets';
+
 interface ChallengeState {
   company: string | null;
+  challengeType: ChallengeType | null;
   questions: Question[];
   currentQuestionIndex: number;
   lives: number;
   hintsUsed: number;
   startTime: number;
   timeRemaining: number; // in seconds
-  answers: { [questionId: string]: number | null };
+  answers: { [questionId: string]: number | string | null }; // Support both number and MCQ (string) answers
   hintsRevealed: { [questionId: string]: number };
   completed: boolean;
   failed: boolean;
@@ -68,9 +71,19 @@ const getEligibleCompanies = (isPaid: boolean): string[] => {
   return eligible.sort();
 };
 
-// Select 3 questions of increasing difficulty for a company
-const selectChallengeQuestions = (company: string): Question[] => {
-  const companyQuestions = questions.filter(q => q.firm === company);
+// Select 3 questions of increasing difficulty for a company, filtered by challenge type
+const selectChallengeQuestions = (company: string, challengeType: ChallengeType): Question[] => {
+  // Filter by company and answer type
+  let companyQuestions = questions.filter(q => q.firm === company);
+  
+  if (challengeType === 'probability') {
+    // Probability-oriented: only number input questions
+    companyQuestions = companyQuestions.filter(q => q.answerType === 'number');
+  } else if (challengeType === 'markets') {
+    // Market-oriented: only MCQ questions
+    companyQuestions = companyQuestions.filter(q => q.answerType === 'mcq');
+  }
+  
   const byDifficulty = {
     easy: companyQuestions.filter(q => getDifficultyLevel(q.difficulty) === "easy"),
     medium: companyQuestions.filter(q => getDifficultyLevel(q.difficulty) === "medium"),
@@ -109,6 +122,7 @@ export default function Challenge() {
   const { isPaid } = useSubscription();
   const [state, setState] = useState<ChallengeState>({
     company: null,
+    challengeType: null,
     questions: [],
     currentQuestionIndex: 0,
     lives: 3,
@@ -150,15 +164,16 @@ export default function Challenge() {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const handleStartChallenge = (company: string) => {
-    const challengeQuestions = selectChallengeQuestions(company);
+  const handleStartChallenge = (company: string, challengeType: ChallengeType) => {
+    const challengeQuestions = selectChallengeQuestions(company, challengeType);
     if (challengeQuestions.length < 3) {
-      toast.error("Not enough questions available for this company");
+      toast.error(`Not enough ${challengeType === 'probability' ? 'probability' : 'market'} questions available for this company`);
       return;
     }
 
     setState({
       company,
+      challengeType,
       questions: challengeQuestions,
       currentQuestionIndex: 0,
       lives: 3,
@@ -194,11 +209,17 @@ export default function Challenge() {
     }));
   };
 
-  const handleSubmitAnswer = (questionId: string, answer: number) => {
+  const handleSubmitAnswer = (questionId: string, answer: number | string) => {
     const question = state.questions.find(q => q.id === questionId);
     if (!question) return;
 
-    const isCorrect = Math.abs(answer - question.numericAnswer) < 0.001;
+    let isCorrect = false;
+    if (question.answerType === 'number' && question.numericAnswer !== undefined) {
+      const numAnswer = typeof answer === 'number' ? answer : parseFloat(answer as string);
+      isCorrect = !isNaN(numAnswer) && Math.abs(numAnswer - question.numericAnswer) < 0.001;
+    } else if (question.answerType === 'mcq' && question.correctAnswerId !== undefined) {
+      isCorrect = answer === question.correctAnswerId;
+    }
 
     if (isCorrect) {
       const newAnswers = { ...state.answers, [questionId]: answer };
@@ -259,14 +280,22 @@ export default function Challenge() {
     }
   };
 
-  const handleComplete = async (success: boolean, answersOverride?: { [questionId: string]: number | null }) => {
+  const handleComplete = async (success: boolean, answersOverride?: { [questionId: string]: number | string | null }) => {
     // Use provided answers or state answers
     const currentAnswers = answersOverride || state.answers;
     
-    const correctAnswers = state.questions.filter(
-      (q) => currentAnswers[q.id] !== undefined && 
-      Math.abs((currentAnswers[q.id] || 0) - q.numericAnswer) < 0.001
-    ).length;
+    const correctAnswers = state.questions.filter((q) => {
+      const userAnswer = currentAnswers[q.id];
+      if (userAnswer === undefined || userAnswer === null) return false;
+      
+      if (q.answerType === 'number' && q.numericAnswer !== undefined) {
+        const numAnswer = typeof userAnswer === 'number' ? userAnswer : parseFloat(userAnswer as string);
+        return !isNaN(numAnswer) && Math.abs(numAnswer - q.numericAnswer) < 0.001;
+      } else if (q.answerType === 'mcq' && q.correctAnswerId !== undefined) {
+        return userAnswer === q.correctAnswerId;
+      }
+      return false;
+    }).length;
 
     // Challenge is only successful if all 3 questions are correct AND success flag is true
     const allCorrect = correctAnswers === state.questions.length && success && state.questions.length === 3;
@@ -290,8 +319,15 @@ export default function Challenge() {
       // Double-check all answers are correct
       const allAnswersCorrect = prev.questions.every(q => {
         const userAnswer = answersToCheck[q.id];
-        return userAnswer !== undefined && 
-               Math.abs(userAnswer - q.numericAnswer) < 0.001;
+        if (userAnswer === undefined || userAnswer === null) return false;
+        
+        if (q.answerType === 'number' && q.numericAnswer !== undefined) {
+          const numAnswer = typeof userAnswer === 'number' ? userAnswer : parseFloat(userAnswer as string);
+          return !isNaN(numAnswer) && Math.abs(numAnswer - q.numericAnswer) < 0.001;
+        } else if (q.answerType === 'mcq' && q.correctAnswerId !== undefined) {
+          return userAnswer === q.correctAnswerId;
+        }
+        return false;
       });
       
       const finalAllCorrect = allAnswersCorrect && success;
@@ -308,7 +344,7 @@ export default function Challenge() {
     // Save challenge completion to database (even if failed)
     if (user && state.company) {
       try {
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from("challenge_completions")
           .insert({
             user_id: user.id,
@@ -342,13 +378,188 @@ export default function Challenge() {
     ? ((state.currentQuestionIndex + (state.answers[currentQuestion?.id || ""] !== undefined ? 1 : 0)) / state.questions.length) * 100 
     : 0;
 
+  // Challenge type selection screen (after company is selected)
+  if (state.company && !state.challengeType) {
+    const companyQuestions = questions.filter(q => q.firm === state.company);
+    const probabilityQuestions = companyQuestions.filter(q => q.answerType === 'number');
+    const marketQuestions = companyQuestions.filter(q => q.answerType === 'mcq');
+    const hasProbability = probabilityQuestions.length >= 3;
+    const hasMarkets = marketQuestions.length >= 3;
+
+    return (
+<div className="min-h-screen bg-background relative overflow-hidden">
+  <Navbar />
+
+  {/* 🔥 Smooth neon intensity background */}
+  <div className="pointer-events-none fixed inset-0 -z-10">
+    <div
+      className="
+        absolute inset-0
+        bg-gradient-to-br
+        from-orange-500/25
+        via-red-500/15
+        to-transparent
+        blur-[200px]
+      "
+    />
+    <div
+      className="
+        absolute inset-0
+        bg-gradient-to-tr
+        from-red-600/20
+        via-orange-400/10
+        to-transparent
+        blur-[260px]
+        animate-neonPulse
+      "
+    />
+  </div>
+
+  <main className="container px-4 pt-24 pb-12 relative z-10">
+    <div className="max-w-4xl mx-auto">
+      {/* Header */}
+      <div className="text-center mb-10">
+        <Button
+          variant="ghost"
+          onClick={() =>
+            setState(prev => ({ ...prev, company: null, challengeType: null }))
+          }
+          className="mb-6"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Companies
+        </Button>
+
+        <h1 className="text-4xl md:text-5xl font-bold mb-4">
+          Choose Challenge Type
+        </h1>
+        <p className="text-xl text-muted-foreground">
+          Select the type of challenge for <span className="font-medium">{state.company}</span>
+        </p>
+      </div>
+
+      {/* Challenge cards */}
+      <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+        
+        {/* Probability Challenge */}
+        <Card
+          className={`
+            group relative cursor-pointer transition-all duration-300
+            ${hasProbability
+              ? "hover:-translate-y-1 hover:shadow-xl hover:border-green-400"
+              : "opacity-60 cursor-not-allowed"}
+          `}
+          onClick={() => {
+            if (hasProbability) {
+              handleStartChallenge(state.company!, "probability");
+            }
+          }}
+        >
+          {/* Hover glow */}
+          {hasProbability && (
+            <div className="
+              absolute inset-0 rounded-xl bg-green-500/20 blur-2xl
+              opacity-0 group-hover:opacity-100 transition-opacity
+              pointer-events-none
+            " />
+          )}
+
+          <CardContent className="relative z-10 p-8 text-center space-y-4">
+            <h3 className="text-2xl font-semibold">Probability Challenge</h3>
+            <p className="text-sm text-muted-foreground">
+              Input-based questions focused on probability and mathematics
+            </p>
+
+            <div className="pt-4 space-y-3">
+              <p className="text-xs text-muted-foreground">
+                {probabilityQuestions.length} questions available
+              </p>
+
+              <Button
+                size="sm"
+                className="w-full"
+                disabled={!hasProbability}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (hasProbability) {
+                    handleStartChallenge(state.company!, "probability");
+                  }
+                }}
+              >
+                {hasProbability ? "Start Challenge" : "Not Enough Questions"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Markets Challenge */}
+        <Card
+          className={`
+            group relative cursor-pointer transition-all duration-300
+            ${hasMarkets
+              ? "hover:-translate-y-1 hover:shadow-xl hover:border-green-400"
+              : "opacity-60 cursor-not-allowed"}
+          `}
+          onClick={() => {
+            if (hasMarkets) {
+              handleStartChallenge(state.company!, "markets");
+            }
+          }}
+        >
+          {/* Hover glow */}
+          {hasMarkets && (
+            <div className="
+              absolute inset-0 rounded-xl bg-green-500/20 blur-2xl
+              opacity-0 group-hover:opacity-100 transition-opacity
+              pointer-events-none
+            " />
+          )}
+
+          <CardContent className="relative z-10 p-8 text-center space-y-4">
+            <h3 className="text-2xl font-semibold">Markets Challenge</h3>
+            <p className="text-sm text-muted-foreground">
+              Multiple-choice questions focused on Sales & Trading concepts
+            </p>
+
+            <div className="pt-4 space-y-3">
+              <p className="text-xs text-muted-foreground">
+                {marketQuestions.length} questions available
+              </p>
+
+              <Button
+                size="sm"
+                className="w-full"
+                disabled={!hasMarkets}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (hasMarkets) {
+                    handleStartChallenge(state.company!, "markets");
+                  }
+                }}
+              >
+                {hasMarkets ? "Start Challenge" : "Not Enough Questions"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+      </div>
+    </div>
+  </main>
+</div>
+    );
+  }
+
   // Company selection screen
   if (!state.company) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="container px-4 pt-24 pb-12">
-          <div className="max-w-4xl mx-auto">
+<main className="container px-4 pt-24 pb-12 relative overflow-hidden">
+
+  
+
+  <div className="max-w-4xl mx-auto">
             <div className="text-center mb-8">
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
                 Company Challenge
@@ -358,34 +569,117 @@ export default function Challenge() {
               </p>
             </div>
 
-            <Card className="mb-6">
-              <CardHeader>
-                <CardTitle>Challenge Rules</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <p>• 30 minutes to complete 3 questions of increasing difficulty</p>
-                <p>• 3 lives - wrong answer costs 1 life</p>
-                <p>• Hints available but reduce your final score</p>
-                <p>• No answer reveal - solve it yourself!</p>
-                <p>• Bonus points for time remaining</p>
-              </CardContent>
-            </Card>
+            <Card className="mb-6 relative overflow-hidden">
+  <CardHeader>
+    <CardTitle>Challenge Rules</CardTitle>
+  </CardHeader>
+
+  <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    {[
+      "30 minutes to complete 3 questions of increasing difficulty",
+      "3 lives — wrong answer costs 1 life",
+      "Hints available but reduce your final score",
+      "No answer reveal — solve it yourself",
+      "Bonus points for time remaining",
+    ].map((rule, index) => (
+      <div
+        key={index}
+        className="
+          relative group rounded-lg border bg-background px-4 py-3
+          text-sm text-muted-foreground
+          transition-all duration-300
+          hover:border-green-400 hover:text-foreground
+        "
+      >
+        {/* Hover glow */}
+        <div className="
+          absolute inset-0 rounded-lg bg-green-500/20 blur-xl opacity-0
+          group-hover:opacity-100 transition-opacity duration-300
+          pointer-events-none
+        " />
+
+
+        <span className="relative z-10">{rule}</span>
+      </div>
+    ))}
+  </CardContent>
+</Card>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {eligibleCompanies.map((company) => (
-                <Card
-                  key={company}
-                  className="cursor-pointer hover:border-primary transition-colors"
-                  onClick={() => handleStartChallenge(company)}
-                >
-                  <CardContent className="p-6 text-center">
-                    <h3 className="text-xl font-semibold">{company}</h3>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      {questions.filter(q => q.firm === company).length} questions available
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
+              {eligibleCompanies.map((company) => {
+                const companyQuestions = questions.filter(q => q.firm === company);
+                const probabilityCount = companyQuestions.filter(q => q.answerType === 'number').length;
+                const marketCount = companyQuestions.filter(q => q.answerType === 'mcq').length;
+                
+                return (
+                  <Card
+                    key={company}
+                    className="
+                      group cursor-pointer transition-all
+                      hover:border-primary hover:shadow-md
+                    "
+                    onClick={() => {
+                      // If only one type available, start directly; otherwise show type selection
+                      const hasProbability = probabilityCount >= 3;
+                      const hasMarkets = marketCount >= 3;
+                      
+                      if (hasProbability && !hasMarkets) {
+                        handleStartChallenge(company, 'probability');
+                      } else if (hasMarkets && !hasProbability) {
+                        handleStartChallenge(company, 'markets');
+                      } else {
+                        // Both available or neither - show type selection
+                        setState(prev => ({ ...prev, company }));
+                      }
+                    }}
+                  >
+                    <CardContent className="p-6 text-center space-y-4">
+                      <div>
+                        <h3 className="text-xl font-semibold">{company}</h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {probabilityCount >= 3 && marketCount >= 3 ? (
+                            <>
+                              {probabilityCount} probability, {marketCount} market questions
+                            </>
+                          ) : probabilityCount >= 3 ? (
+                            `${probabilityCount} probability questions`
+                          ) : marketCount >= 3 ? (
+                            `${marketCount} market questions`
+                          ) : (
+                            `${companyQuestions.length} questions available`
+                          )}
+                        </p>
+                      </div>
+
+                      {/* Start button — always visible */}
+                      <Button
+                        size="sm"
+                        className="
+                          w-full
+                          bg-primary text-primary-foreground
+                          hover:bg-primary/90
+                          transition-all
+                        "
+                        onClick={(e) => {
+                          e.stopPropagation(); // avoid double trigger
+                          const hasProbability = probabilityCount >= 3;
+                          const hasMarkets = marketCount >= 3;
+                          
+                          if (hasProbability && !hasMarkets) {
+                            handleStartChallenge(company, 'probability');
+                          } else if (hasMarkets && !hasProbability) {
+                            handleStartChallenge(company, 'markets');
+                          } else {
+                            setState(prev => ({ ...prev, company }));
+                          }
+                        }}
+                      >
+                        Start
+                      </Button>
+                    </CardContent>
+                  </Card>
+                );
+              })}
               
               {/* Locked companies for non-paid users */}
               {!isPaid && getEligibleCompanies(true).filter(c => c !== "Citadel").map((company) => (
@@ -417,6 +711,7 @@ export default function Challenge() {
               ))}
             </div>
           </div>
+        
         </main>
       </div>
     );
@@ -472,10 +767,14 @@ export default function Challenge() {
 
             {/* Current Question */}
             {currentQuestion && (
-              <Card className={`mb-6 transition-all duration-300 ${
+              <Card className={`mb-6 transition-all duration-300 relative overflow-hidden ${
                 state.shake ? "animate-shake border-2 border-red-500" : ""
               }`}>
-                <CardHeader>
+                {/* Subtle red neon blur effect in background only */}
+                {state.shake && (
+                  <div className="absolute -inset-20 bg-red-500/10 blur-3xl animate-pulse pointer-events-none opacity-50" />
+                )}
+                <CardHeader className="relative z-10">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-2xl">{currentQuestion.title}</CardTitle>
                     <Badge variant="outline">
@@ -483,7 +782,7 @@ export default function Challenge() {
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-6 relative z-10">
                   <div className="prose dark:prose-invert max-w-none">
                     <LatexRenderer content={currentQuestion.content} />
                   </div>
@@ -510,9 +809,9 @@ export default function Challenge() {
                         {currentQuestion.hints
                           .slice(0, state.hintsRevealed[currentQuestion.id])
                           .map((hint, idx) => (
-                            <p key={idx} className="text-sm">
-                              {idx + 1}. {hint}
-                            </p>
+                            <div key={idx} className="text-sm">
+                              <span className="font-medium">{idx + 1}.</span> <LatexRenderer content={hint} />
+                            </div>
                           ))}
                       </div>
                     )}
@@ -521,45 +820,94 @@ export default function Challenge() {
                   {/* Answer Input */}
                   {state.answers[currentQuestion.id] === undefined && (
                     <div className="space-y-4">
-                      <Input
-                        type="number"
-                        step="any"
-                        placeholder="Enter your answer"
-                        className="text-lg"
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            const value = parseFloat(e.currentTarget.value);
-                            if (!isNaN(value)) {
-                              handleSubmitAnswer(currentQuestion.id, value);
-                              e.currentTarget.value = "";
-                            }
-                          }
-                        }}
-                      />
-                      <Button
-                        className="w-full"
-                        onClick={() => {
-                          const input = document.querySelector('input[type="number"]') as HTMLInputElement;
-                          if (input) {
-                            const value = parseFloat(input.value);
-                            if (!isNaN(value)) {
-                              handleSubmitAnswer(currentQuestion.id, value);
-                              input.value = "";
-                            } else {
-                              toast.error("Please enter a valid number");
-                            }
-                          }
-                        }}
-                      >
-                        Submit Answer
-                      </Button>
+                      {currentQuestion.answerType === 'number' ? (
+                        <>
+                          <Input
+                            type="number"
+                            step="any"
+                            placeholder="Enter your answer"
+                            className="text-lg"
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                const value = parseFloat(e.currentTarget.value);
+                                if (!isNaN(value)) {
+                                  handleSubmitAnswer(currentQuestion.id, value);
+                                  e.currentTarget.value = "";
+                                }
+                              }
+                            }}
+                          />
+                          <Button
+                            className="w-full"
+                            onClick={() => {
+                              const input = document.querySelector('input[type="number"]') as HTMLInputElement;
+                              if (input) {
+                                const value = parseFloat(input.value);
+                                if (!isNaN(value)) {
+                                  handleSubmitAnswer(currentQuestion.id, value);
+                                  input.value = "";
+                                } else {
+                                  toast.error("Please enter a valid number");
+                                }
+                              }
+                            }}
+                          >
+                            Submit Answer
+                          </Button>
+                        </>
+                      ) : currentQuestion.answerType === 'mcq' && currentQuestion.mcqOptions ? (
+                        <div className="space-y-3">
+                          {currentQuestion.mcqOptions.map((option) => {
+                            const isSelected = state.answers[currentQuestion.id] === option.id;
+                            
+                            return (
+                              <button
+                                key={option.id}
+                                type="button"
+                                onClick={() => {
+                                  handleSubmitAnswer(currentQuestion.id, option.id);
+                                }}
+                                className={`
+                                  w-full p-4 rounded-lg border-2 text-left transition-all duration-300
+                                  ${
+                                    isSelected
+                                      ? 'border-primary bg-primary/10'
+                                      : 'border-border bg-secondary/50 hover:border-primary/50 hover:bg-secondary'
+                                  }
+                                  cursor-pointer
+                                `}
+                              >
+                                <div className="flex items-center gap-3">
+                                  <div className={`
+                                    w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
+                                    ${
+                                      isSelected
+                                        ? 'border-primary bg-primary'
+                                        : 'border-border'
+                                    }
+                                  `}>
+                                    {isSelected && (
+                                      <div className="w-3 h-3 rounded-full bg-background" />
+                                    )}
+                                  </div>
+                                  <span className="font-medium">{option.id.toUpperCase()}. {option.label}</span>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ) : null}
                     </div>
                   )}
 
                   {state.answers[currentQuestion.id] !== undefined && (
                     <div className="flex items-center gap-2 text-green-500">
                       <CheckCircle2 className="w-5 h-5" />
-                      <span>Answer submitted: {state.answers[currentQuestion.id]}</span>
+                      <span>Answer submitted: {
+                        currentQuestion.answerType === 'mcq' && currentQuestion.mcqOptions
+                          ? currentQuestion.mcqOptions.find(o => o.id === state.answers[currentQuestion.id])?.label || state.answers[currentQuestion.id]
+                          : state.answers[currentQuestion.id]
+                      }</span>
                     </div>
                   )}
                 </CardContent>
@@ -635,6 +983,7 @@ export default function Challenge() {
                   onClick={() => {
                     setState({
                       company: null,
+                      challengeType: null,
                       questions: [],
                       currentQuestionIndex: 0,
                       lives: 3,

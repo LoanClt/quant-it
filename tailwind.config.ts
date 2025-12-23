@@ -100,6 +100,16 @@ export default {
           "10%, 30%, 50%, 70%, 90%": { transform: "translateX(-10px)" },
           "20%, 40%, 60%, 80%": { transform: "translateX(10px)" },
         },
+        neonPulse: {
+          '0%, 100%': { opacity: '0.6', transform: 'scale(0.95)' },
+          '50%': { opacity: '1', transform: 'scale(1.05)' },
+        },
+        neonFlicker: {
+          '0%, 100%': { opacity: '1' },
+          '45%': { opacity: '0.8' },
+          '50%': { opacity: '0.3' },
+          '55%': { opacity: '1' },
+        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -107,6 +117,8 @@ export default {
         shimmer: "shimmer 2s infinite",
         "border-beam": "border-beam 3s linear infinite",
         shake: "shake 0.6s ease-in-out",
+        neonPulse: 'neonPulse 2.8s ease-in-out infinite',
+        neonFlicker: 'neonFlicker 3.5s infinite',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

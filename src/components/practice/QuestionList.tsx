@@ -41,6 +41,7 @@ export function QuestionList({ questions, onSelect }: QuestionListProps) {
   const getCategoryLabel = (category: string) => {
     if (category === 'probability') return 'Probability';
     if (category === 'brain-teaser') return 'Brain Teaser';
+    if (category === 'sales-and-trading') return 'Markets';
     return category;
   };
 

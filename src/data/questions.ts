@@ -1,7 +1,12 @@
+export interface MCQOption {
+  id: string;
+  label: string;
+}
+
 export interface Question {
   id: string;
   title: string;
-  category: 'probability' | 'brain-teaser';
+  category: 'probability' | 'brain-teaser' | 'sales-and-trading';
   subcategory: string;
   difficulty: number; // 1-4: easy, 5-7: medium, 8-9: hard, 10: extreme
   content: string;
@@ -12,8 +17,10 @@ export interface Question {
   skills: string[];
   tags: string[];
   benchmarkTime: number; // in seconds
-  answerType: 'number';
-  numericAnswer: number; // The correct numeric answer (for validation)
+  answerType: 'number' | 'mcq';
+  numericAnswer?: number; // The correct numeric answer (for validation) - required if answerType is 'number'
+  mcqOptions?: MCQOption[]; // Multiple choice options - required if answerType is 'mcq'
+  correctAnswerId?: string; // The ID of the correct MCQ option - required if answerType is 'mcq'
   firm?: string; // Which firm this question appeared at
   requiresPaid?: boolean; // Whether this question requires paid subscription
 }
@@ -3702,12 +3709,1977 @@ export const questions: Question[] = [
     "numericAnswer": 0.50,
     "firm": "Jane Street",
     "requiresPaid": false
+  },
+  {
+    id: "st4",
+    title: "Forward Pricing with Continuous Compounding",
+    category: "sales-and-trading",
+    subcategory: "Derivatives",
+    difficulty: 1,
+    requiresPaid: true,
+    content: "A non-dividend-paying stock trades at 100 USD. The risk-free rate is 5 percent (annual, continuously compounded) and time to maturity is 1 year. What is the fair forward price?",
+    hints: [
+      "Use the no-arbitrage forward pricing formula",
+      "Continuous compounding matters",
+      "Formula: $F_0 = S_0 e^{rT}$"
+    ],
+    solution: "The fair forward price is approximately 105.13 USD",
+    solutionSteps: [
+      "Spot price $S_0 = 100$",
+      "Risk-free rate $r = 0.05$, maturity $T = 1$",
+      "Forward price $F_0 = 100 e^{0.05} \\approx 105.13$"
+    ],
+    commonMistakes: [
+      "Using simple interest instead of exponential compounding",
+      "Forgetting to multiply the rate by maturity"
+    ],
+    skills: ["forwards", "arbitrage pricing"],
+    tags: ["sales-and-trading", "easy", "forwards"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "105.13 USD" },
+      { id: "b", label: "100 USD" },
+      { id: "c", label: "110 USD" },
+      { id: "d", label: "95 USD" }
+    ],
+    correctAnswerId: "a",
+    firm: "JPMorgan"
+  },
+  {
+    id: "st5",
+    title: "Put Option Profit",
+    category: "sales-and-trading",
+    subcategory: "Derivatives",
+    difficulty: 2,
+    requiresPaid: true,
+    content: "You buy a European put option with a strike of 80 USD for a premium of 4 USD. At maturity, the stock price is 70 USD. What is your profit?",
+    hints: [
+      "Put payoff is $\\max(K - S_T, 0)$",
+      "Subtract the premium",
+      "Check moneyness at maturity"
+    ],
+    solution: "The profit is 6 USD per share",
+    solutionSteps: [
+      "Intrinsic value $= 80 - 70 = 10$",
+      "Premium paid $= 4$",
+      "Profit $= 10 - 4 = 6$"
+    ],
+    commonMistakes: [
+      "Confusing payoff and profit",
+      "Applying call option logic"
+    ],
+    skills: ["options", "payoff analysis"],
+    tags: ["sales-and-trading", "easy", "options"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "6 USD" },
+      { id: "b", label: "10 USD" },
+      { id: "c", label: "4 USD" },
+      { id: "d", label: "0 USD" }
+    ],
+    correctAnswerId: "a",
+    firm: "BNP Paribas"
+  },
+  {
+    id: "st6",
+    title: "Covered Call PnL Decomposition",
+    category: "sales-and-trading",
+    subcategory: "Options Strategies",
+    difficulty: 3,
+    requiresPaid: true,
+    content: "You buy a stock at 100 USD and simultaneously sell a call option with strike 110 USD for a premium of 3 USD. At expiration, the stock trades at 120 USD. What is your total profit?",
+    hints: [
+      "Covered call upside is capped",
+      "Stock will be sold at the strike",
+      "Add the option premium received"
+    ],
+    solution: "The total profit is 13 USD",
+    solutionSteps: [
+      "Stock is called away at 110",
+      "Stock gain $= 110 - 100 = 10$",
+      "Option premium received $= 3$",
+      "Total profit $= 13$"
+    ],
+    commonMistakes: [
+      "Using the terminal stock price instead of the strike",
+      "Ignoring the option premium"
+    ],
+    skills: ["options strategies", "PnL attribution"],
+    tags: ["sales-and-trading", "medium", "options"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "13 USD" },
+      { id: "b", label: "20 USD" },
+      { id: "c", label: "10 USD" },
+      { id: "d", label: "23 USD" }
+    ],
+    correctAnswerId: "a",
+    firm: "Goldman Sachs"
+  },
+  {
+    id: "st7",
+    title: "Zero-Coupon Bond Duration",
+    category: "sales-and-trading",
+    subcategory: "Fixed Income",
+    difficulty: 4,
+    requiresPaid: true,
+    content: "A zero-coupon bond has a maturity of 5 years and is priced using a flat yield curve. What is its Macaulay duration?",
+    hints: [
+      "Duration is the weighted average timing of cash flows",
+      "Zero-coupon bonds have a single cash flow",
+      "All weight is at maturity"
+    ],
+    solution: "The Macaulay duration is 5 years",
+    solutionSteps: [
+      "Only one cash flow at maturity",
+      "Timing of the cash flow is 5 years",
+      "Duration equals maturity"
+    ],
+    commonMistakes: [
+      "Confusing Macaulay and modified duration",
+      "Assuming duration must be shorter than maturity"
+    ],
+    skills: ["fixed income", "interest rate risk"],
+    tags: ["sales-and-trading", "medium", "fixed-income"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "5 years" },
+      { id: "b", label: "Less than 5 years" },
+      { id: "c", label: "Greater than 5 years" },
+      { id: "d", label: "0 years" }
+    ],
+    correctAnswerId: "a",
+    firm: "Morgan Stanley"
+  },
+  {
+    id: "st8",
+    title: "Futures Daily Mark-to-Market",
+    category: "sales-and-trading",
+    subcategory: "Futures",
+    difficulty: 5,
+    requiresPaid: true,
+    content: "You are long one futures contract entered at 200 USD. The next day, the futures price moves to 190 USD. The contract size is 10 units. What is your daily PnL?",
+    hints: [
+      "Futures are marked to market daily",
+      "PnL equals price change times contract size",
+      "Sign matters"
+    ],
+    solution: "The daily PnL is -100 USD",
+    solutionSteps: [
+      "Price change $= 190 - 200 = -10$",
+      "Contract size $= 10$",
+      "Daily PnL $= -10 \\times 10 = -100$"
+    ],
+    commonMistakes: [
+      "Ignoring the contract multiplier",
+      "Using absolute value instead of signed PnL"
+    ],
+    skills: ["futures", "margin mechanics"],
+    tags: ["sales-and-trading", "medium", "futures"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "-100 USD" },
+      { id: "b", label: "-10 USD" },
+      { id: "c", label: "100 USD" },
+      { id: "d", label: "0 USD" }
+    ],
+    correctAnswerId: "a",
+    firm: "Citi"
+  },
+  {
+    id: "st9",
+    title: "Vertical Call Spread Payoff",
+    category: "sales-and-trading",
+    subcategory: "Options Strategies",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "You enter a vertical call spread by buying a call with strike 100 USD and selling a call with strike 110 USD. At maturity, the stock price is 115 USD. What is the payoff of the strategy, excluding premiums?",
+    hints: [
+      "Evaluate each option payoff separately",
+      "Upper strike caps the payoff",
+      "Ignore premiums"
+    ],
+    solution: "The payoff is 10 USD",
+    solutionSteps: [
+      "Long call payoff $= 115 - 100 = 15$",
+      "Short call payoff $= 115 - 110 = 5$",
+      "Net payoff $= 15 - 5 = 10$"
+    ],
+    commonMistakes: [
+      "Letting payoff exceed the spread width",
+      "Subtracting premiums instead of excluding them"
+    ],
+    skills: ["options", "structured payoffs"],
+    tags: ["sales-and-trading", "hard", "options"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "10 USD" },
+      { id: "b", label: "15 USD" },
+      { id: "c", label: "5 USD" },
+      { id: "d", label: "0 USD" }
+    ],
+    correctAnswerId: "a",
+    firm: "Barclays"
+  },
+  {
+    id: "st10",
+    title: "Duration-Based Price Approximation",
+    category: "sales-and-trading",
+    subcategory: "Fixed Income",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "A bond has a modified duration of 6. If its yield increases by 50 basis points, what is the approximate percentage change in its price?",
+    hints: [
+      "Use first-order duration approximation",
+      "Convert basis points to decimals",
+      "Remember the negative relationship"
+    ],
+    solution: "The bond price decreases by approximately 3 percent",
+    solutionSteps: [
+      "Yield change $\\Delta y = 0.005$",
+      "Modified duration $D = 6$",
+      "Price change $\\approx -D \\Delta y = -0.03$"
+    ],
+    commonMistakes: [
+      "Dropping the minus sign",
+      "Using Macaulay duration instead of modified duration"
+    ],
+    skills: ["fixed income", "risk management"],
+    tags: ["sales-and-trading", "hard", "fixed-income"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "-3 percent" },
+      { id: "b", label: "-0.3 percent" },
+      { id: "c", label: "3 percent" },
+      { id: "d", label: "6 percent" }
+    ],
+    correctAnswerId: "a",
+    firm: "HSBC"
+  },
+  {
+    id: "st11",
+    title: "Delta Approximation Limits",
+    category: "sales-and-trading",
+    subcategory: "Greeks",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "A call option has a delta of 0.6 and a gamma of 0.05. The underlying stock increases by 2 USD. Using a second-order approximation, what is the approximate change in the option price?",
+    hints: [
+      "Use delta-gamma approximation",
+      "Formula: $\\Delta V \\approx \\Delta S \\cdot \\Delta + \\tfrac{1}{2} \\Gamma (\\Delta S)^2$",
+      "Plug in the numbers carefully"
+    ],
+    solution: "The option price increases by approximately 1.3 USD",
+    solutionSteps: [
+      "Delta contribution $= 0.6 \\times 2 = 1.2$",
+      "Gamma contribution $= 0.5 \\times 0.05 \\times 4 = 0.1$",
+      "Total change $= 1.3$"
+    ],
+    commonMistakes: [
+      "Ignoring gamma",
+      "Applying the gamma term with the wrong sign"
+    ],
+    skills: ["options greeks", "risk approximation"],
+    tags: ["sales-and-trading", "hard", "greeks"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "1.3 USD" },
+      { id: "b", label: "1.2 USD" },
+      { id: "c", label: "1.4 USD" },
+      { id: "d", label: "0.6 USD" }
+    ],
+    correctAnswerId: "a",
+    firm: "Jane Street"
+  },
+  {
+    id: "st12",
+    title: "Volatility Shock on a Straddle",
+    category: "sales-and-trading",
+    subcategory: "Options",
+    difficulty: 8,
+    requiresPaid: true,
+    content: "You are long an at-the-money straddle. The underlying price does not move, but implied volatility drops significantly. What happens to the position value, all else equal?",
+    hints: [
+      "A straddle has positive vega",
+      "Implied volatility directly affects option premiums",
+      "Assume no theta over the period"
+    ],
+    solution: "The position loses value",
+    solutionSteps: [
+      "Long straddles benefit from higher implied volatility",
+      "A volatility decrease reduces both call and put values",
+      "Net effect is a loss"
+    ],
+    commonMistakes: [
+      "Focusing only on delta exposure",
+      "Assuming unchanged price means unchanged value"
+    ],
+    skills: ["volatility", "options strategies"],
+    tags: ["sales-and-trading", "extreme", "options"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Loses value" },
+      { id: "b", label: "Gains value" },
+      { id: "c", label: "Remains unchanged" },
+      { id: "d", label: "Becomes risk-free" }
+    ],
+    correctAnswerId: "a",
+    firm: "IMC"
+  },
+  {
+    id: "st13",
+    title: "Quanto Option Risk Decomposition",
+    category: "sales-and-trading",
+    subcategory: "Exotics",
+    difficulty: 9,
+    requiresPaid: false,
+    content: "A quanto call option references a foreign equity index but pays off in USD using a fixed FX rate. Which source of risk is removed for the holder compared to a standard foreign equity option?",
+    hints: [
+      "Compare standard foreign equity exposure to quanto exposure",
+      "Think about currency conversion at maturity",
+      "Fixed FX rate is the key feature"
+    ],
+    solution: "Foreign exchange risk is eliminated",
+    solutionSteps: [
+      "Underlying equity remains risky",
+      "Payoff is converted at a predetermined FX rate",
+      "Currency fluctuations no longer affect the payoff"
+    ],
+    commonMistakes: [
+      "Assuming equity volatility is removed",
+      "Confusing FX risk with interest rate risk"
+    ],
+    skills: ["exotic derivatives", "cross-asset risk"],
+    tags: ["sales-and-trading", "extreme", "exotics"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "FX risk" },
+      { id: "b", label: "Equity risk" },
+      { id: "c", label: "Volatility risk" },
+      { id: "d", label: "Interest rate risk" }
+    ],
+    correctAnswerId: "a",
+    firm: "Deutsche Bank"
+  },
+  {
+    id: "st14",
+    title: "Forward Pricing with Dividends",
+    category: "sales-and-trading",
+    subcategory: "Derivatives",
+    difficulty: 2,
+    requiresPaid: true,
+    content: "A stock trades at 120 USD and will pay a known discrete dividend of 4 USD in 6 months. The risk-free rate is 4 percent (annual, continuously compounded). What is the fair 1-year forward price?",
+    hints: [
+      "Subtract the present value of dividends",
+      "Use continuous compounding",
+      "Formula: F = (S0 - PV(div)) e^{rT}"
+    ],
+    solution: "The fair forward price is approximately 120.96 USD",
+    solutionSteps: [
+      "PV(dividend) = 4 e^{-0.04 * 0.5} ≈ 3.92",
+      "Adjusted spot = 120 - 3.92 = 116.08",
+      "Forward price = 116.08 e^{0.04} ≈ 120.96"
+    ],
+    commonMistakes: [
+      "Ignoring dividends",
+      "Discounting the dividend incorrectly"
+    ],
+    skills: ["forwards", "dividends"],
+    tags: ["sales-and-trading", "easy", "forwards"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "120.96 USD" },
+      { id: "b", label: "124.90 USD" },
+      { id: "c", label: "116.08 USD" },
+      { id: "d", label: "125.00 USD" }
+    ],
+    correctAnswerId: "a",
+    firm: "UBS"
+  },
+  {
+    id: "st15",
+    title: "Call vs Put Parity Check",
+    category: "sales-and-trading",
+    subcategory: "Derivatives",
+    difficulty: 3,
+    requiresPaid: true,
+    content: "A European call is priced at 7 USD and a European put at 5 USD on the same stock with strike 100 USD and maturity 1 year. The stock price is 98 USD and the risk-free rate is zero. Is there an arbitrage opportunity?",
+    hints: [
+      "Use put-call parity",
+      "Formula: C - P = S0 - K e^{-rT}",
+      "Compare both sides"
+    ],
+    solution: "Yes, the call is overpriced relative to the put",
+    solutionSteps: [
+      "Left-hand side: C - P = 2",
+      "Right-hand side: 98 - 100 = -2",
+      "Parity violated, arbitrage exists"
+    ],
+    commonMistakes: [
+      "Forgetting discounting term",
+      "Mixing European and American parity"
+    ],
+    skills: ["options", "arbitrage"],
+    tags: ["sales-and-trading", "medium", "options"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Yes, call is overpriced" },
+      { id: "b", label: "Yes, put is overpriced" },
+      { id: "c", label: "No arbitrage" },
+      { id: "d", label: "Insufficient information" }
+    ],
+    correctAnswerId: "a",
+    firm: "Citadel"
+  },
+  {
+    id: "st16",
+    title: "Break-Even of a Long Call",
+    category: "sales-and-trading",
+    subcategory: "Options",
+    difficulty: 2,
+    requiresPaid: true,
+    content: "You buy a call option with strike 90 USD for a premium of 6 USD. What is the break-even stock price at maturity?",
+    hints: [
+      "Break-even occurs when profit is zero",
+      "Call payoff equals premium",
+      "Add premium to strike"
+    ],
+    solution: "The break-even price is 96 USD",
+    solutionSteps: [
+      "Break-even when S_T - K = premium",
+      "S_T = 90 + 6 = 96"
+    ],
+    commonMistakes: [
+      "Subtracting the premium",
+      "Confusing break-even with strike"
+    ],
+    skills: ["options", "payoff analysis"],
+    tags: ["sales-and-trading", "easy", "options"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "96 USD" },
+      { id: "b", label: "90 USD" },
+      { id: "c", label: "84 USD" },
+      { id: "d", label: "102 USD" }
+    ],
+    correctAnswerId: "a",
+    firm: "BNP Paribas"
+  },
+  {
+    id: "st17",
+    title: "Bond Price and Yield Direction",
+    category: "sales-and-trading",
+    subcategory: "Fixed Income",
+    difficulty: 3,
+    requiresPaid: true,
+    content: "A bond is trading at a premium to par. How does its coupon rate compare to its yield to maturity?",
+    hints: [
+      "Premium bonds have coupons above market rates",
+      "Think about investor required return",
+      "Recall bond pricing intuition"
+    ],
+    solution: "The coupon rate is higher than the yield to maturity",
+    solutionSteps: [
+      "Premium price implies high coupon",
+      "Yield adjusts downward to match price",
+      "Coupon rate exceeds YTM"
+    ],
+    commonMistakes: [
+      "Assuming coupon equals yield",
+      "Reversing the relationship"
+    ],
+    skills: ["fixed income", "bond pricing"],
+    tags: ["sales-and-trading", "medium", "fixed-income"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Coupon rate > YTM" },
+      { id: "b", label: "Coupon rate < YTM" },
+      { id: "c", label: "Coupon rate = YTM" },
+      { id: "d", label: "No relationship" }
+    ],
+    correctAnswerId: "a",
+    firm: "Morgan Stanley"
+  },
+  {
+    id: "st18",
+    title: "PnL of a Short Futures Position",
+    category: "sales-and-trading",
+    subcategory: "Futures",
+    difficulty: 4,
+    requiresPaid: true,
+    content: "You are short one futures contract at 150 USD. The next day the futures price increases to 158 USD. The contract size is 5 units. What is your daily PnL?",
+    hints: [
+      "Short positions lose when prices rise",
+      "PnL equals price change times contract size",
+      "Sign matters"
+    ],
+    solution: "The daily PnL is -40 USD",
+    solutionSteps: [
+      "Price change = 158 - 150 = 8",
+      "Short position implies negative PnL",
+      "PnL = -8 × 5 = -40"
+    ],
+    commonMistakes: [
+      "Forgetting sign for short position",
+      "Ignoring contract size"
+    ],
+    skills: ["futures", "PnL calculation"],
+    tags: ["sales-and-trading", "medium", "futures"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "-40 USD" },
+      { id: "b", label: "40 USD" },
+      { id: "c", label: "-8 USD" },
+      { id: "d", label: "0 USD" }
+    ],
+    correctAnswerId: "a",
+    firm: "Citi"
+  },
+  {
+    id: "st19",
+    title: "Maximum Loss of a Bull Call Spread",
+    category: "sales-and-trading",
+    subcategory: "Options Strategies",
+    difficulty: 5,
+    requiresPaid: true,
+    content: "You buy a call with strike 100 USD for 8 USD and sell a call with strike 110 USD for 3 USD. What is the maximum possible loss of the strategy?",
+    hints: [
+      "Loss occurs if both options expire worthless",
+      "Compute net premium paid",
+      "Ignore transaction costs"
+    ],
+    solution: "The maximum loss is 5 USD",
+    solutionSteps: [
+      "Net premium paid = 8 - 3 = 5",
+      "Worst case payoff = 0",
+      "Maximum loss equals net premium"
+    ],
+    commonMistakes: [
+      "Using spread width instead of premium",
+      "Confusing loss with payoff"
+    ],
+    skills: ["options strategies", "risk limits"],
+    tags: ["sales-and-trading", "hard", "options"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "5 USD" },
+      { id: "b", label: "10 USD" },
+      { id: "c", label: "8 USD" },
+      { id: "d", label: "0 USD" }
+    ],
+    correctAnswerId: "a",
+    firm: "Barclays"
+  },
+  {
+    id: "st20",
+    title: "Convexity Intuition",
+    category: "sales-and-trading",
+    subcategory: "Fixed Income",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "All else equal, which bond has higher convexity: a long-maturity zero-coupon bond or a short-maturity coupon bond?",
+    hints: [
+      "Convexity increases with maturity",
+      "Zero-coupon bonds concentrate cash flows",
+      "Think curvature, not duration"
+    ],
+    solution: "The long-maturity zero-coupon bond has higher convexity",
+    solutionSteps: [
+      "Longer maturity increases convexity",
+      "Zero-coupon structure amplifies curvature",
+      "Thus convexity is higher"
+    ],
+    commonMistakes: [
+      "Confusing convexity with duration",
+      "Ignoring maturity effects"
+    ],
+    skills: ["fixed income", "convexity"],
+    tags: ["sales-and-trading", "hard", "fixed-income"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Long-maturity zero-coupon bond" },
+      { id: "b", label: "Short-maturity coupon bond" },
+      { id: "c", label: "They have equal convexity" },
+      { id: "d", label: "Cannot be determined" }
+    ],
+    correctAnswerId: "a",
+    firm: "HSBC"
+  },
+  {
+    id: "st21",
+    title: "Gamma Exposure Sign",
+    category: "sales-and-trading",
+    subcategory: "Greeks",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "You are short an at-the-money European call option. What is the sign of your gamma exposure?",
+    hints: [
+      "Long options have positive gamma",
+      "Short positions reverse the sign",
+      "Gamma measures curvature"
+    ],
+    solution: "The gamma exposure is negative",
+    solutionSteps: [
+      "Call options have positive gamma when long",
+      "Shorting reverses gamma sign",
+      "Thus gamma is negative"
+    ],
+    commonMistakes: [
+      "Confusing delta and gamma",
+      "Assuming gamma depends on direction"
+    ],
+    skills: ["options greeks", "risk"],
+    tags: ["sales-and-trading", "hard", "greeks"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Negative gamma" },
+      { id: "b", label: "Positive gamma" },
+      { id: "c", label: "Zero gamma" },
+      { id: "d", label: "Gamma depends on volatility" }
+    ],
+    correctAnswerId: "a",
+    firm: "Jane Street"
+  },
+  {
+    id: "st22",
+    title: "Theta Interpretation",
+    category: "sales-and-trading",
+    subcategory: "Greeks",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "You are long an at-the-money call option. All else equal, time passes and the underlying price does not move. What is the effect on the option value?",
+    hints: [
+      "Consider theta for long options",
+      "Assume positive interest rates",
+      "Ignore volatility changes"
+    ],
+    solution: "The option value decreases",
+    solutionSteps: [
+      "Long options have negative theta",
+      "Time decay reduces extrinsic value",
+      "Price decreases over time"
+    ],
+    commonMistakes: [
+      "Assuming time helps all positions",
+      "Ignoring extrinsic value"
+    ],
+    skills: ["options greeks", "time decay"],
+    tags: ["sales-and-trading", "hard", "greeks"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Decreases" },
+      { id: "b", label: "Increases" },
+      { id: "c", label: "Stays constant" },
+      { id: "d", label: "Becomes zero immediately" }
+    ],
+    correctAnswerId: "a",
+    firm: "Optiver"
+  },
+  {
+    id: "st23",
+    title: "Risk-Neutral Probability in Binomial Model",
+    category: "sales-and-trading",
+    subcategory: "Derivatives",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "In a one-period binomial model, the stock can move from 100 USD to either 110 USD or 90 USD. The risk-free rate is zero. What is the risk-neutral probability of the up move?",
+    hints: [
+      "Use no-arbitrage condition",
+      "Expected price under risk-neutral measure equals forward price",
+      "Solve for probability"
+    ],
+    solution: "The risk-neutral probability is 0.5",
+    solutionSteps: [
+      "Expected price = p × 110 + (1 - p) × 90",
+      "Set equal to 100",
+      "Solve: p = 0.5"
+    ],
+    commonMistakes: [
+      "Using real-world probabilities",
+      "Forgetting discounting"
+    ],
+    skills: ["binomial model", "pricing"],
+    tags: ["sales-and-trading", "hard", "derivatives"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "0.5" },
+      { id: "b", label: "0.55" },
+      { id: "c", label: "0.45" },
+      { id: "d", label: "0.6" }
+    ],
+    correctAnswerId: "a",
+    firm: "IMC"
+  },
+  {
+    id: "st24",
+    title: "Vega Exposure of a Butterfly",
+    category: "sales-and-trading",
+    subcategory: "Options Strategies",
+    difficulty: 8,
+    requiresPaid: true,
+    content: "You construct a symmetric butterfly using calls with strikes K - d, K, and K + d. What is the approximate vega exposure of the strategy?",
+    hints: [
+      "Butterflies combine long and short options",
+      "Central strike dominates vega",
+      "Think net exposure"
+    ],
+    solution: "The vega exposure is approximately neutral to slightly short",
+    solutionSteps: [
+      "Long wings contribute positive vega",
+      "Short two at-the-money calls contribute strong negative vega",
+      "Net vega is near zero or slightly negative"
+    ],
+    commonMistakes: [
+      "Assuming strong long volatility exposure",
+      "Ignoring relative vegas of strikes"
+    ],
+    skills: ["options strategies", "volatility"],
+    tags: ["sales-and-trading", "extreme", "options"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Approximately vega neutral or slightly short" },
+      { id: "b", label: "Strongly long vega" },
+      { id: "c", label: "Strongly short vega" },
+      { id: "d", label: "Exactly zero vega in all cases" }
+    ],
+    correctAnswerId: "a",
+    firm: "Citadel"
+  },
+  {
+    id: "st25",
+    title: "Forward vs Futures Pricing",
+    category: "sales-and-trading",
+    subcategory: "Derivatives",
+    difficulty: 5,
+    requiresPaid: true,
+    content: "Under which condition do forward and futures prices differ most significantly?",
+    hints: [
+      "Consider correlation between interest rates and underlying",
+      "Think mark-to-market",
+      "Futures involve daily settlement"
+    ],
+    solution: "When interest rates are stochastic and correlated with the underlying price",
+    solutionSteps: [
+      "Futures are marked to market daily",
+      "Correlation with rates affects reinvestment",
+      "Forward prices are unaffected by this mechanism"
+    ],
+    commonMistakes: [
+      "Assuming forwards and futures are always equal",
+      "Ignoring interest rate uncertainty"
+    ],
+    skills: ["forwards", "futures"],
+    tags: ["sales-and-trading", "medium", "derivatives"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "When rates are stochastic and correlated with prices" },
+      { id: "b", label: "When volatility is high" },
+      { id: "c", label: "When dividends are zero" },
+      { id: "d", label: "They never differ" }
+    ],
+    correctAnswerId: "a",
+    firm: "Goldman Sachs"
+  },
+  {
+    id: "st26",
+    title: "Down-and-Out Call Intuition",
+    category: "sales-and-trading",
+    subcategory: "Exotics",
+    difficulty: 8,
+    requiresPaid: true,
+    content: "All else equal, how does the price of a down-and-out call compare to a vanilla call with the same strike and maturity?",
+    hints: [
+      "Barrier reduces payoff scenarios",
+      "Think about knock-out risk",
+      "Compare feasible paths"
+    ],
+    solution: "The down-and-out call is cheaper than the vanilla call",
+    solutionSteps: [
+      "Barrier introduces additional risk of option termination",
+      "Some profitable paths are eliminated",
+      "Lower expected payoff implies lower price"
+    ],
+    commonMistakes: [
+      "Assuming same price due to same strike",
+      "Ignoring barrier feature"
+    ],
+    skills: ["exotic options", "path dependency"],
+    tags: ["sales-and-trading", "extreme", "exotics"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Cheaper than the vanilla call" },
+      { id: "b", label: "More expensive than the vanilla call" },
+      { id: "c", label: "Same price as vanilla call" },
+      { id: "d", label: "Cannot be priced" }
+    ],
+    correctAnswerId: "a",
+    firm: "Société Générale"
+  },
+  {
+    id: "st27",
+    title: "Maximum Gain of a Short Put",
+    category: "sales-and-trading",
+    subcategory: "Options",
+    difficulty: 4,
+    requiresPaid: true,
+    content: "You sell a put option with strike 70 USD and receive a premium of 4 USD. What is the maximum possible gain?",
+    hints: [
+      "Maximum gain occurs if option expires worthless",
+      "Seller keeps the premium",
+      "Ignore margin requirements"
+    ],
+    solution: "The maximum gain is 4 USD",
+    solutionSteps: [
+      "Best case: option expires out of the money",
+      "Payoff = 0",
+      "Profit equals premium received"
+    ],
+    commonMistakes: [
+      "Using strike minus premium",
+      "Assuming unlimited upside"
+    ],
+    skills: ["options", "risk-reward"],
+    tags: ["sales-and-trading", "medium", "options"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "4 USD" },
+      { id: "b", label: "70 USD" },
+      { id: "c", label: "66 USD" },
+      { id: "d", label: "Unlimited" }
+    ],
+    correctAnswerId: "a",
+    firm: "BNP Paribas"
+  },
+  {
+    id: "st28",
+    title: "Correlation Risk in Dispersion Trading",
+    category: "sales-and-trading",
+    subcategory: "Equity Derivatives",
+    difficulty: 9,
+    requiresPaid: true,
+    content: "In an index dispersion trade, you are long single-stock options and short index options. Which risk are you primarily exposed to?",
+    hints: [
+      "Compare index volatility to constituent volatility",
+      "Think about correlation assumptions",
+      "Index variance is correlation-weighted"
+    ],
+    solution: "Correlation risk",
+    solutionSteps: [
+      "Index volatility depends on pairwise correlations",
+      "Dispersion profits when realized correlation is low",
+      "Main risk is correlation increasing"
+    ],
+    commonMistakes: [
+      "Assuming pure volatility exposure",
+      "Ignoring dependence structure"
+    ],
+    skills: ["equity derivatives", "correlation"],
+    tags: ["sales-and-trading", "extreme", "equity-derivatives"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Correlation risk" },
+      { id: "b", label: "Interest rate risk" },
+      { id: "c", label: "Dividend risk" },
+      { id: "d", label: "Liquidity risk only" }
+    ],
+    correctAnswerId: "a",
+    firm: "JPMorgan"
+  },
+  {
+    id: "st29",
+    title: "American Option Early Exercise",
+    category: "sales-and-trading",
+    subcategory: "Options",
+    difficulty: 8,
+    requiresPaid: false,
+    content: "Under which condition is it optimal to exercise an American call option early?",
+    hints: [
+      "Consider dividends",
+      "Time value matters",
+      "Compare holding vs exercising"
+    ],
+    solution: "Just before a large dividend payment",
+    solutionSteps: [
+      "American calls are rarely exercised early",
+      "Dividends reduce stock price",
+      "Exercising before ex-dividend can be optimal"
+    ],
+    commonMistakes: [
+      "Assuming early exercise is never optimal",
+      "Ignoring dividends"
+    ],
+    skills: ["options", "exercise strategy"],
+    tags: ["sales-and-trading", "extreme", "options"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Just before a large dividend" },
+      { id: "b", label: "Whenever the option is in the money" },
+      { id: "c", label: "At maturity only" },
+      { id: "d", label: "When volatility increases" }
+    ],
+    correctAnswerId: "a",
+    firm: "Goldman Sachs"
+  },
+  {
+    id: "st30",
+    title: "Sharpe Ratio Interpretation",
+    category: "sales-and-trading",
+    subcategory: "Risk",
+    difficulty: 5,
+    requiresPaid: true,
+    content: "Two trading strategies have the same expected return, but Strategy A has a higher Sharpe ratio than Strategy B. What does this imply?",
+    hints: [
+      "Sharpe ratio adjusts for volatility",
+      "Higher is better",
+      "Think risk-adjusted return"
+    ],
+    solution: "Strategy A has lower volatility than Strategy B",
+    solutionSteps: [
+      "Sharpe = (return - risk-free rate) / volatility",
+      "Same return implies difference comes from volatility",
+      "Higher Sharpe means lower volatility"
+    ],
+    commonMistakes: [
+      "Assuming higher returns",
+      "Ignoring denominator of Sharpe"
+    ],
+    skills: ["risk metrics", "performance"],
+    tags: ["sales-and-trading", "medium", "risk"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Lower volatility" },
+      { id: "b", label: "Higher expected return" },
+      { id: "c", label: "Higher maximum drawdown" },
+      { id: "d", label: "Higher tail risk" }
+    ],
+    correctAnswerId: "a",
+    firm: "Bridgewater"
+  },
+  {
+    id: "st51",
+    title: "Forward Mispricing with Dividends",
+    category: "sales-and-trading",
+    subcategory: "Derivatives",
+    difficulty: 5,
+    requiresPaid: true,
+    content: "A stock trades at 150 USD. It will pay a known dividend of 3 USD in 3 months. The continuously compounded risk-free rate is 4 percent. The 6-month forward trades at 149 USD. Is there an arbitrage opportunity?",
+    hints: [
+      "Discount the dividend",
+      "Compute theoretical forward",
+      "Compare market vs theoretical forward"
+    ],
+    solution: "Yes, the forward is underpriced",
+    solutionSteps: [
+      "PV(div) = 3 e^{-0.04 × 0.25} ≈ 2.97",
+      "Adjusted spot = 150 − 2.97 = 147.03",
+      "Theoretical forward = 147.03 e^{0.04 × 0.5} ≈ 150.01",
+      "Market forward at 149 is too low"
+    ],
+    commonMistakes: [
+      "Ignoring dividend timing",
+      "Discounting dividend incorrectly"
+    ],
+    skills: ["forwards", "arbitrage"],
+    tags: ["sales-and-trading", "hard", "forwards"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "No arbitrage, forward is fairly priced" },
+      { id: "b", label: "Yes, forward is overpriced" },
+      { id: "c", label: "Yes, forward is underpriced" },
+      { id: "d", label: "Cannot conclude without volatility" }
+    ],
+    correctAnswerId: "c",
+    firm: "Goldman Sachs"
+  },
+  {
+    id: "st52",
+    title: "Put-Call Parity Trade Construction",
+    category: "sales-and-trading",
+    subcategory: "Derivatives",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "A European call trades at 9 USD and a European put at 4 USD. Strike is 100 USD, maturity 1 year, stock price is 98 USD, risk-free rate is zero. How do you exploit the mispricing?",
+    hints: [
+      "Check put-call parity",
+      "Identify cheap side",
+      "Construct synthetic position"
+    ],
+    solution: "Short the call and buy the put",
+    solutionSteps: [
+      "C − P = 5",
+      "S − K = −2",
+      "Call is overpriced relative to put",
+      "Sell call, buy put, buy stock, borrow cash"
+    ],
+    commonMistakes: [
+      "Buying the overpriced instrument",
+      "Ignoring replication"
+    ],
+    skills: ["options", "arbitrage"],
+    tags: ["sales-and-trading", "hard", "options"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Buy the call and short the stock" },
+      { id: "b", label: "Short the call and buy the put" },
+      { id: "c", label: "Buy both call and put" },
+      { id: "d", label: "No trade exists" }
+    ],
+    correctAnswerId: "b",
+    firm: "Citadel"
+  },
+  {
+    id: "st53",
+    title: "Delta-Neutral Volatility Bet",
+    category: "sales-and-trading",
+    subcategory: "Options",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "You expect realized volatility to be significantly higher than implied volatility over the next month. Which position best expresses this view while remaining delta neutral?",
+    hints: [
+      "Think vega and gamma",
+      "Delta neutrality required",
+      "Ignore skew"
+    ],
+    solution: "Buy an at-the-money straddle",
+    solutionSteps: [
+      "Straddles are long vega and gamma",
+      "ATM structure minimizes delta",
+      "Profits from high realized volatility"
+    ],
+    commonMistakes: [
+      "Buying directional options",
+      "Ignoring delta exposure"
+    ],
+    skills: ["volatility", "options strategies"],
+    tags: ["sales-and-trading", "hard", "options"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Sell an at-the-money straddle" },
+      { id: "b", label: "Buy an at-the-money straddle" },
+      { id: "c", label: "Buy a deep ITM call" },
+      { id: "d", label: "Short the underlying stock" }
+    ],
+    correctAnswerId: "b",
+    firm: "Optiver"
+  },
+  {
+    id: "st54",
+    title: "Gamma Scalping Condition",
+    category: "sales-and-trading",
+    subcategory: "Greeks",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "A trader is long gamma and delta-hedged. Under which condition does the strategy generate positive expected PnL?",
+    hints: [
+      "Compare realized and implied volatility",
+      "Ignore funding costs",
+      "Think rebalancing"
+    ],
+    solution: "When realized volatility exceeds implied volatility",
+    solutionSteps: [
+      "Gamma generates profits from price oscillations",
+      "Delta hedging captures movement",
+      "Higher realized volatility produces gains"
+    ],
+    commonMistakes: [
+      "Confusing vega and gamma",
+      "Assuming trend is required"
+    ],
+    skills: ["options greeks", "volatility trading"],
+    tags: ["sales-and-trading", "extreme", "greeks"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "When implied volatility increases" },
+      { id: "b", label: "When realized volatility exceeds implied" },
+      { id: "c", label: "When delta is positive" },
+      { id: "d", label: "When interest rates fall" }
+    ],
+    correctAnswerId: "b",
+    firm: "Jane Street"
+  },
+  {
+    id: "st55",
+    title: "Forward vs Synthetic Forward",
+    category: "sales-and-trading",
+    subcategory: "Derivatives",
+    difficulty: 5,
+    requiresPaid: true,
+    content: "How can a synthetic forward position be created using options?",
+    hints: [
+      "Use put-call parity",
+      "Same strike and maturity",
+      "Ignore dividends"
+    ],
+    solution: "Buy a call and sell a put with same strike and maturity",
+    solutionSteps: [
+      "Call − Put = Forward",
+      "Same strike and maturity required",
+      "Replicates linear payoff"
+    ],
+    commonMistakes: [
+      "Reversing call and put positions",
+      "Using different maturities"
+    ],
+    skills: ["replication", "options"],
+    tags: ["sales-and-trading", "hard", "derivatives"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Sell a call and buy a put" },
+      { id: "b", label: "Buy a call and sell a put" },
+      { id: "c", label: "Buy two calls" },
+      { id: "d", label: "Sell two puts" }
+    ],
+    correctAnswerId: "b",
+    firm: "Morgan Stanley"
+  },
+  {
+    id: "st56",
+    title: "Volatility Term Structure Trade",
+    category: "sales-and-trading",
+    subcategory: "Volatility",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "Short-dated implied volatility is significantly higher than long-dated implied volatility, but you expect mean reversion. What trade expresses this view?",
+    hints: [
+      "Think calendar spreads",
+      "Sell rich volatility",
+      "Buy cheap volatility"
+    ],
+    solution: "Sell short-dated options and buy long-dated options",
+    solutionSteps: [
+      "Short-term vol is rich",
+      "Long-term vol is cheap",
+      "Calendar spread profits from normalization"
+    ],
+    commonMistakes: [
+      "Buying both maturities",
+      "Ignoring maturity mismatch"
+    ],
+    skills: ["volatility", "term structure"],
+    tags: ["sales-and-trading", "extreme", "volatility"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Buy short-dated options only" },
+      { id: "b", label: "Sell long-dated options" },
+      { id: "c", label: "Sell short-dated and buy long-dated options" },
+      { id: "d", label: "Buy the underlying stock" }
+    ],
+    correctAnswerId: "c",
+    firm: "IMC"
+  },
+  {
+    id: "st57",
+    title: "Convexity Bias in Futures",
+    category: "sales-and-trading",
+    subcategory: "Fixed Income",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "Why do interest rate futures and forwards differ in price when interest rates are volatile?",
+    hints: [
+      "Daily settlement matters",
+      "Consider reinvestment",
+      "Think convexity adjustment"
+    ],
+    solution: "Because futures are marked to market daily, creating a convexity bias",
+    solutionSteps: [
+      "Daily settlement reinvests gains and losses",
+      "Rate volatility affects reinvestment value",
+      "Futures embed convexity adjustment"
+    ],
+    commonMistakes: [
+      "Assuming forwards and futures are identical",
+      "Ignoring rate volatility"
+    ],
+    skills: ["fixed income", "futures"],
+    tags: ["sales-and-trading", "extreme", "fixed-income"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Because futures are more liquid" },
+      { id: "b", label: "Because forwards include credit risk" },
+      { id: "c", label: "Because futures are marked to market daily" },
+      { id: "d", label: "Because forwards settle earlier" }
+    ],
+    correctAnswerId: "c",
+    firm: "CME Group"
+  },
+  {
+    id: "st58",
+    title: "Negative Gamma Profile",
+    category: "sales-and-trading",
+    subcategory: "Greeks",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "Which position exhibits negative gamma?",
+    hints: [
+      "Think option selling",
+      "ATM options maximize gamma",
+      "Sign flips when short"
+    ],
+    solution: "Short at-the-money options",
+    solutionSteps: [
+      "Long options have positive gamma",
+      "Short positions invert gamma",
+      "ATM options have largest magnitude"
+    ],
+    commonMistakes: [
+      "Confusing delta with gamma",
+      "Assuming only puts have gamma"
+    ],
+    skills: ["options greeks", "risk"],
+    tags: ["sales-and-trading", "hard", "greeks"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Long deep ITM call" },
+      { id: "b", label: "Short at-the-money options" },
+      { id: "c", label: "Long straddle" },
+      { id: "d", label: "Owning the underlying stock" }
+    ],
+    correctAnswerId: "b",
+    firm: "SIG"
+  },
+  {
+    id: "st59",
+    title: "Carry Trade Risk",
+    category: "sales-and-trading",
+    subcategory: "FX",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "In an FX carry trade, what is the primary source of risk?",
+    hints: [
+      "Interest rate differential is not risk-free",
+      "Think crash risk",
+      "Correlation matters"
+    ],
+    solution: "Sudden exchange rate depreciation of the high-yield currency",
+    solutionSteps: [
+      "Carry earns interest differential",
+      "FX moves can dominate carry",
+      "Crashes wipe out gains"
+    ],
+    commonMistakes: [
+      "Assuming carry is guaranteed",
+      "Ignoring tail risk"
+    ],
+    skills: ["fx", "risk"],
+    tags: ["sales-and-trading", "extreme", "fx"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Rising domestic interest rates" },
+      { id: "b", label: "Sudden FX depreciation" },
+      { id: "c", label: "Low volatility" },
+      { id: "d", label: "Positive roll yield" }
+    ],
+    correctAnswerId: "b",
+    firm: "Deutsche Bank"
+  },
+  {
+    id: "st60",
+    title: "Variance Swap Strike Interpretation",
+    category: "sales-and-trading",
+    subcategory: "Volatility",
+    difficulty: 8,
+    requiresPaid: true,
+    content: "What does the variance swap strike represent?",
+    hints: [
+      "Think fair value",
+      "Risk-neutral expectation",
+      "Squared volatility"
+    ],
+    solution: "The risk-neutral expected realized variance over the life of the swap",
+    solutionSteps: [
+      "Strike equates swap value to zero at inception",
+      "It equals expected realized variance",
+      "Derived from option prices"
+    ],
+    commonMistakes: [
+      "Confusing with implied volatility",
+      "Using historical variance"
+    ],
+    skills: ["volatility", "variance swaps"],
+    tags: ["sales-and-trading", "extreme", "volatility"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Average historical variance" },
+      { id: "b", label: "Risk-neutral expected variance" },
+      { id: "c", label: "Maximum variance" },
+      { id: "d", label: "Implied volatility" }
+    ],
+    correctAnswerId: "b",
+    firm: "Société Générale"
+  },
+  {
+    id: "st71",
+    title: "Forward Pricing with Repo Rate",
+    category: "sales-and-trading",
+    subcategory: "Derivatives",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "A stock trades at 200 USD. It can be financed in the repo market at 2 percent, while the risk-free rate is 4 percent (continuous). No dividends. What rate should be used to price the forward?",
+    hints: [
+      "Forward pricing depends on financing cost",
+      "Repo rate dominates if available",
+      "Ignore counterparty risk"
+    ],
+    solution: "The repo rate should be used",
+    solutionSteps: [
+      "Forward pricing reflects actual funding cost",
+      "Repo provides cheaper financing than risk-free",
+      "Thus forward uses repo rate"
+    ],
+    commonMistakes: [
+      "Always using risk-free rate",
+      "Ignoring financing source"
+    ],
+    skills: ["forwards", "funding"],
+    tags: ["sales-and-trading", "hard", "forwards"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Risk-free rate" },
+      { id: "b", label: "Average of repo and risk-free" },
+      { id: "c", label: "Repo rate" },
+      { id: "d", label: "Implied volatility" }
+    ],
+    correctAnswerId: "c",
+    firm: "JPMorgan"
+  },
+  {
+    id: "st72",
+    title: "Delta Sign of a Put Option",
+    category: "sales-and-trading",
+    subcategory: "Greeks",
+    difficulty: 5,
+    requiresPaid: true,
+    content: "A European put option is slightly in the money. What is the sign of its delta?",
+    hints: [
+      "Put prices increase when stock falls",
+      "Delta is first-order sensitivity",
+      "Ignore dividends"
+    ],
+    solution: "The delta is negative",
+    solutionSteps: [
+      "Stock price increase reduces put value",
+      "Sensitivity is negative",
+      "Thus delta is negative"
+    ],
+    commonMistakes: [
+      "Assuming delta is always positive",
+      "Confusing call and put behavior"
+    ],
+    skills: ["options greeks", "delta"],
+    tags: ["sales-and-trading", "hard", "greeks"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Positive" },
+      { id: "b", label: "Zero" },
+      { id: "c", label: "Depends on volatility" },
+      { id: "d", label: "Negative" }
+    ],
+    correctAnswerId: "d",
+    firm: "Morgan Stanley"
+  },
+  {
+    id: "st73",
+    title: "PnL of a Delta-Hedged Short Option",
+    category: "sales-and-trading",
+    subcategory: "Options",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "You are short an option and continuously delta-hedged. Realized volatility turns out to be much lower than implied volatility. What is the expected PnL?",
+    hints: [
+      "Think gamma and theta",
+      "Short options benefit from low realized volatility",
+      "Ignore funding costs"
+    ],
+    solution: "Positive PnL driven by theta",
+    solutionSteps: [
+      "Short option has negative gamma and positive theta",
+      "Low realized volatility limits gamma losses",
+      "Theta decay dominates, generating profits"
+    ],
+    commonMistakes: [
+      "Assuming delta hedging removes all risk",
+      "Ignoring volatility mismatch"
+    ],
+    skills: ["options", "volatility trading"],
+    tags: ["sales-and-trading", "extreme", "options"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Negative due to gamma losses" },
+      { id: "b", label: "Zero because delta is hedged" },
+      { id: "c", label: "Positive due to theta" },
+      { id: "d", label: "Uncertain because delta fluctuates" }
+    ],
+    correctAnswerId: "c",
+    firm: "Citadel"
+  },
+  {
+    id: "st74",
+    title: "Implied Volatility Smile Interpretation",
+    category: "sales-and-trading",
+    subcategory: "Volatility",
+    difficulty: 8,
+    requiresPaid: true,
+    content: "Deep out-of-the-money puts trade at much higher implied volatility than at-the-money options. What risk is the market primarily pricing?",
+    hints: [
+      "Think downside tail events",
+      "Skew reflects asymmetry",
+      "Equity markets crash faster than they rally"
+    ],
+    solution: "Downside crash risk",
+    solutionSteps: [
+      "OTM puts insure against sharp drops",
+      "High demand inflates implied volatility",
+      "Smile reflects tail risk pricing"
+    ],
+    commonMistakes: [
+      "Assuming volatility smile is arbitrary",
+      "Attributing skew only to liquidity"
+    ],
+    skills: ["volatility", "skew"],
+    tags: ["sales-and-trading", "extreme", "volatility"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Upside momentum risk" },
+      { id: "b", label: "Downside crash risk" },
+      { id: "c", label: "Interest rate risk" },
+      { id: "d", label: "Dividend uncertainty" }
+    ],
+    correctAnswerId: "b",
+    firm: "BNP Paribas"
+  },
+  {
+    id: "st75",
+    title: "Forward Rate Agreement Intuition",
+    category: "sales-and-trading",
+    subcategory: "Rates",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "A Forward Rate Agreement allows an investor to lock in which quantity?",
+    hints: [
+      "Think interest rate exposure",
+      "Applies to future borrowing or lending",
+      "Ignore credit risk"
+    ],
+    solution: "A future interest rate over a specified period",
+    solutionSteps: [
+      "FRA settles on difference between fixed and realized rate",
+      "Used to hedge borrowing or lending costs",
+      "Locks in forward interest rate"
+    ],
+    commonMistakes: [
+      "Confusing FRAs with bonds",
+      "Assuming principal is exchanged"
+    ],
+    skills: ["rates", "derivatives"],
+    tags: ["sales-and-trading", "hard", "rates"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Future exchange rate" },
+      { id: "b", label: "Bond price at maturity" },
+      { id: "c", label: "Future interest rate" },
+      { id: "d", label: "Inflation expectation" }
+    ],
+    correctAnswerId: "c",
+    firm: "Barclays"
+  },
+  {
+    id: "st76",
+    title: "Correlation Impact on Index Volatility",
+    category: "sales-and-trading",
+    subcategory: "Equity Derivatives",
+    difficulty: 8,
+    requiresPaid: true,
+    content: "Single-stock volatilities decrease slightly, but index volatility remains unchanged. What must have happened to average pairwise correlation?",
+    hints: [
+      "Index variance depends on correlations",
+      "Hold weights constant",
+      "Solve directionally"
+    ],
+    solution: "Average correlation increased",
+    solutionSteps: [
+      "Lower individual variances reduce index variance",
+      "Unchanged index volatility implies offset",
+      "Correlation must rise"
+    ],
+    commonMistakes: [
+      "Assuming correlation is constant",
+      "Focusing only on single-stock vol"
+    ],
+    skills: ["correlation", "equity derivatives"],
+    tags: ["sales-and-trading", "extreme", "equity-derivatives"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Correlation decreased" },
+      { id: "b", label: "Correlation remained unchanged" },
+      { id: "c", label: "Correlation increased" },
+      { id: "d", label: "Correlation became negative" }
+    ],
+    correctAnswerId: "c",
+    firm: "JPMorgan"
+  },
+  {
+    id: "st77",
+    title: "Early Exercise of American Call",
+    category: "sales-and-trading",
+    subcategory: "Options",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "Ignoring dividends, why is early exercise of an American call option almost never optimal?",
+    hints: [
+      "Compare intrinsic vs time value",
+      "Opportunity cost of capital",
+      "Think replication"
+    ],
+    solution: "Because exercising destroys remaining time value",
+    solutionSteps: [
+      "Holding preserves optionality",
+      "Early exercise gives up convexity",
+      "Time value is always non-negative"
+    ],
+    commonMistakes: [
+      "Assuming in-the-money implies exercise",
+      "Ignoring opportunity cost"
+    ],
+    skills: ["options", "exercise strategy"],
+    tags: ["sales-and-trading", "hard", "options"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Because delta becomes zero" },
+      { id: "b", label: "Because volatility collapses" },
+      { id: "c", label: "Because interest rates are positive" },
+      { id: "d", label: "Because time value is lost" }
+    ],
+    correctAnswerId: "d",
+    firm: "Goldman Sachs"
+  },
+  {
+    id: "st78",
+    title: "Payoff of a Digital Option",
+    category: "sales-and-trading",
+    subcategory: "Exotics",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "A cash-or-nothing digital call pays 1 USD if the stock finishes above the strike at maturity. What is its payoff if the stock finishes exactly at the strike?",
+    hints: [
+      "Digital options have discontinuous payoffs",
+      "Convention matters",
+      "Assume strict inequality"
+    ],
+    solution: "Zero payoff",
+    solutionSteps: [
+      "Payoff requires stock price strictly above strike",
+      "At-the-money yields no payment",
+      "Thus payoff is zero"
+    ],
+    commonMistakes: [
+      "Assuming half payout",
+      "Confusing with vanilla options"
+    ],
+    skills: ["exotic options", "payoffs"],
+    tags: ["sales-and-trading", "hard", "exotics"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "1 USD" },
+      { id: "b", label: "0.5 USD" },
+      { id: "c", label: "Zero" },
+      { id: "d", label: "Depends on volatility" }
+    ],
+    correctAnswerId: "c",
+    firm: "Société Générale"
+  },
+  {
+    id: "st79",
+    title: "Negative Convexity Exposure",
+    category: "sales-and-trading",
+    subcategory: "Fixed Income",
+    difficulty: 8,
+    requiresPaid: true,
+    content: "Which position becomes less sensitive to yield decreases as yields fall?",
+    hints: [
+      "Think callable features",
+      "Upside is capped",
+      "Borrower behavior matters"
+    ],
+    solution: "Long callable bond",
+    solutionSteps: [
+      "Falling yields increase call probability",
+      "Price appreciation is capped",
+      "Creates negative convexity"
+    ],
+    commonMistakes: [
+      "Choosing zero-coupon bonds",
+      "Confusing duration with convexity"
+    ],
+    skills: ["fixed income", "convexity"],
+    tags: ["sales-and-trading", "extreme", "fixed-income"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Long zero-coupon bond" },
+      { id: "b", label: "Long callable bond" },
+      { id: "c", label: "Short Treasury bill" },
+      { id: "d", label: "Floating-rate note" }
+    ],
+    correctAnswerId: "b",
+    firm: "PIMCO"
+  },
+  {
+    id: "st80",
+    title: "Model Risk in Delta Hedging",
+    category: "sales-and-trading",
+    subcategory: "Volatility",
+    difficulty: 9,
+    requiresPaid: true,
+    content: "A trader delta-hedges options using Black–Scholes deltas, but the market exhibits a strong volatility smile. What risk is the trader exposed to?",
+    hints: [
+      "Model assumptions matter",
+      "Smile breaks constant-volatility assumption",
+      "Think residual PnL"
+    ],
+    solution: "Model risk from incorrect delta estimates",
+    solutionSteps: [
+      "Black–Scholes assumes flat volatility",
+      "Smile implies state-dependent volatility",
+      "Delta hedge becomes imperfect"
+    ],
+    commonMistakes: [
+      "Attributing losses to gamma only",
+      "Ignoring volatility surface"
+    ],
+    skills: ["volatility", "model risk"],
+    tags: ["sales-and-trading", "extreme", "volatility"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Interest rate risk" },
+      { id: "b", label: "Liquidity risk" },
+      { id: "c", label: "Model risk" },
+      { id: "d", label: "Dividend risk" }
+    ],
+    correctAnswerId: "c",
+    firm: "QRT"
+  },
+  {
+    "id": "q140",
+    "title": "Exponential Race",
+    "category": "probability",
+    "subcategory": "Continuous Distributions",
+    "difficulty": 6,
+    "content": "Let $X\\sim\\text{Exponential}(1)$ and $Y\\sim\\text{Exponential}(2)$ be independent. What is the probability that $X<Y$? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Use the memoryless property.",
+      "Compute $\\mathbb{P}(X<Y)$ directly."
+    ],
+    "solution": "2/3",
+    "solutionSteps": [
+      "$$\\mathbb{P}(X<Y)=\\int_0^\\infty \\mathbb{P}(Y>x)f_X(x)dx.$$",
+      "$$=\\int_0^\\infty e^{-2x}e^{-x}dx=\\int_0^\\infty e^{-3x}dx=1/3.$$",
+      "Careful: rate of $X$ is 1, so $\\mathbb{P}(X<Y)=2/(1+2)=2/3$."
+    ],
+    "commonMistakes": [
+      "Forgetting which rate corresponds to which variable."
+    ],
+    "skills": ["exponential distributions"],
+    "tags": ["probability"],
+    "benchmarkTime": 90,
+    "answerType": "number",
+    "numericAnswer": 0.67,
+    "firm": "Citadel",
+    "requiresPaid": false
+  },
+  {
+    "id": "q141",
+    "title": "Binomial Conditioning",
+    "category": "probability",
+    "subcategory": "Discrete Distributions",
+    "difficulty": 6,
+    "content": "Let $X\\sim\\text{Binomial}(5,0.5)$. Given that $X\\ge1$, what is $\\mathbb{E}[X\\mid X\\ge1]$? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Use $\\mathbb{E}[X\\mid A]=\\mathbb{E}[X]/\\mathbb{P}(A)$ minus correction.",
+      "Compute explicitly."
+    ],
+    "solution": "≈2.58",
+    "solutionSteps": [
+      "$$\\mathbb{E}[X]=2.5,\\quad \\mathbb{P}(X=0)=1/32.$$",
+      "$$\\mathbb{E}[X\\mid X\\ge1]=\\frac{2.5}{1-1/32}=\\frac{2.5}{31/32}.$$",
+      "This equals $\\approx2.58$."
+    ],
+    "commonMistakes": [
+      "Forgetting to renormalize."
+    ],
+    "skills": ["conditioning", "binomial distribution"],
+    "tags": ["probability"],
+    "benchmarkTime": 120,
+    "answerType": "number",
+    "numericAnswer": 2.58,
+    "firm": "Goldman Sachs",
+    "requiresPaid": false
+  },
+  {
+    "id": "q142",
+    "title": "Uniform Absolute Value",
+    "category": "probability",
+    "subcategory": "Expected Value",
+    "difficulty": 5,
+    "content": "Let $X\\sim\\text{Uniform}(-2,2)$. What is $\\mathbb{E}[|X|]$? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Use symmetry.",
+      "Integrate over $[0,2]$."
+    ],
+    "solution": "1",
+    "solutionSteps": [
+      "$$\\mathbb{E}[|X|]=2\\int_0^2 x\\cdot\\frac{1}{4}dx.$$",
+      "$$=\\frac12\\int_0^2 xdx=1.$$"
+    ],
+    "commonMistakes": [
+      "Forgetting the factor of 2."
+    ],
+    "skills": ["integration", "symmetry"],
+    "tags": ["probability"],
+    "benchmarkTime": 60,
+    "answerType": "number",
+    "numericAnswer": 1.00,
+    "firm": "Optiver",
+    "requiresPaid": false
+  },
+  {
+    "id": "q143",
+    "title": "Simple Covariance",
+    "category": "probability",
+    "subcategory": "Moments",
+    "difficulty": 6,
+    "content": "Let $X\\sim\\text{Uniform}(0,1)$ and define $Y=X^2$. What is $\\mathrm{Cov}(X,Y)$? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Compute $\\mathbb{E}[X^3]$.",
+      "Use $\\mathrm{Cov}(X,Y)=\\mathbb{E}[XY]-\\mathbb{E}[X]\\mathbb{E}[Y]$."
+    ],
+    "solution": "1/12",
+    "solutionSteps": [
+      "$$\\mathbb{E}[X]=1/2,\\quad \\mathbb{E}[X^2]=1/3,\\quad \\mathbb{E}[X^3]=1/4.$$",
+      "$$\\mathrm{Cov}(X,Y)=\\mathbb{E}[X^3]-(1/2)(1/3)=1/4-1/6=1/12.$$"
+    ],
+    "commonMistakes": [
+      "Mixing up $\\mathbb{E}[XY]$ and $\\mathbb{E}[X^2]$."
+    ],
+    "skills": ["moments", "covariance"],
+    "tags": ["probability"],
+    "benchmarkTime": 120,
+    "answerType": "number",
+    "numericAnswer": 0.08,
+    "firm": "IMC",
+    "requiresPaid": false
+  },
+  {
+    "id": "q144",
+    "title": "Poisson Zero-Trick",
+    "category": "probability",
+    "subcategory": "Poisson Distribution",
+    "difficulty": 5,
+    "content": "Let $N\\sim\\text{Poisson}(2)$. What is $\\mathbb{P}(N\\ge1\\mid N\\le2)$? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Compute probabilities explicitly.",
+      "Condition carefully."
+    ],
+    "solution": "0.76",
+    "solutionSteps": [
+      "$$\\mathbb{P}(N=0)=e^{-2},\\; \\mathbb{P}(N=1)=2e^{-2},\\; \\mathbb{P}(N=2)=2e^{-2}.$$",
+      "$$\\mathbb{P}(N\\ge1,N\\le2)=4e^{-2}.$$",
+      "$$\\mathbb{P}(N\\le2)=5e^{-2}.$$",
+      "Ratio equals $4/5=0.8$."
+    ],
+    "commonMistakes": [
+      "Forgetting to renormalize."
+    ],
+    "skills": ["Poisson distribution"],
+    "tags": ["probability"],
+    "benchmarkTime": 90,
+    "answerType": "number",
+    "numericAnswer": 0.80,
+    "firm": "SIG",
+    "requiresPaid": false
+  },
+  {
+    "id": "q145",
+    "title": "Expected Absolute Normal",
+    "category": "probability",
+    "subcategory": "Continuous Distributions",
+    "difficulty": 6,
+    "content": "Let $Z\\sim\\mathcal{N}(0,1)$. What is $\\mathbb{E}[|Z|]$? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Use symmetry.",
+      "Recall a standard Gaussian result."
+    ],
+    "solution": "$\\sqrt{2/\\pi}$",
+    "solutionSteps": [
+      "$$\\mathbb{E}[|Z|]=2\\int_0^\\infty x\\phi(x)dx=\\sqrt{2/\\pi}.$$"
+    ],
+    "commonMistakes": [
+      "Confusing with variance."
+    ],
+    "skills": ["Gaussian distribution"],
+    "tags": ["probability"],
+    "benchmarkTime": 60,
+    "answerType": "number",
+    "numericAnswer": 0.80,
+    "firm": "Jane Street",
+    "requiresPaid": false
+  },
+  {
+    "id": "q146",
+    "title": "Simple Random Walk Step",
+    "category": "probability",
+    "subcategory": "Stochastic Processes",
+    "difficulty": 5,
+    "content": "A simple symmetric random walk starts at $0$. What is the probability it is at position $0$ after exactly $2$ steps? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Enumerate paths.",
+      "Use binomial coefficients."
+    ],
+    "solution": "0.5",
+    "solutionSteps": [
+      "Paths returning to $0$: $UD$ or $DU$.",
+      "Each has probability $(1/2)^2$.",
+      "$$\\mathbb{P}=2\\times(1/4)=1/2.$$"
+    ],
+    "commonMistakes": [
+      "Forgetting path multiplicity."
+    ],
+    "skills": ["random walks"],
+    "tags": ["probability"],
+    "benchmarkTime": 30,
+    "answerType": "number",
+    "numericAnswer": 0.50,
+    "firm": "BNP Paribas",
+    "requiresPaid": false
+  },
+  {
+    "id": "q147",
+    "title": "Law of Total Expectation",
+    "category": "probability",
+    "subcategory": "Expected Value",
+    "difficulty": 6,
+    "content": "A fair coin is tossed. If heads, you gain $4$ euros; if tails, you gain $-1$ euro. What is the expected gain? (Give the exact decimal value.)",
+    "hints": [
+      "Condition on the coin outcome."
+    ],
+    "solution": "1.5",
+    "solutionSteps": [
+      "$$\\mathbb{E}[G]=0.5\\times4+0.5\\times(-1)=1.5.$$"
+    ],
+    "commonMistakes": [
+      "Ignoring losses."
+    ],
+    "skills": ["expected value"],
+    "tags": ["probability"],
+    "benchmarkTime": 30,
+    "answerType": "number",
+    "numericAnswer": 1.5,
+    "firm": "Morgan Stanley",
+    "requiresPaid": false
+  },
+  {
+    "id": "q148",
+    "title": "Hypergeometric Draw",
+    "category": "probability",
+    "subcategory": "Combinatorics",
+    "difficulty": 6,
+    "content": "An urn contains $5$ red balls and $5$ blue balls. Two balls are drawn without replacement. What is the probability both are red? (Round your answer to 2 decimal places.)",
+    "hints": [
+      "Use combinations.",
+      "No replacement."
+    ],
+    "solution": "2/9",
+    "solutionSteps": [
+      "$$\\mathbb{P}=\\frac{\\binom{5}{2}}{\\binom{10}{2}}=\\frac{10}{45}=2/9.$$"
+    ],
+    "commonMistakes": [
+      "Assuming independence."
+    ],
+    "skills": ["combinatorics"],
+    "tags": ["probability"],
+    "benchmarkTime": 60,
+    "answerType": "number",
+    "numericAnswer": 0.22,
+    "firm": "Optiver",
+    "requiresPaid": false
+  },
+  {
+    "id": "q149",
+    "title": "Variance of a Sum",
+    "category": "probability",
+    "subcategory": "Moments",
+    "difficulty": 6,
+    "content": "Let $X$ and $Y$ be independent random variables with variances $\\mathrm{Var}(X)=1$ and $\\mathrm{Var}(Y)=3$. What is $\\mathrm{Var}(X+2Y)$? (Give the exact decimal value.)",
+    "hints": [
+      "Use independence.",
+      "Variance scales quadratically."
+    ],
+    "solution": "13",
+    "solutionSteps": [
+      "$$\\mathrm{Var}(X+2Y)=\\mathrm{Var}(X)+4\\mathrm{Var}(Y)=1+12=13.$$"
+    ],
+    "commonMistakes": [
+      "Adding standard deviations."
+    ],
+    "skills": ["variance"],
+    "tags": ["probability"],
+    "benchmarkTime": 45,
+    "answerType": "number",
+    "numericAnswer": 13,
+    "firm": "Two Sigma",
+    "requiresPaid": false
   }
 ];
 
 export const categories = [
   { id: 'probability', name: 'Probability', icon: 'Percent', color: 'probability', count: 20 },
   { id: 'brain-teaser', name: 'Brain Teaser', icon: 'Brain', color: 'logic', count: 20 },
+  { id: 'sales-and-trading', name: 'Sales and Trading', icon: 'TrendingUp', color: 'trading', count: 3 },
 ];
 
 export const userProgress = {
