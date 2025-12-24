@@ -4,6 +4,9 @@ const companies = [
   { name: "Citadel", logo: "/slides/citadel.png" },
   { name: "Jane Street", logo: "/slides/jane-street.png" },
   { name: "Susquehanna", logo: "/slides/susquehanna.png" },
+  { name: "RBC", logo: "/slides/rbc.png" },
+  { name: "Barclays", logo: "/slides/barclays.png" },
+  { name: "BNP", logo: "/slides/bnp.png" },
 ];
 
 export function CompanyLogos() {

@@ -2,12 +2,19 @@ import { Navbar } from "@/components/landing/Navbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, Brain, Star, X, BookOpen, User, Zap } from "lucide-react";
+import { Check, Brain, Star, X, BookOpen, User, Zap, Settings as SettingsIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useStripe } from "@/hooks/useStripe";
 import { useSubscription } from "@/hooks/useSubscription";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export default function Pricing() {
   const { user } = useAuth();
@@ -35,20 +42,19 @@ export default function Pricing() {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Green/White neon blur effects */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '-1s' }} />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '-2s' }} />
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-green-500/15 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '-0.5s' }} />
+      {/* Background glow */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-green-500/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
       </div>
+
       <Navbar />
+
       <main className="container px-4 pt-24 pb-12 relative z-10">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Pricing
-            </h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">Pricing</h1>
             <p className="text-xl text-muted-foreground">
               Choose the plan that works for you
             </p>
@@ -63,36 +69,42 @@ export default function Pricing() {
           </div>
 
           {/* Comparison Table */}
-          <Card className="mb-12">
+          <Card className="mb-12 bg-white/5 backdrop-blur-xl border border-white/10 shadow-xl">
             <CardHeader>
-              <CardTitle className="text-2xl text-center">QuantIt vs. Traditional Methods</CardTitle>
+              <CardTitle className="text-2xl text-center">
+                QuantIt vs. Traditional Methods
+              </CardTitle>
               <p className="text-center text-muted-foreground mt-2">
                 See how we compare to books and coaches
               </p>
             </CardHeader>
+
             <CardContent>
               <div className="overflow-x-auto">
-                <Table>
+                <Table className="border-collapse">
                   <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[200px]">Feature</TableHead>
+                    <TableRow className="border-white/10">
+                      <TableHead className="w-[200px] text-muted-foreground">
+                        Feature
+                      </TableHead>
+
                       <TableHead className="text-center">
                         <div className="flex flex-col items-center gap-2">
                           <BookOpen className="w-5 h-5" />
                           <span>Books</span>
                         </div>
                       </TableHead>
+
                       <TableHead className="text-center">
                         <div className="flex flex-col items-center gap-2">
                           <User className="w-5 h-5" />
                           <span>Coaches</span>
                         </div>
                       </TableHead>
-                      <TableHead className="text-center relative border-l-4 border-r-4 border-green-500">
+
+                      <TableHead className="text-center bg-green-500/5 border-l-2 border-r-2 border-green-500/40">
                         <div className="flex flex-col items-center gap-2 py-2">
-                          <div className="p-2 rounded-lg">
-                            <Brain className="w-6 h-6 text-primary" />
-                          </div>
+                          <Brain className="w-6 h-6 text-green-500" />
                           <span className="font-bold">QuantIt</span>
                           <Badge variant="glow" className="text-xs">
                             Premium
@@ -101,127 +113,51 @@ export default function Pricing() {
                       </TableHead>
                     </TableRow>
                   </TableHeader>
+
                   <TableBody>
-                    <TableRow>
-                      <TableCell className="font-medium">Real Interview Questions</TableCell>
-                      <TableCell className="text-center">
-                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Check className="w-5 h-5 text-green-500 mx-auto" />
-                      </TableCell>
-                      <TableCell className="text-center border-l-4 border-r-4 border-green-500">
-                        <Check className="w-5 h-5 text-green-500 mx-auto" />
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Interactive Practice</TableCell>
-                      <TableCell className="text-center">
-                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Check className="w-5 h-5 text-green-500 mx-auto" />
-                      </TableCell>
-                      <TableCell className="text-center border-l-4 border-r-4 border-green-500">
-                        <Check className="w-5 h-5 text-green-500 mx-auto" />
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Instant Feedback</TableCell>
-                      <TableCell className="text-center">
-                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Check className="w-5 h-5 text-green-500 mx-auto" />
-                      </TableCell>
-                      <TableCell className="text-center border-l-4 border-r-4 border-green-500">
-                        <Check className="w-5 h-5 text-green-500 mx-auto" />
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Progressive Hints</TableCell>
-                      <TableCell className="text-center">
-                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <Check className="w-5 h-5 text-green-500 mx-auto" />
-                      </TableCell>
-                      <TableCell className="text-center border-l-4 border-r-4 border-green-500">
-                        <Check className="w-5 h-5 text-green-500 mx-auto" />
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Progress Tracking</TableCell>
-                      <TableCell className="text-center">
-                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
-                      </TableCell>
-                      <TableCell className="text-center border-l-4 border-r-4 border-green-500">
-                        <Check className="w-5 h-5 text-green-500 mx-auto" />
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Filter by Difficulty/Firm</TableCell>
-                      <TableCell className="text-center">
-                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
-                      </TableCell>
-                      <TableCell className="text-center border-l-4 border-r-4 border-green-500">
-                        <Check className="w-5 h-5 text-green-500 mx-auto" />
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">24/7 Availability</TableCell>
-                      <TableCell className="text-center">
-                        <Check className="w-5 h-5 text-green-500 mx-auto" />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
-                      </TableCell>
-                      <TableCell className="text-center border-l-4 border-r-4 border-green-500">
-                        <Check className="w-5 h-5 text-green-500 mx-auto" />
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Affordable Price</TableCell>
-                      <TableCell className="text-center">
-                        <Check className="w-5 h-5 text-green-500 mx-auto" />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
-                      </TableCell>
-                      <TableCell className="text-center border-l-4 border-r-4 border-green-500">
-                        <Check className="w-5 h-5 text-green-500 mx-auto" />
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Self-Paced Learning</TableCell>
-                      <TableCell className="text-center">
-                        <Check className="w-5 h-5 text-green-500 mx-auto" />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
-                      </TableCell>
-                      <TableCell className="text-center border-l-4 border-r-4 border-green-500">
-                        <Check className="w-5 h-5 text-green-500 mx-auto" />
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">LaTeX Rendering</TableCell>
-                      <TableCell className="text-center">
-                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
-                      </TableCell>
-                      <TableCell className="text-center">
-                        <X className="w-5 h-5 text-muted-foreground mx-auto" />
-                      </TableCell>
-                      <TableCell className="text-center border-l-4 border-r-4 border-green-500">
-                        <Check className="w-5 h-5 text-green-500 mx-auto" />
-                      </TableCell>
-                    </TableRow>
+                    {[
+                      ["Real Interview Questions", false, true, true],
+                      ["Interactive Practice", false, true, true],
+                      ["Instant Feedback", false, true, true],
+                      ["Progressive Hints", false, true, true],
+                      ["Progress Tracking", false, false, true],
+                      ["Filter by Difficulty/Firm", false, false, true],
+                      ["24/7 Availability", true, false, true],
+                      ["Affordable Price", true, false, true],
+                      ["Self-Paced Learning", true, false, true],
+                      ["LaTeX Rendering", false, false, true],
+                    ].map(([label, books, coaches, quantit]) => (
+                      <TableRow
+                        key={label as string}
+                        className="transition-colors hover:bg-white/5"
+                      >
+                        <TableCell className="font-medium">
+                          {label}
+                        </TableCell>
+
+                        <TableCell className="text-center">
+                          {books ? (
+                            <Check className="w-5 h-5 text-green-500 mx-auto" />
+                          ) : (
+                            <X className="w-5 h-5 text-muted-foreground mx-auto" />
+                          )}
+                        </TableCell>
+
+                        <TableCell className="text-center">
+                          {coaches ? (
+                            <Check className="w-5 h-5 text-green-500 mx-auto" />
+                          ) : (
+                            <X className="w-5 h-5 text-muted-foreground mx-auto" />
+                          )}
+                        </TableCell>
+
+                        <TableCell className="text-center bg-green-500/5 border-l-2 border-r-2 border-green-500/40">
+                          {quantit && (
+                            <Check className="w-5 h-5 text-green-500 mx-auto drop-shadow-[0_0_6px_rgba(34,197,94,0.6)]" />
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))}
                   </TableBody>
                 </Table>
               </div>
@@ -230,139 +166,78 @@ export default function Pricing() {
 
           {/* Pricing Cards */}
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-12">
-            {/* Free Plan */}
-            <Card variant="glass" className={!isPaid && user ? "ring-2 ring-primary" : ""}>
+            {/* Free */}
+            <Card variant="glass">
               <CardHeader className="text-center pb-6">
                 <CardTitle className="text-2xl mb-2">Free</CardTitle>
-                <div className="flex items-baseline justify-center gap-2">
+                <div className="flex justify-center items-baseline gap-2">
                   <span className="text-4xl font-bold">$0</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
-                {!isPaid && user && (
-                  <Badge variant="outline" className="mt-2">
-                    Your Current Plan
-                  </Badge>
-                )}
               </CardHeader>
               <CardContent className="space-y-4">
                 <ul className="space-y-3">
-                  {freeFeatures.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      {feature.included ? (
-                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  {freeFeatures.map((f, i) => (
+                    <li key={i} className="flex gap-3">
+                      {f.included ? (
+                        <Check className="w-5 h-5 text-green-500" />
                       ) : (
-                        <X className="w-5 h-5 text-muted-foreground flex-shrink-0 mt-0.5" />
+                        <X className="w-5 h-5 text-muted-foreground" />
                       )}
-                      <span className={`text-sm ${feature.included ? '' : 'text-muted-foreground'}`}>
-                        {feature.text}
-                      </span>
+                      <span className="text-sm">{f.text}</span>
                     </li>
                   ))}
                 </ul>
-                {!user ? (
-                  <Button variant="outline" className="w-full" size="lg" asChild>
-                    <Link to="/auth">Get Started</Link>
-                  </Button>
-                ) : !isPaid ? (
-                  <Button variant="outline" className="w-full" size="lg" disabled>
-                    Current Plan
-                  </Button>
-                ) : (
-                  <Button variant="outline" className="w-full" size="lg" disabled>
-                    Downgrade
-                  </Button>
-                )}
+                <Button variant="outline" className="w-full" asChild>
+                  <Link to="/auth">Get Started</Link>
+                </Button>
               </CardContent>
             </Card>
 
-            {/* Premium Plan */}
-            <Card variant="glow" className={isPaid && user ? "ring-2 ring-primary" : ""}>
+            {/* Premium */}
+            <Card variant="glow">
               <CardHeader className="text-center pb-6">
-                <div className="flex items-center justify-center gap-2 mb-4">
-                  {isPaid && user ? (
-                    <Badge variant="glow" className="px-3 py-1">
-                      <Star className="w-4 h-4 mr-1" />
-                      Your Current Plan
-                    </Badge>
-                  ) : (
-                    <Badge variant="glow" className="px-3 py-1">
-                      <Star className="w-4 h-4 mr-1" />
-                      Most Popular
-                    </Badge>
-                  )}
-                </div>
+                <Badge variant="glow" className="mx-auto mb-4">
+                  Most Popular
+                </Badge>
                 <CardTitle className="text-2xl mb-2">Premium</CardTitle>
-                <div className="flex items-baseline justify-center gap-2">
+                <div className="flex justify-center items-baseline gap-2">
                   <span className="text-4xl font-bold">$5</span>
                   <span className="text-muted-foreground">/month</span>
                 </div>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Cancel anytime
-                </p>
               </CardHeader>
               <CardContent className="space-y-4">
                 <ul className="space-y-3">
-                  {premiumFeatures.map((feature, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm">{feature.text}</span>
+                  {premiumFeatures.map((f, i) => (
+                    <li key={i} className="flex gap-3">
+                      <Check className="w-5 h-5 text-green-500" />
+                      <span className="text-sm">{f.text}</span>
                     </li>
                   ))}
                 </ul>
-                {user ? (
-                  isPaid ? (
-                    <Button variant="hero" className="w-full" size="lg" asChild>
-                      <Link to="/dashboard">
-                        <Zap className="w-4 h-4 mr-2" />
-                        Go to Dashboard
-                      </Link>
-                    </Button>
-                  ) : (
-                    <Button 
-                      variant="hero" 
-                      className="w-full" 
-                      size="lg"
-                      onClick={createCheckoutSession}
-                    >
-                      <Zap className="w-4 h-4 mr-2" />
-                      Upgrade to Premium
-                    </Button>
-                  )
-                ) : (
-                  <Button variant="hero" className="w-full" size="lg" asChild>
-                    <Link to="/auth">
-                      <Zap className="w-4 h-4 mr-2" />
-                      Get Started
+                {isPaid ? (
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    asChild
+                  >
+                    <Link to="/settings">
+                      <SettingsIcon className="w-4 h-4 mr-2" />
+                      Manage Subscription
                     </Link>
+                  </Button>
+                ) : (
+                  <Button
+                    variant="hero"
+                    className="w-full"
+                    onClick={createCheckoutSession}
+                  >
+                    <Zap className="w-4 h-4 mr-2" />
+                    Upgrade to Premium
                   </Button>
                 )}
               </CardContent>
             </Card>
-          </div>
-
-          {/* Info Section */}
-          <div className="mt-12 text-center">
-            <h2 className="text-2xl font-bold mb-4">What's Included</h2>
-            <div className="grid md:grid-cols-3 gap-6 mt-8">
-              <div>
-                <h3 className="font-semibold mb-2">All Questions</h3>
-                <p className="text-sm text-muted-foreground">
-                  Access to 40+ quant interview questions from top firms
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-2">Full Hints</h3>
-                <p className="text-sm text-muted-foreground">
-                  Progressive hints to guide your thinking
-                </p>
-              </div>
-              <div>
-                <h3 className="font-semibold mb-2">Support & Community</h3>
-                <p className="text-sm text-muted-foreground">
-                  Get help when you need it and connect with others
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </main>

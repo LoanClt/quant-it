@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Navbar } from "@/components/landing/Navbar";
 import { QuestionCard } from "@/components/practice/QuestionCard";
-import { CompactFilters } from "@/components/practice/CompactFilters";
 import { QuestionList } from "@/components/practice/QuestionList";
 import { questions, type Question } from "@/data/questions";
 import { Badge } from "@/components/ui/badge";
@@ -52,6 +51,7 @@ export default function Practice() {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const prevLocationKey = useRef<string | undefined>(location.key);
+  const [hideCompleted, setHideCompleted] = useState(false);
   
   const QUESTIONS_PER_PAGE = 30;
 
@@ -62,6 +62,17 @@ export default function Practice() {
       setSelectedDifficulty(difficultyParam);
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [
+    selectedCategory,
+    selectedDifficulty,
+    selectedFirm,
+    showBookmarkedOnly,
+    hideCompleted,
+    searchQuery,
+  ]);
 
   // Clear active question when navigating to practice page (e.g., clicking Practice in navbar)
   useEffect(() => {
@@ -81,46 +92,54 @@ export default function Practice() {
 
   const filteredQuestions = useMemo(() => {
     let filtered = questions;
-
-    // Filter by search query (by title)
+  
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase().trim();
-      filtered = filtered.filter((q) => 
+      filtered = filtered.filter((q) =>
         q.title.toLowerCase().includes(query)
       );
     }
-
-    // Filter by bookmarked only
+  
     if (showBookmarkedOnly) {
       filtered = filtered.filter((q) => bookmarkedQuestions.has(q.id));
     }
-
-    // Show all questions (including paid ones) so users can see what's locked
-    // Filter by category
+  
+    if (hideCompleted) {
+      filtered = filtered.filter((q) => !completedQuestions.has(q.id));
+    }
+  
     if (selectedCategory) {
       filtered = filtered.filter((q) => q.category === selectedCategory);
     }
-
-    // Filter by difficulty FIRST (before sorting)
+  
     if (selectedDifficulty !== "all") {
-      filtered = filtered.filter((q) => getDifficultyLevel(q.difficulty) === selectedDifficulty);
+      filtered = filtered.filter(
+        (q) => getDifficultyLevel(q.difficulty) === selectedDifficulty
+      );
     }
-
-    // Filter by firm
+  
     if (selectedFirm) {
       filtered = filtered.filter((q) => q.firm === selectedFirm);
     }
-
-    // Sort by difficulty (only applies to filtered results)
-    // When a single difficulty is selected, sorting still works but only within that difficulty
+  
     if (sortBy === "difficulty-asc") {
       filtered = [...filtered].sort((a, b) => a.difficulty - b.difficulty);
     } else if (sortBy === "difficulty-desc") {
       filtered = [...filtered].sort((a, b) => b.difficulty - a.difficulty);
     }
-
+  
     return filtered;
-  }, [selectedCategory, selectedDifficulty, selectedFirm, sortBy, showBookmarkedOnly, bookmarkedQuestions, searchQuery]);
+  }, [
+    selectedCategory,
+    selectedDifficulty,
+    selectedFirm,
+    sortBy,
+    showBookmarkedOnly,
+    hideCompleted,          // ✅ MISSING
+    bookmarkedQuestions,
+    completedQuestions,     // ✅ MISSING (CRITICAL)
+    searchQuery,
+  ]);
 
   // Pagination logic
   const totalPages = Math.ceil(filteredQuestions.length / QUESTIONS_PER_PAGE);
@@ -130,10 +149,7 @@ export default function Practice() {
     return filteredQuestions.slice(startIndex, endIndex);
   }, [filteredQuestions, currentPage]);
 
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategory, selectedDifficulty, selectedFirm, showBookmarkedOnly, searchQuery]);
+  
 
   const handleClearFilters = () => {
     setSelectedCategory(null);
@@ -190,17 +206,28 @@ export default function Practice() {
             </Button>
             
             <Card variant="glass" className="max-w-2xl mx-auto">
-              <CardContent className="p-12 text-center">
-                <Lock className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-                <h2 className="text-2xl font-bold mb-2">Premium Question</h2>
-                <p className="text-muted-foreground mb-6">
-                  This question is available for premium members only.
-                </p>
-                <Button variant="hero" onClick={() => navigate('/pricing')}>
-                  Upgrade to Premium
-                </Button>
-              </CardContent>
-            </Card>
+  <CardContent className="p-12 text-center">
+    <Lock className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+    <h2 className="text-2xl font-bold mb-2">Premium Question</h2>
+    <p className="text-muted-foreground mb-6">
+      This question is available for premium members only.
+    </p>
+    <Button variant="hero" onClick={() => navigate('/pricing')}>
+      Upgrade to Premium
+    </Button>
+  </CardContent>
+
+  <div className="flex justify-between px-6 pb-6">
+    <Button variant="ghost" onClick={handlePreviousQuestion}>
+      <ChevronLeft className="w-4 h-4 mr-1" />
+      Previous
+    </Button>
+    <Button variant="ghost" onClick={handleNextQuestion}>
+      Next
+      <ChevronRight className="w-4 h-4 ml-1" />
+    </Button>
+  </div>
+</Card> 
           </main>
         </div>
       );
@@ -269,20 +296,29 @@ export default function Practice() {
 
         {/* Quick Filters Below Search */}
         <div className="mb-4 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          {/* Show Bookmarked Only */}
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              id="bookmarked-only"
-              checked={showBookmarkedOnly}
-              onCheckedChange={(checked) => setShowBookmarkedOnly(checked === true)}
-            />
-            <Label
-              htmlFor="bookmarked-only"
-              className="text-sm font-medium cursor-pointer flex items-center gap-2"
-            >
-              <Bookmark className={`w-4 h-4 ${showBookmarkedOnly ? 'fill-current' : ''}`} />
-              Show Bookmarked Only
+          {/* Category Filter */}
+          <div className="flex items-center gap-2">
+            <Label className="text-sm font-medium whitespace-nowrap">
+              Category:
             </Label>
+            <Select
+              value={selectedCategory ?? "all"}
+              onValueChange={(value) =>
+                setSelectedCategory(value === "all" ? null : value)
+              }
+            >
+              <SelectTrigger className="w-[220px] border-green-500/40 focus:ring-green-500">
+                <SelectValue placeholder="All categories" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All categories</SelectItem>
+                <SelectItem value="probability">Probability</SelectItem>
+                <SelectItem value="brain-teaser">Brain Teaser</SelectItem>
+                <SelectItem value="sales-and-trading">
+                  Markets (Sales & Trading)
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Difficulty Filter */}
@@ -294,21 +330,26 @@ export default function Practice() {
               value={selectedDifficulty}
               onValueChange={setSelectedDifficulty}
             >
-              <SelectTrigger id="difficulty-filter" className="w-[180px]">
+              <SelectTrigger
+                id="difficulty-filter"
+                className="w-[200px] border-green-500/40 focus:ring-green-500"
+              >
                 {selectedDifficulty === "all" ? (
                   <SelectValue placeholder="All Difficulties" />
                 ) : (
                   <div className="flex items-center w-full">
-                    <Badge variant={selectedDifficulty as any} className="text-xs">
-                      {selectedDifficulty.charAt(0).toUpperCase() + selectedDifficulty.slice(1)}
+                    <Badge
+                      variant={selectedDifficulty as any}
+                      className="text-xs ring-1 ring-green-500/50"
+                    >
+                      {selectedDifficulty.charAt(0).toUpperCase() +
+                        selectedDifficulty.slice(1)}
                     </Badge>
                   </div>
                 )}
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">
-                  <span className="text-sm">All Difficulties</span>
-                </SelectItem>
+                <SelectItem value="all">All Difficulties</SelectItem>
                 <SelectItem value="easy">
                   <Badge variant="easy" className="text-xs">Easy</Badge>
                 </SelectItem>
@@ -324,22 +365,86 @@ export default function Practice() {
               </SelectContent>
             </Select>
           </div>
+
+          {/* Checkboxes */}
+          <div className="flex items-center gap-6">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="bookmarked-only"
+                checked={showBookmarkedOnly}
+                onCheckedChange={(checked) => setShowBookmarkedOnly(checked === true)}
+                className="
+                  h-4 w-4 aspect-square !rounded-md
+                  border border-gray-500 bg-gray-600
+                  data-[state=checked]:bg-green-500
+                  data-[state=checked]:border-green-500
+                  data-[state=checked]:shadow-[0_0_10px_rgba(34,197,94,0.9)]
+                  [&>span]:!w-full [&>span]:!h-full [&>span]:!rounded-md [&>span]:!bg-transparent
+                  [&_svg]:hidden
+                "
+              />
+              <Label htmlFor="bookmarked-only" className="text-sm font-medium cursor-pointer">
+                Bookmarked only
+              </Label>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="hide-completed"
+                checked={hideCompleted}
+                onCheckedChange={(checked) => setHideCompleted(checked === true)}
+                className="
+                  h-4 w-4 aspect-square !rounded-md
+                  border border-gray-500 bg-gray-600
+                  data-[state=checked]:bg-green-500
+                  data-[state=checked]:border-green-500
+                  data-[state=checked]:shadow-[0_0_10px_rgba(34,197,94,0.9)]
+                  [&>span]:!w-full [&>span]:!h-full [&>span]:!rounded-md [&>span]:!bg-transparent
+                  [&_svg]:hidden
+                "
+              />
+              <Label htmlFor="hide-completed" className="text-sm font-medium cursor-pointer">
+                Hide completed
+              </Label>
+            </div>
+          </div>
         </div>
 
-        {/* Compact Filters Dropdown */}
-        <CompactFilters
-          selectedCategory={selectedCategory}
-          selectedDifficulty={selectedDifficulty}
-          selectedFirm={selectedFirm}
-          showBookmarkedOnly={showBookmarkedOnly}
-          sortBy={sortBy}
-          onCategoryChange={setSelectedCategory}
-          onDifficultyChange={setSelectedDifficulty}
-          onFirmChange={setSelectedFirm}
-          onBookmarkedOnlyChange={setShowBookmarkedOnly}
-          onSortChange={(value) => setSortBy(value as SortOption)}
-          onClear={handleClearFilters}
-        />
+
+
+        {/* Sort Buttons */}
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-sm text-muted-foreground mr-2">
+            Order by difficulty:
+          </span>
+          <Button
+            size="sm"
+            variant={sortBy === "difficulty-asc" ? "outline" : "ghost"}
+            className={sortBy === "difficulty-asc" ? "border-green-500 text-green-500" : ""}
+            onClick={() => setSortBy("difficulty-asc")}
+          >
+            Easy → Hard
+          </Button>
+          <Button
+            size="sm"
+            variant={sortBy === "difficulty-desc" ? "outline" : "ghost"}
+            className={sortBy === "difficulty-desc" ? "border-green-500 text-green-500" : ""}
+            onClick={() => setSortBy("difficulty-desc")}
+          >
+            Hard → Easy
+          </Button>
+        </div>
+
+<div className="mb-6">
+  <Button
+    variant="ghost"
+    size="sm"
+    onClick={handleClearFilters}
+    className="text-muted-foreground"
+  >
+    Clear all filters
+  </Button>
+</div>
 
         {/* Results Count */}
         <div className="mb-4 text-sm text-muted-foreground">

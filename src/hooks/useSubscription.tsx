@@ -56,8 +56,15 @@ export function useSubscription() {
       )
       .subscribe();
 
+    // Periodically check subscription status (every 5 minutes)
+    // This ensures we catch any subscription expiration even if webhook fails
+    const intervalId = setInterval(() => {
+      fetchSubscription();
+    }, 5 * 60 * 1000); // 5 minutes
+
     return () => {
       supabase.removeChannel(channel);
+      clearInterval(intervalId);
     };
   }, [user]);
 

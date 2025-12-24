@@ -162,16 +162,32 @@ serve(async (req) => {
           .single();
 
         if (profile) {
+          // Subscription is active only if status is 'active' or 'trialing'
+          // All other statuses (canceled, past_due, unpaid, incomplete, etc.) mean subscription is not active
           const isActive = subscription.status === 'active' || subscription.status === 'trialing';
           
-          await supabase
+          console.log('Updating subscription status:', {
+            userId: profile.user_id,
+            subscriptionId: subscription.id,
+            status: subscription.status,
+            isActive,
+          });
+          
+          const { data, error } = await supabase
             .from('profiles')
             .update({
               is_paid: isActive,
               stripe_subscription_id: subscription.id,
               stripe_price_id: subscription.items.data[0]?.price.id,
             })
-            .eq('user_id', profile.user_id);
+            .eq('user_id', profile.user_id)
+            .select();
+
+          if (error) {
+            console.error('Error updating subscription status:', error);
+          } else {
+            console.log('Subscription status updated successfully:', data);
+          }
         }
         break;
       }
@@ -225,8 +241,37 @@ serve(async (req) => {
         const invoice = event.data.object as any;
         const customerId = invoice.customer;
 
-        // Optional: You might want to notify the user or mark subscription as past_due
-        // For now, we'll keep is_paid as true until subscription is actually canceled
+        // Find user by customer ID
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('user_id, stripe_subscription_id')
+          .eq('stripe_customer_id', customerId)
+          .single();
+
+        if (profile && profile.stripe_subscription_id) {
+          // Check subscription status - if it's past_due or unpaid, mark as not paid
+          try {
+            const subscription = await stripeClient.subscriptions.retrieve(profile.stripe_subscription_id);
+            
+            // If subscription is past_due, unpaid, or canceled, mark as not paid
+            if (subscription.status === 'past_due' || subscription.status === 'unpaid' || subscription.status === 'canceled') {
+              await supabase
+                .from('profiles')
+                .update({
+                  is_paid: false,
+                })
+                .eq('user_id', profile.user_id);
+              
+              console.log('Subscription marked as not paid due to payment failure:', {
+                userId: profile.user_id,
+                subscriptionStatus: subscription.status,
+              });
+            }
+          } catch (err) {
+            console.error('Error checking subscription status after payment failure:', err);
+          }
+        }
+        
         console.log('Payment failed for customer:', customerId);
         break;
       }

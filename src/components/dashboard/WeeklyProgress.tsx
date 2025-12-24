@@ -1,9 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Button } from "@/components/ui/button";
-import { Flame, Calendar } from "lucide-react";
-import { useMemo, useState } from "react";
-import { CalendarView } from "./CalendarView";
+import { Flame } from "lucide-react";
+import { useMemo } from "react";
 
 interface DailyActivity {
   date: string; // YYYY-MM-DD format
@@ -16,7 +14,6 @@ interface WeeklyProgressProps {
 }
 
 export function WeeklyProgress({ dailyActivity, streakDays }: WeeklyProgressProps) {
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   // Get the last 7 days (including today)
   const weekDays = useMemo(() => {
     const days = [];
@@ -93,23 +90,12 @@ export function WeeklyProgress({ dailyActivity, streakDays }: WeeklyProgressProp
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Weekly Progress</CardTitle>
-            <div className="flex items-center gap-3">
-              {streakDays > 0 && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
-                  <span className="font-semibold text-orange-500">{streakDays} day streak</span>
-                </div>
-              )}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => setIsCalendarOpen(true)}
-                title="View full calendar"
-              >
-                <Calendar className="h-4 w-4" />
-              </Button>
-            </div>
+            {streakDays > 0 && (
+              <div className="flex items-center gap-2 text-sm">
+                <Flame className="w-4 h-4 text-orange-500 fill-orange-500" />
+                <span className="font-semibold text-orange-500">{streakDays} day streak</span>
+              </div>
+            )}
           </div>
         </CardHeader>
       <CardContent>
@@ -181,12 +167,6 @@ export function WeeklyProgress({ dailyActivity, streakDays }: WeeklyProgressProp
         </div>
       </CardContent>
     </Card>
-    
-    <CalendarView 
-      dailyActivity={dailyActivity} 
-      isOpen={isCalendarOpen}
-      onClose={() => setIsCalendarOpen(false)}
-    />
     </>
   );
 }

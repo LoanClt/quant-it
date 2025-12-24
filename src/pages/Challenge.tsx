@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/landing/Navbar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -137,6 +137,12 @@ export default function Challenge() {
     shake: false,
   });
 
+  // Use ref to store latest state for async operations
+  const stateRef = useRef(state);
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
+
   const eligibleCompanies = useMemo(() => getEligibleCompanies(isPaid), [isPaid]);
 
   // Timer countdown
@@ -237,8 +243,15 @@ export default function Challenge() {
       // Check if all questions are now correctly answered using newAnswers
       const allCorrect = state.questions.every(q => {
         const userAnswer = newAnswers[q.id];
-        return userAnswer !== undefined && 
-               Math.abs(userAnswer - q.numericAnswer) < 0.001;
+        if (userAnswer === undefined || userAnswer === null) return false;
+        
+        if (q.answerType === 'number' && q.numericAnswer !== undefined) {
+          const numAnswer = typeof userAnswer === 'number' ? userAnswer : parseFloat(userAnswer as string);
+          return !isNaN(numAnswer) && Math.abs(numAnswer - q.numericAnswer) < 0.001;
+        } else if (q.answerType === 'mcq' && q.correctAnswerId !== undefined) {
+          return userAnswer === q.correctAnswerId;
+        }
+        return false;
       });
 
       // If this is the last question and all are correct, complete immediately with green highlight
@@ -281,10 +294,18 @@ export default function Challenge() {
   };
 
   const handleComplete = async (success: boolean, answersOverride?: { [questionId: string]: number | string | null }) => {
-    // Use provided answers or state answers
-    const currentAnswers = answersOverride || state.answers;
+    // Use ref to get the latest state (handles async/setTimeout scenarios)
+    const currentState = stateRef.current;
+    const currentCompany = currentState.company;
+    const currentTimeRemaining = currentState.timeRemaining;
+    const currentHintsUsed = currentState.hintsUsed;
+    const currentLives = currentState.lives;
+    const currentQuestions = currentState.questions;
     
-    const correctAnswers = state.questions.filter((q) => {
+    // Use provided answers or state answers
+    const currentAnswers = answersOverride || currentState.answers;
+    
+    const correctAnswers = currentQuestions.filter((q) => {
       const userAnswer = currentAnswers[q.id];
       if (userAnswer === undefined || userAnswer === null) return false;
       
@@ -298,7 +319,7 @@ export default function Challenge() {
     }).length;
 
     // Challenge is only successful if all 3 questions are correct AND success flag is true
-    const allCorrect = correctAnswers === state.questions.length && success && state.questions.length === 3;
+    const allCorrect = correctAnswers === currentQuestions.length && success && currentQuestions.length === 3;
 
     let finalScore = 0;
     if (allCorrect) {
@@ -306,12 +327,58 @@ export default function Challenge() {
       // Base: 100 points per question, max 300
       // Penalty: -10 points per hint used
       const baseScore = correctAnswers * 100;
-      const hintPenalty = state.hintsUsed * 10;
-      const timeBonus = Math.floor(state.timeRemaining / 60) * 2; // 2 points per minute remaining
+      const hintPenalty = currentHintsUsed * 10;
+      const timeBonus = Math.floor(currentTimeRemaining / 60) * 2; // 2 points per minute remaining
       finalScore = Math.max(0, baseScore - hintPenalty + timeBonus);
     }
 
-    // Update state with completion status
+    const timeTaken = 30 * 60 - currentTimeRemaining;
+
+    // Save challenge completion to database FIRST (before state update)
+    if (user && currentCompany) {
+      try {
+        console.log("Attempting to save challenge completion:", {
+          user_id: user.id,
+          company: currentCompany,
+          score: finalScore,
+          questions_completed: correctAnswers,
+          time_taken: timeTaken,
+          hints_used: currentHintsUsed,
+          lives_remaining: currentLives,
+          failed: !allCorrect,
+        });
+
+        const { data, error } = await (supabase as any)
+          .from("challenge_completions")
+          .insert({
+            user_id: user.id,
+            company: currentCompany,
+            score: finalScore,
+            questions_completed: correctAnswers,
+            time_taken: timeTaken,
+            hints_used: currentHintsUsed,
+            lives_remaining: currentLives,
+            // Note: 'failed' column may not exist in database, infer from score = 0
+          })
+          .select();
+
+        if (error) {
+          console.error("Error saving challenge completion:", error);
+          console.error("Error details:", JSON.stringify(error, null, 2));
+          toast.error(`Failed to save challenge completion: ${error.message || 'Unknown error'}`);
+        } else {
+          console.log("Challenge completion saved successfully:", data);
+          toast.success("Challenge completion saved!");
+        }
+      } catch (err) {
+        console.error("Exception saving challenge:", err);
+        toast.error(`Failed to save challenge completion: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      }
+    } else {
+      console.warn("Cannot save challenge completion - missing user or company:", { user: !!user, company: currentCompany });
+    }
+
+    // Update state with completion status AFTER database save
     setState((prev) => {
       // Use the answers passed in or from state
       const answersToCheck = answersOverride || prev.answers;
@@ -340,30 +407,6 @@ export default function Challenge() {
         score: finalAllCorrect ? finalScore : 0,
       };
     });
-
-    // Save challenge completion to database (even if failed)
-    if (user && state.company) {
-      try {
-        const { error } = await (supabase as any)
-          .from("challenge_completions")
-          .insert({
-            user_id: user.id,
-            company: state.company,
-            score: finalScore,
-            questions_completed: correctAnswers,
-            time_taken: 30 * 60 - state.timeRemaining,
-            hints_used: state.hintsUsed,
-            lives_remaining: state.lives,
-            failed: !allCorrect,
-          });
-
-        if (error) {
-          console.error("Error saving challenge completion:", error);
-        }
-      } catch (err) {
-        console.error("Error saving challenge:", err);
-      }
-    }
 
     // Show toast based on completion status
     if (allCorrect) {
@@ -555,62 +598,85 @@ export default function Challenge() {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-<main className="container px-4 pt-24 pb-12 relative overflow-hidden">
+        <main className="container px-4 pt-24 pb-12 relative overflow-hidden">
+          <div className="max-w-4xl mx-auto">
+            {/* Hero */}
+            <div className="text-center mb-14">
+              <Badge variant="outline" className="mb-4">
+                Interview-style challenge
+              </Badge>
 
-  
-
-  <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-8">
               <h1 className="text-4xl md:text-5xl font-bold mb-4">
                 Company Challenge
               </h1>
-              <p className="text-xl text-muted-foreground">
-                Test your skills with 3 questions in 30 minutes
+
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Simulate real interview pressure with a timed, multi-question challenge
+                designed to test accuracy, speed, and composure.
               </p>
             </div>
 
-            <Card className="mb-6 relative overflow-hidden">
-  <CardHeader>
-    <CardTitle>Challenge Rules</CardTitle>
-  </CardHeader>
+            {/* How it works */}
+            <Card className="mb-10 relative overflow-hidden">
+              <div className="absolute inset-0 bg-green-500/10 blur-3xl pointer-events-none" />
 
-  <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-    {[
-      "30 minutes to complete 3 questions of increasing difficulty",
-      "3 lives — wrong answer costs 1 life",
-      "Hints available but reduce your final score",
-      "No answer reveal — solve it yourself",
-      "Bonus points for time remaining",
-    ].map((rule, index) => (
-      <div
-        key={index}
-        className="
-          relative group rounded-lg border bg-background px-4 py-3
-          text-sm text-muted-foreground
-          transition-all duration-300
-          hover:border-green-400 hover:text-foreground
-        "
-      >
-        {/* Hover glow */}
-        <div className="
-          absolute inset-0 rounded-lg bg-green-500/20 blur-xl opacity-0
-          group-hover:opacity-100 transition-opacity duration-300
-          pointer-events-none
-        " />
+              <CardHeader className="relative z-10">
+                <CardTitle className="text-2xl">How the challenge works</CardTitle>
+              </CardHeader>
 
+              <CardContent className="relative z-10">
+                <div className="grid md:grid-cols-5 gap-6">
+                  {[
+                    { title: "30 minutes", desc: "Complete the challenge under time pressure" },
+                    { title: "3 questions", desc: "Increasing difficulty, interview-style" },
+                    { title: "3 lives", desc: "Each mistake costs one life" },
+                    { title: "Hints", desc: "Available, but reduce your score" },
+                    { title: "Scoring", desc: "Accuracy first, time bonus if early" },
+                  ].map((item, i) => (
+                    <div
+                      key={i}
+                      className="
+                        relative group rounded-xl border bg-background/60
+                        p-5 text-center transition-all duration-300
+                        hover:-translate-y-1 hover:border-green-400
+                      "
+                    >
+                      <div
+                        className="
+                          absolute -top-3 left-1/2 -translate-x-1/2
+                          w-7 h-7 rounded-full bg-green-500 text-background
+                          flex items-center justify-center text-sm font-bold shadow-lg
+                        "
+                      >
+                        {i + 1}
+                      </div>
 
-        <span className="relative z-10">{rule}</span>
-      </div>
-    ))}
-  </CardContent>
-</Card>
+                      <div
+                        className="
+                          absolute inset-0 rounded-xl bg-green-500/20 blur-xl
+                          opacity-0 group-hover:opacity-100 transition-opacity
+                          pointer-events-none
+                        "
+                      />
+
+                      <h3 className="mt-4 font-semibold text-lg">{item.title}</h3>
+                      <p className="text-sm text-muted-foreground mt-2">{item.desc}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <p className="text-center text-sm text-muted-foreground mb-10">
+              Choose a company below to start a challenge.
+            </p>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {eligibleCompanies.map((company) => {
                 const companyQuestions = questions.filter(q => q.firm === company);
                 const probabilityCount = companyQuestions.filter(q => q.answerType === 'number').length;
                 const marketCount = companyQuestions.filter(q => q.answerType === 'mcq').length;
-                
+
                 return (
                   <Card
                     key={company}
@@ -622,7 +688,7 @@ export default function Challenge() {
                       // If only one type available, start directly; otherwise show type selection
                       const hasProbability = probabilityCount >= 3;
                       const hasMarkets = marketCount >= 3;
-                      
+
                       if (hasProbability && !hasMarkets) {
                         handleStartChallenge(company, 'probability');
                       } else if (hasMarkets && !hasProbability) {
@@ -664,7 +730,7 @@ export default function Challenge() {
                           e.stopPropagation(); // avoid double trigger
                           const hasProbability = probabilityCount >= 3;
                           const hasMarkets = marketCount >= 3;
-                          
+
                           if (hasProbability && !hasMarkets) {
                             handleStartChallenge(company, 'probability');
                           } else if (hasMarkets && !hasProbability) {
@@ -680,7 +746,7 @@ export default function Challenge() {
                   </Card>
                 );
               })}
-              
+
               {/* Locked companies for non-paid users */}
               {!isPaid && getEligibleCompanies(true).filter(c => c !== "Citadel").map((company) => (
                 <Card
@@ -711,7 +777,6 @@ export default function Challenge() {
               ))}
             </div>
           </div>
-        
         </main>
       </div>
     );
@@ -958,10 +1023,18 @@ export default function Challenge() {
                 <div>
                   <p className="text-sm text-muted-foreground">Correct</p>
                   <p className="text-2xl font-bold">
-                    {state.questions.filter(q => 
-                      state.answers[q.id] !== undefined && 
-                      Math.abs((state.answers[q.id] || 0) - q.numericAnswer) < 0.001
-                    ).length} / {state.questions.length}
+                    {state.questions.filter(q => {
+                      const userAnswer = state.answers[q.id];
+                      if (userAnswer === undefined || userAnswer === null) return false;
+                      
+                      if (q.answerType === 'number' && q.numericAnswer !== undefined) {
+                        const numAnswer = typeof userAnswer === 'number' ? userAnswer : parseFloat(userAnswer as string);
+                        return !isNaN(numAnswer) && Math.abs(numAnswer - q.numericAnswer) < 0.001;
+                      } else if (q.answerType === 'mcq' && q.correctAnswerId !== undefined) {
+                        return userAnswer === q.correctAnswerId;
+                      }
+                      return false;
+                    }).length} / {state.questions.length}
                   </p>
                 </div>
                 <div>
@@ -1001,7 +1074,11 @@ export default function Challenge() {
                 >
                   Try Another Challenge
                 </Button>
-                <Button variant="outline" onClick={() => navigate("/dashboard")}>
+                <Button variant="outline" onClick={() => {
+                  // Trigger a custom event to refresh challenge tracker
+                  window.dispatchEvent(new CustomEvent('challengeCompleted'));
+                  navigate("/dashboard");
+                }}>
                   View Dashboard
                 </Button>
               </div>
