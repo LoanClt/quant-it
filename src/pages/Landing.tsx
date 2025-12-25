@@ -69,14 +69,15 @@ export default function Landing() {
         <MCQPreview />
       </Section>
       <Section>
+        <Timeline />
+      </Section>
+      <Section>
         <PracticeShowcase />
       </Section>
       <Section>
         <ChallengeShowcase />
       </Section>
-      <Section>
-        <Timeline />
-      </Section>
+
       <Section>
         <Benefits />
       </Section>

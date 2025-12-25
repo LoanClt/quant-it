@@ -5673,6 +5673,2526 @@ export const questions: Question[] = [
     "numericAnswer": 13,
     "firm": "Two Sigma",
     "requiresPaid": false
+  },
+  {
+    id: "st81",
+    title: "Forward Price Sensitivity",
+    category: "sales-and-trading",
+    subcategory: "Derivatives",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "A stock forward price increases while the spot price remains unchanged. Which parameter most likely increased?",
+    hints: [
+      "Think cost of carry",
+      "Spot unchanged",
+      "Ignore dividends"
+    ],
+    solution: "An increase in interest rates raises the forward price",
+    solutionSteps: [
+      "Forward price grows with financing cost",
+      "Higher rates increase carry",
+      "Spot remaining constant isolates rate effect"
+    ],
+    commonMistakes: [
+      "Blaming volatility",
+      "Assuming forward equals spot"
+    ],
+    skills: ["forwards", "rates"],
+    tags: ["sales-and-trading", "hard", "derivatives"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Interest rates increased" },
+      { id: "b", label: "Volatility increased" },
+      { id: "c", label: "Dividend yield increased" },
+      { id: "d", label: "Correlation changed" }
+    ],
+    correctAnswerId: "a",
+    firm: "UBS"
+  },
+  {
+    id: "st82",
+    title: "Short Gamma Market Environment",
+    category: "sales-and-trading",
+    subcategory: "Greeks",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "In which market environment does a short gamma position perform worst?",
+    hints: [
+      "Think large price swings",
+      "Direction matters less than movement",
+      "Ignore drift"
+    ],
+    solution: "Large and rapid price movements hurt short gamma positions",
+    solutionSteps: [
+      "Short gamma loses from convexity",
+      "Large moves amplify losses",
+      "Choppy markets are worst"
+    ],
+    commonMistakes: [
+      "Assuming trend direction matters",
+      "Confusing gamma with delta"
+    ],
+    skills: ["options greeks", "risk"],
+    tags: ["sales-and-trading", "extreme", "greeks"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Low volatility markets" },
+      { id: "b", label: "Large price swings" },
+      { id: "c", label: "High interest rate environments" },
+      { id: "d", label: "Flat markets" }
+    ],
+    correctAnswerId: "b",
+    firm: "Jane Street"
+  },
+  {
+    id: "st83",
+    title: "Effect of Dividend Yield on Calls",
+    category: "sales-and-trading",
+    subcategory: "Options",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "All else equal, how does an increase in dividend yield affect European call option prices?",
+    hints: [
+      "Dividends reduce expected future spot",
+      "Call payoff depends on future spot",
+      "Think present value"
+    ],
+    solution: "Higher dividends reduce call option prices",
+    solutionSteps: [
+      "Dividends lower expected terminal price",
+      "Call payoff probability decreases",
+      "Call value falls"
+    ],
+    commonMistakes: [
+      "Assuming dividends increase volatility",
+      "Ignoring dividend yield"
+    ],
+    skills: ["options", "dividends"],
+    tags: ["sales-and-trading", "hard", "options"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Increase call prices" },
+      { id: "b", label: "No impact" },
+      { id: "c", label: "Reduce call prices" },
+      { id: "d", label: "Make calls worthless" }
+    ],
+    correctAnswerId: "c",
+    firm: "BNP Paribas"
+  },
+  {
+    id: "st84",
+    title: "Deep OTM Option Sensitivity",
+    category: "sales-and-trading",
+    subcategory: "Greeks",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "Which Greek dominates the price behavior of a deep out-of-the-money option?",
+    hints: [
+      "Low delta",
+      "High convexity",
+      "Think probability of large move"
+    ],
+    solution: "Vega dominates deep OTM option pricing",
+    solutionSteps: [
+      "Delta is near zero",
+      "Payoff depends on tail probability",
+      "Volatility drives tail risk"
+    ],
+    commonMistakes: [
+      "Choosing delta",
+      "Ignoring volatility effects"
+    ],
+    skills: ["options greeks", "volatility"],
+    tags: ["sales-and-trading", "extreme", "greeks"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Delta" },
+      { id: "b", label: "Theta" },
+      { id: "c", label: "Vega" },
+      { id: "d", label: "Rho" }
+    ],
+    correctAnswerId: "c",
+    firm: "Citadel"
+  },
+  {
+    id: "st85",
+    title: "Put Price Reaction to Rate Increase",
+    category: "sales-and-trading",
+    subcategory: "Options",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "All else equal, what happens to the price of a European put when interest rates increase?",
+    hints: [
+      "Think present value of strike",
+      "Discounting matters",
+      "Compare call vs put"
+    ],
+    solution: "Put prices decrease when interest rates increase",
+    solutionSteps: [
+      "Higher rates reduce present value of strike",
+      "Put payoff depends on strike",
+      "Put value declines"
+    ],
+    commonMistakes: [
+      "Assuming both calls and puts increase",
+      "Ignoring discounting"
+    ],
+    skills: ["options", "rates"],
+    tags: ["sales-and-trading", "hard", "options"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Increase" },
+      { id: "b", label: "Decrease" },
+      { id: "c", label: "Remain unchanged" },
+      { id: "d", label: "Become zero" }
+    ],
+    correctAnswerId: "b",
+    firm: "HSBC"
+  },
+  {
+    id: "st86",
+    title: "Synthetic Put Construction",
+    category: "sales-and-trading",
+    subcategory: "Derivatives",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "How can a synthetic European put option be replicated using other instruments?",
+    hints: [
+      "Use put-call parity",
+      "Rearrange the equation",
+      "Ignore dividends"
+    ],
+    solution: "Sell a call, buy the stock, and borrow cash",
+    solutionSteps: [
+      "Put = Call − Stock + Bond",
+      "Replicates downside payoff",
+      "Parity holds"
+    ],
+    commonMistakes: [
+      "Buying the call",
+      "Ignoring cash position"
+    ],
+    skills: ["replication", "options"],
+    tags: ["sales-and-trading", "extreme", "derivatives"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Buy a call and short the stock" },
+      { id: "b", label: "Sell a call, buy stock, borrow cash" },
+      { id: "c", label: "Buy a call and buy a put" },
+      { id: "d", label: "Sell a put and lend cash" }
+    ],
+    correctAnswerId: "b",
+    firm: "Morgan Stanley"
+  },
+  {
+    id: "st87",
+    title: "When Vega is Maximum",
+    category: "sales-and-trading",
+    subcategory: "Greeks",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "For which option is vega typically the highest?",
+    hints: [
+      "Consider moneyness",
+      "Time to maturity matters",
+      "Ignore dividends"
+    ],
+    solution: "At-the-money options have the highest vega",
+    solutionSteps: [
+      "ATM options are most sensitive to volatility",
+      "Deep ITM/OTM have lower vega",
+      "Effect strongest for longer maturities"
+    ],
+    commonMistakes: [
+      "Choosing deep ITM",
+      "Assuming vega depends only on maturity"
+    ],
+    skills: ["options greeks", "volatility"],
+    tags: ["sales-and-trading", "hard", "greeks"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Deep in-the-money options" },
+      { id: "b", label: "Deep out-of-the-money options" },
+      { id: "c", label: "At-the-money options" },
+      { id: "d", label: "Options at expiration" }
+    ],
+    correctAnswerId: "c",
+    firm: "Optiver"
+  },
+  {
+    id: "st88",
+    title: "Forward Curve Backwardation",
+    category: "sales-and-trading",
+    subcategory: "Commodities",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "A commodity forward curve is in backwardation. What does this typically imply?",
+    hints: [
+      "Compare spot and forward prices",
+      "Think inventory scarcity",
+      "Ignore seasonality"
+    ],
+    solution: "Spot prices are higher than forward prices",
+    solutionSteps: [
+      "Backwardation means downward-sloping curve",
+      "Often linked to scarcity",
+      "Convenience yield dominates"
+    ],
+    commonMistakes: [
+      "Confusing with contango",
+      "Ignoring inventory effects"
+    ],
+    skills: ["commodities", "forwards"],
+    tags: ["sales-and-trading", "extreme", "commodities"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Spot prices below forwards" },
+      { id: "b", label: "Spot prices above forwards" },
+      { id: "c", label: "Flat forward curve" },
+      { id: "d", label: "Zero carry" }
+    ],
+    correctAnswerId: "b",
+    firm: "Trafigura"
+  },
+  {
+    id: "st89",
+    title: "Risk-Neutral Pricing Principle",
+    category: "sales-and-trading",
+    subcategory: "Derivatives",
+    difficulty: 8,
+    requiresPaid: true,
+    content: "Under the risk-neutral measure, how are expected asset returns treated?",
+    hints: [
+      "Risk premia removed",
+      "Drift changes",
+      "Think pricing, not forecasting"
+    ],
+    solution: "Expected returns equal the risk-free rate",
+    solutionSteps: [
+      "Risk-neutral world removes risk premia",
+      "Assets grow at financing rate",
+      "Used for pricing derivatives"
+    ],
+    commonMistakes: [
+      "Using historical returns",
+      "Confusing real-world expectations"
+    ],
+    skills: ["risk-neutral pricing", "theory"],
+    tags: ["sales-and-trading", "extreme", "derivatives"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Equal expected return across assets" },
+      { id: "b", label: "Equal to risk-free rate" },
+      { id: "c", label: "Zero expected return" },
+      { id: "d", label: "Equal to volatility" }
+    ],
+    correctAnswerId: "b",
+    firm: "IMC"
+  },
+  {
+    id: "st90",
+    title: "Theta Sign of Long Option",
+    category: "sales-and-trading",
+    subcategory: "Greeks",
+    difficulty: 5,
+    requiresPaid: true,
+    content: "What is the sign of theta for a long European option, all else equal?",
+    hints: [
+      "Time decay",
+      "Extrinsic value",
+      "Ignore dividends"
+    ],
+    solution: "Theta is negative for long options",
+    solutionSteps: [
+      "Time reduces optionality",
+      "Extrinsic value decays",
+      "Long option loses value"
+    ],
+    commonMistakes: [
+      "Assuming time helps buyers",
+      "Confusing theta with vega"
+    ],
+    skills: ["options greeks", "theta"],
+    tags: ["sales-and-trading", "hard", "greeks"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Positive" },
+      { id: "b", label: "Negative" },
+      { id: "c", label: "Zero" },
+      { id: "d", label: "Depends on delta" }
+    ],
+    correctAnswerId: "b",
+    firm: "Barclays"
+  },
+  {
+    id: "st91",
+    title: "Effect of Correlation on Dispersion Trade",
+    category: "sales-and-trading",
+    subcategory: "Equity Derivatives",
+    difficulty: 8,
+    requiresPaid: true,
+    content: "You are long single-stock volatility and short index volatility in a dispersion trade. What market move hurts this position most?",
+    hints: [
+      "Think correlation",
+      "Index variance formula",
+      "Ignore individual vol changes"
+    ],
+    solution: "A sharp increase in correlation",
+    solutionSteps: [
+      "Higher correlation increases index volatility",
+      "Short index vol loses",
+      "Dispersion trade underperforms"
+    ],
+    commonMistakes: [
+      "Focusing only on vol levels",
+      "Ignoring dependence structure"
+    ],
+    skills: ["dispersion", "correlation"],
+    tags: ["sales-and-trading", "extreme", "equity-derivatives"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Correlation spike" },
+      { id: "b", label: "Lower index volatility" },
+      { id: "c", label: "Higher dividends" },
+      { id: "d", label: "Falling interest rates" }
+    ],
+    correctAnswerId: "a",
+    firm: "JPMorgan"
+  },
+  {
+    id: "st92",
+    title: "Digital Option Delta",
+    category: "sales-and-trading",
+    subcategory: "Exotics",
+    difficulty: 8,
+    requiresPaid: true,
+    content: "Near maturity, how does the delta of a digital option behave around the strike?",
+    hints: [
+      "Think discontinuity",
+      "Steep payoff",
+      "Limit behavior"
+    ],
+    solution: "Delta spikes sharply around the strike",
+    solutionSteps: [
+      "Digital payoff jumps at strike",
+      "Small price change flips outcome",
+      "Delta becomes very large"
+    ],
+    commonMistakes: [
+      "Assuming smooth delta",
+      "Treating digitals like vanillas"
+    ],
+    skills: ["exotic options", "greeks"],
+    tags: ["sales-and-trading", "extreme", "exotics"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Delta is zero everywhere" },
+      { id: "b", label: "Delta is constant" },
+      { id: "c", label: "Delta spikes near the strike" },
+      { id: "d", label: "Delta becomes negative" }
+    ],
+    correctAnswerId: "c",
+    firm: "Société Générale"
+  },
+  {
+    id: "st93",
+    title: "Forward Rate Curve Interpretation",
+    category: "sales-and-trading",
+    subcategory: "Rates",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "An upward-sloping forward rate curve most directly implies what expectation?",
+    hints: [
+      "Market-implied expectations",
+      "Risk-neutral view",
+      "Ignore term premium"
+    ],
+    solution: "Higher expected future short-term rates",
+    solutionSteps: [
+      "Forward rates embed expectations",
+      "Upward slope suggests rising rates",
+      "Risk-neutral interpretation"
+    ],
+    commonMistakes: [
+      "Assuming guaranteed outcomes",
+      "Ignoring term premium caveat"
+    ],
+    skills: ["rates", "yield curve"],
+    tags: ["sales-and-trading", "hard", "rates"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Lower future inflation" },
+      { id: "b", label: "Higher future short rates" },
+      { id: "c", label: "Flat yield expectations" },
+      { id: "d", label: "Recession certainty" }
+    ],
+    correctAnswerId: "b",
+    firm: "Nomura"
+  },
+  {
+    id: "st94",
+    title: "Effect of Volatility on Gamma",
+    category: "sales-and-trading",
+    subcategory: "Greeks",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "Holding all else constant, what happens to gamma when implied volatility increases?",
+    hints: [
+      "Gamma is curvature",
+      "Volatility spreads probability mass",
+      "ATM focus"
+    ],
+    solution: "Gamma decreases as volatility increases",
+    solutionSteps: [
+      "Higher volatility smooths payoff curvature",
+      "Price sensitivity spreads out",
+      "Gamma magnitude falls"
+    ],
+    commonMistakes: [
+      "Assuming all Greeks increase with volatility",
+      "Confusing gamma with vega"
+    ],
+    skills: ["options greeks", "volatility"],
+    tags: ["sales-and-trading", "extreme", "greeks"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Gamma increases" },
+      { id: "b", label: "Gamma decreases" },
+      { id: "c", label: "Gamma is unchanged" },
+      { id: "d", label: "Gamma becomes negative" }
+    ],
+    correctAnswerId: "b",
+    firm: "QRT"
+  },
+  {
+    id: "st95",
+    title: "Credit Spread Widening Impact",
+    category: "sales-and-trading",
+    subcategory: "Credit",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "What is the immediate effect of credit spread widening on corporate bond prices?",
+    hints: [
+      "Higher required yield",
+      "Discounting cash flows",
+      "Risk premium increases"
+    ],
+    solution: "Corporate bond prices fall",
+    solutionSteps: [
+      "Higher spreads increase discount rate",
+      "Present value of cash flows drops",
+      "Bond price declines"
+    ],
+    commonMistakes: [
+      "Assuming coupon changes",
+      "Ignoring discounting"
+    ],
+    skills: ["credit", "fixed income"],
+    tags: ["sales-and-trading", "hard", "credit"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Prices increase" },
+      { id: "b", label: "Prices fall" },
+      { id: "c", label: "Prices stay constant" },
+      { id: "d", label: "Depends on duration only" }
+    ],
+    correctAnswerId: "b",
+    firm: "BlackRock"
+  },
+  {
+    id: "st96",
+    title: "Hedging Vega Risk",
+    category: "sales-and-trading",
+    subcategory: "Volatility",
+    difficulty: 8,
+    requiresPaid: true,
+    content: "Which instrument is most directly used to hedge vega risk?",
+    hints: [
+      "Think volatility exposure",
+      "Second-order effect",
+      "Ignore delta"
+    ],
+    solution: "Other options with offsetting volatility exposure",
+    solutionSteps: [
+      "Vega measures sensitivity to volatility",
+      "Options are primary volatility instruments",
+      "Offsets vega exposure"
+    ],
+    commonMistakes: [
+      "Using the underlying asset",
+      "Using bonds"
+    ],
+    skills: ["volatility", "risk management"],
+    tags: ["sales-and-trading", "extreme", "volatility"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Underlying stock" },
+      { id: "b", label: "Other options" },
+      { id: "c", label: "Cash position" },
+      { id: "d", label: "Futures contracts only" }
+    ],
+    correctAnswerId: "b",
+    firm: "Citadel"
+  },
+  {
+    id: "st97",
+    title: "ATM Forward Definition",
+    category: "sales-and-trading",
+    subcategory: "Derivatives",
+    difficulty: 5,
+    requiresPaid: true,
+    content: "What does it mean for an option to be at-the-money forward?",
+    hints: [
+      "Forward price vs strike",
+      "Not spot-based",
+      "Think moneyness definition"
+    ],
+    solution: "The strike equals the forward price",
+    solutionSteps: [
+      "ATM-forward compares strike to forward",
+      "Spot may differ",
+      "Used in volatility quoting"
+    ],
+    commonMistakes: [
+      "Using spot price",
+      "Confusing with ATM-spot"
+    ],
+    skills: ["options", "forwards"],
+    tags: ["sales-and-trading", "hard", "derivatives"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Strike equals spot price" },
+      { id: "b", label: "Strike equals forward price" },
+      { id: "c", label: "Strike equals zero" },
+      { id: "d", label: "Option has zero premium" }
+    ],
+    correctAnswerId: "b",
+    firm: "HSBC"
+  },
+  {
+    id: "st98",
+    title: "Variance Swap PnL Driver",
+    category: "sales-and-trading",
+    subcategory: "Volatility",
+    difficulty: 8,
+    requiresPaid: true,
+    content: "A trader is long a variance swap. Which outcome generates positive PnL?",
+    hints: [
+      "Compare realized vs strike",
+      "Squared returns",
+      "Ignore carry"
+    ],
+    solution: "Realized variance exceeding the strike",
+    solutionSteps: [
+      "Variance swap pays realized minus strike",
+      "Higher realized variance benefits long",
+      "PnL positive"
+    ],
+    commonMistakes: [
+      "Using implied volatility",
+      "Confusing variance and volatility"
+    ],
+    skills: ["variance swaps", "volatility"],
+    tags: ["sales-and-trading", "extreme", "volatility"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Realized variance below strike" },
+      { id: "b", label: "Implied volatility collapse" },
+      { id: "c", label: "Realized variance above strike" },
+      { id: "d", label: "Flat price paths" }
+    ],
+    correctAnswerId: "c",
+    firm: "Société Générale"
+  },
+  {
+    id: "st99",
+    title: "Negative Carry Position",
+    category: "sales-and-trading",
+    subcategory: "Derivatives",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "Which position typically exhibits negative carry in stable markets?",
+    hints: [
+      "Think insurance",
+      "Premium paid",
+      "Time decay"
+    ],
+    solution: "Long volatility positions",
+    solutionSteps: [
+      "Volatility sellers earn premium",
+      "Buyers pay time decay",
+      "Carry is negative for long vol"
+    ],
+    commonMistakes: [
+      "Assuming volatility always pays",
+      "Ignoring theta"
+    ],
+    skills: ["volatility", "carry"],
+    tags: ["sales-and-trading", "extreme", "derivatives"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Long volatility strategies" },
+      { id: "b", label: "Cash holdings" },
+      { id: "c", label: "Short futures in backwardation" },
+      { id: "d", label: "Dividend-paying stocks" }
+    ],
+    correctAnswerId: "a",
+    firm: "IMC"
+  },
+  {
+    id: "st100",
+    title: "Forward Measure Change",
+    category: "sales-and-trading",
+    subcategory: "Derivatives",
+    difficulty: 9,
+    requiresPaid: true,
+    content: "When pricing options using the forward measure, which quantity becomes a martingale?",
+    hints: [
+      "Change of numeraire",
+      "Discounting matters",
+      "Think forward price dynamics"
+    ],
+    solution: "The forward price of the underlying",
+    solutionSteps: [
+      "Numeraire is zero-coupon bond",
+      "Forward price discounted by numeraire",
+      "Becomes martingale"
+    ],
+    commonMistakes: [
+      "Choosing spot price",
+      "Confusing with risk-neutral measure"
+    ],
+    skills: ["measure change", "derivative pricing"],
+    tags: ["sales-and-trading", "extreme", "derivatives"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Spot price" },
+      { id: "b", label: "Discounted payoff" },
+      { id: "c", label: "Forward price" },
+      { id: "d", label: "Volatility process" }
+    ],
+    correctAnswerId: "c",
+    firm: "Jane Street"
+  },
+  {
+    id: "st101",
+    title: "Forward Price with Convenience Yield",
+    category: "sales-and-trading",
+    subcategory: "Commodities",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "A commodity trades at 80 USD. Storage costs are negligible, the risk-free rate is 5 percent, and the convenience yield is estimated at 3 percent (continuous). What is the qualitative impact on the forward price?",
+    hints: [
+      "Forward = spot × exp((r − convenience yield)T)",
+      "Convenience yield lowers carry",
+      "Ignore seasonality"
+    ],
+    solution: "The forward price increases, but less than under zero convenience yield",
+    solutionSteps: [
+      "Net carry = 5 − 3 = 2 percent",
+      "Positive but reduced growth rate",
+      "Forward price rises moderately"
+    ],
+    commonMistakes: [
+      "Treating convenience yield like a cost",
+      "Ignoring carry decomposition"
+    ],
+    skills: ["commodities", "forwards"],
+    tags: ["sales-and-trading", "hard", "commodities"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Forward price decreases" },
+      { id: "b", label: "Forward price equals spot" },
+      { id: "c", label: "Forward price increases less than risk-free growth" },
+      { id: "d", label: "Forward price increases more than risk-free growth" }
+    ],
+    correctAnswerId: "c",
+    firm: "Trafigura"
+  },
+  {
+    id: "st102",
+    title: "Gamma Exposure of a Call Spread",
+    category: "sales-and-trading",
+    subcategory: "Options Strategies",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "You are long a call spread (buy lower strike call, sell higher strike call). Where is gamma exposure maximized?",
+    hints: [
+      "Gamma peaks near strikes",
+      "Upper strike caps convexity",
+      "Think payoff curvature"
+    ],
+    solution: "Gamma is highest near the lower strike",
+    solutionSteps: [
+      "Lower strike call drives convexity",
+      "Upper strike offsets gamma after cap",
+      "Net gamma peaks near lower strike"
+    ],
+    commonMistakes: [
+      "Assuming gamma is flat",
+      "Focusing only on midpoint"
+    ],
+    skills: ["options greeks", "payoff analysis"],
+    tags: ["sales-and-trading", "hard", "options"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Near the higher strike" },
+      { id: "b", label: "Near the lower strike" },
+      { id: "c", label: "Exactly at maturity only" },
+      { id: "d", label: "Gamma is constant" }
+    ],
+    correctAnswerId: "b",
+    firm: "Barclays"
+  },
+  {
+    id: "st103",
+    title: "Risk Premium in Forward Prices",
+    category: "sales-and-trading",
+    subcategory: "Derivatives",
+    difficulty: 5,
+    requiresPaid: true,
+    content: "Why do forward prices generally not include a risk premium?",
+    hints: [
+      "Replication argument",
+      "No-arbitrage pricing",
+      "Compare with futures"
+    ],
+    solution: "Because forwards can be replicated and arbitraged",
+    solutionSteps: [
+      "Replicating portfolio removes risk",
+      "No-arbitrage fixes price",
+      "Risk premium disappears"
+    ],
+    commonMistakes: [
+      "Using expected returns",
+      "Confusing pricing with forecasting"
+    ],
+    skills: ["arbitrage", "pricing theory"],
+    tags: ["sales-and-trading", "hard", "derivatives"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Because volatility is zero" },
+      { id: "b", label: "Because investors are risk neutral" },
+      { id: "c", label: "Because forwards are regulated" },
+      { id: "d", label: "Because replication eliminates risk premium" }
+    ],
+    correctAnswerId: "d",
+    firm: "JPMorgan"
+  },
+  {
+    id: "st104",
+    title: "Theta–Gamma Trade-Off",
+    category: "sales-and-trading",
+    subcategory: "Greeks",
+    difficulty: 8,
+    requiresPaid: true,
+    content: "Why do long gamma positions typically have negative theta?",
+    hints: [
+      "Optionality costs money",
+      "Convexity vs decay",
+      "Think insurance analogy"
+    ],
+    solution: "Because convexity must be paid for through time decay",
+    solutionSteps: [
+      "Gamma provides convex payoff",
+      "Market charges time premium",
+      "Theta offsets gamma benefit"
+    ],
+    commonMistakes: [
+      "Assuming gamma is free",
+      "Separating Greeks independently"
+    ],
+    skills: ["options greeks", "volatility trading"],
+    tags: ["sales-and-trading", "extreme", "greeks"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Because volatility decreases over time" },
+      { id: "b", label: "Because delta hedging fails" },
+      { id: "c", label: "Because convexity has a premium cost" },
+      { id: "d", label: "Because interest rates dominate" }
+    ],
+    correctAnswerId: "c",
+    firm: "Jane Street"
+  },
+  {
+    id: "st105",
+    title: "Forward Measure Numeraire",
+    category: "sales-and-trading",
+    subcategory: "Quantitative Finance",
+    difficulty: 10,
+    requiresPaid: true,
+    content: "When pricing a European option using the T-forward measure, which asset is used as the numeraire?",
+    hints: [
+      "Change of measure",
+      "Martingale property",
+      "Maturity-specific"
+    ],
+    solution: "The zero-coupon bond maturing at T",
+    solutionSteps: [
+      "Forward measure uses bond as numeraire",
+      "Discounted asset prices become martingales",
+      "Simplifies payoff expectation"
+    ],
+    commonMistakes: [
+      "Choosing money market account",
+      "Using the underlying asset"
+    ],
+    skills: ["measure change", "martingale pricing"],
+    tags: ["sales-and-trading", "extreme", "derivatives"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Underlying stock" },
+      { id: "b", label: "Risk-free money market account" },
+      { id: "c", label: "Zero-coupon bond maturing at T" },
+      { id: "d", label: "Forward contract itself" }
+    ],
+    correctAnswerId: "c",
+    firm: "QRT"
+  },
+  {
+    id: "st106",
+    title: "Correlation Breakdown Risk",
+    category: "sales-and-trading",
+    subcategory: "Equity Derivatives",
+    difficulty: 9,
+    requiresPaid: true,
+    content: "A trader runs a dispersion book assuming stable correlations. What event poses the largest tail risk?",
+    hints: [
+      "Stress scenarios",
+      "Market crashes",
+      "Correlation behavior"
+    ],
+    solution: "A market crash causing correlations to spike toward one",
+    solutionSteps: [
+      "Dispersion profits from low correlation",
+      "Crashes increase co-movement",
+      "Index volatility explodes"
+    ],
+    commonMistakes: [
+      "Assuming correlation mean reverts smoothly",
+      "Ignoring crisis regimes"
+    ],
+    skills: ["dispersion", "tail risk"],
+    tags: ["sales-and-trading", "extreme", "equity-derivatives"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Gradual volatility decay" },
+      { id: "b", label: "Idiosyncratic stock rallies" },
+      { id: "c", label: "Correlation spike during market crash" },
+      { id: "d", label: "Stable sideways markets" }
+    ],
+    correctAnswerId: "c",
+    firm: "Citadel"
+  },
+  {
+    id: "st107",
+    title: "ATM-Forward Volatility Quoting",
+    category: "sales-and-trading",
+    subcategory: "Volatility",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "Why is implied volatility often quoted at-the-money forward rather than at-the-money spot?",
+    hints: [
+      "Carry effects",
+      "Dividend neutrality",
+      "Standardization"
+    ],
+    solution: "Because ATM-forward removes carry and dividend effects",
+    solutionSteps: [
+      "Forward-neutralizes financing",
+      "Vol reflects pure uncertainty",
+      "Improves comparability"
+    ],
+    commonMistakes: [
+      "Assuming spot is cleaner",
+      "Ignoring dividends"
+    ],
+    skills: ["volatility", "market conventions"],
+    tags: ["sales-and-trading", "hard", "volatility"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "It maximizes gamma" },
+      { id: "b", label: "It removes carry effects" },
+      { id: "c", label: "It increases option liquidity" },
+      { id: "d", label: "It eliminates skew" }
+    ],
+    correctAnswerId: "b",
+    firm: "Société Générale"
+  },
+  {
+    id: "st108",
+    title: "Credit Convexity",
+    category: "sales-and-trading",
+    subcategory: "Credit",
+    difficulty: 8,
+    requiresPaid: true,
+    content: "Why do high-yield bonds often exhibit negative convexity during credit stress?",
+    hints: [
+      "Default probability",
+      "Price floors",
+      "Asymmetric payoff"
+    ],
+    solution: "Because worsening credit risk caps upside but accelerates downside",
+    solutionSteps: [
+      "Default limits recovery",
+      "Spread widening dominates",
+      "Price response becomes asymmetric"
+    ],
+    commonMistakes: [
+      "Assuming convexity is always positive",
+      "Ignoring default dynamics"
+    ],
+    skills: ["credit", "risk"],
+    tags: ["sales-and-trading", "extreme", "credit"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Because coupons float" },
+      { id: "b", label: "Because recovery values cap upside" },
+      { id: "c", label: "Because yields are short-term" },
+      { id: "d", label: "Because duration vanishes" }
+    ],
+    correctAnswerId: "b",
+    firm: "BlackRock"
+  },
+  {
+    id: "st109",
+    title: "Volatility of Volatility Exposure",
+    category: "sales-and-trading",
+    subcategory: "Exotics",
+    difficulty: 10,
+    requiresPaid: true,
+    content: "Which product is most directly exposed to volatility-of-volatility?",
+    hints: [
+      "Second-order volatility",
+      "Model dependence",
+      "Path sensitivity"
+    ],
+    solution: "A forward-start option",
+    solutionSteps: [
+      "Strike is set in the future",
+      "Distribution width uncertainty dominates",
+      "Sensitive to vol dynamics"
+    ],
+    commonMistakes: [
+      "Choosing vanilla options",
+      "Ignoring strike reset feature"
+    ],
+    skills: ["exotic options", "stochastic volatility"],
+    tags: ["sales-and-trading", "extreme", "exotics"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "European vanilla call" },
+      { id: "b", label: "Forward-start option" },
+      { id: "c", label: "Zero-coupon bond" },
+      { id: "d", label: "Futures contract" }
+    ],
+    correctAnswerId: "b",
+    firm: "BNP Paribas"
+  },
+  {
+    id: "st110",
+    title: "Static Hedging Limitation",
+    category: "sales-and-trading",
+    subcategory: "Derivatives",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "Why is static hedging impossible for most path-dependent options?",
+    hints: [
+      "Dependence on entire path",
+      "Finite instruments",
+      "Dynamic replication"
+    ],
+    solution: "Because payoff depends on the full price path, not just terminal value",
+    solutionSteps: [
+      "Static hedge fixes terminal payoff only",
+      "Path-dependence introduces infinite states",
+      "Dynamic hedging required"
+    ],
+    commonMistakes: [
+      "Assuming all options are terminal",
+      "Ignoring monitoring frequency"
+    ],
+    skills: ["exotic options", "hedging"],
+    tags: ["sales-and-trading", "hard", "derivatives"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Because volatility is stochastic" },
+      { id: "b", label: "Because path matters beyond terminal price" },
+      { id: "c", label: "Because markets are illiquid" },
+      { id: "d", label: "Because Greeks are undefined" }
+    ],
+    correctAnswerId: "b",
+    firm: "HSBC"
+  },
+  {
+    id: "st121",
+    title: "Bull Run I – Upside with Limited Downside",
+    category: "sales-and-trading",
+    subcategory: "Trading Strategies",
+    difficulty: 4,
+    requiresPaid: true,
+    content: "You expect a moderate equity rally over the next 3 months but want to strictly limit downside risk. Which strategy best fits this view?",
+    hints: [
+      "Upside participation",
+      "Downside strictly capped",
+      "Simple structure"
+    ],
+    solution: "Buying a call option",
+    solutionSteps: [
+      "Call offers convex upside",
+      "Maximum loss is premium paid",
+      "No downside exposure beyond premium"
+    ],
+    commonMistakes: [
+      "Buying the underlying stock",
+      "Selling puts"
+    ],
+    skills: ["options", "risk management"],
+    tags: ["sales-and-trading", "hard", "strategy"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Buy the underlying stock" },
+      { id: "b", label: "Sell a put" },
+      { id: "c", label: "Buy a call option" },
+      { id: "d", label: "Short a call option" }
+    ],
+    correctAnswerId: "c",
+    firm: "Goldman Sachs"
+  },
+  {
+    id: "st122",
+    title: "Bull Run II – Reduce Premium Cost",
+    category: "sales-and-trading",
+    subcategory: "Trading Strategies",
+    difficulty: 5,
+    requiresPaid: true,
+    content: "You expect a rally but want to reduce the premium paid compared to a naked call. You are willing to cap upside. What structure do you choose?",
+    hints: [
+      "Premium reduction",
+      "Upside cap acceptable",
+      "Directional bullish"
+    ],
+    solution: "Bull call spread",
+    solutionSteps: [
+      "Sell higher strike call",
+      "Finance part of long call",
+      "Upside capped but cheaper"
+    ],
+    commonMistakes: [
+      "Selling puts instead",
+      "Ignoring upside cap"
+    ],
+    skills: ["options strategies", "cost control"],
+    tags: ["sales-and-trading", "hard", "options"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Long straddle" },
+      { id: "b", label: "Bull call spread" },
+      { id: "c", label: "Short call" },
+      { id: "d", label: "Buy forward" }
+    ],
+    correctAnswerId: "b",
+    firm: "Barclays"
+  },
+  {
+    id: "st123",
+    title: "Bull Run III – High Conviction with Carry",
+    category: "sales-and-trading",
+    subcategory: "Trading Strategies",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "You are strongly bullish and willing to take downside risk in exchange for earning premium while holding the position. Which strategy matches this view?",
+    hints: [
+      "Premium income",
+      "Directional bullish",
+      "Downside exposure accepted"
+    ],
+    solution: "Selling a put",
+    solutionSteps: [
+      "Short put benefits from bullish or flat market",
+      "Premium earned upfront",
+      "Downside risk if market falls"
+    ],
+    commonMistakes: [
+      "Assuming downside is limited",
+      "Ignoring assignment risk"
+    ],
+    skills: ["options", "carry"],
+    tags: ["sales-and-trading", "hard", "strategy"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Buy a call" },
+      { id: "b", label: "Sell a put" },
+      { id: "c", label: "Long straddle" },
+      { id: "d", label: "Buy protective put" }
+    ],
+    correctAnswerId: "b",
+    firm: "Citi"
+  },
+  {
+    id: "st124",
+    title: "Crash Hedge I – Cheap Tail Protection",
+    category: "sales-and-trading",
+    subcategory: "Hedging",
+    difficulty: 5,
+    requiresPaid: true,
+    content: "You want protection against a severe market crash but want to minimize hedge cost. Which hedge is typically cheapest?",
+    hints: [
+      "Tail event",
+      "Low probability",
+      "Cost minimization"
+    ],
+    solution: "Deep out-of-the-money puts",
+    solutionSteps: [
+      "Low probability event",
+      "Cheap premium",
+      "Pays off only in crash"
+    ],
+    commonMistakes: [
+      "Buying ATM puts",
+      "Over-hedging normal moves"
+    ],
+    skills: ["tail risk", "hedging"],
+    tags: ["sales-and-trading", "hard", "hedging"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "At-the-money puts" },
+      { id: "b", label: "Deep out-of-the-money puts" },
+      { id: "c", label: "Short futures" },
+      { id: "d", label: "Long straddle" }
+    ],
+    correctAnswerId: "b",
+    firm: "Société Générale"
+  },
+  {
+    id: "st125",
+    title: "Crash Hedge II – Vega Sensitivity",
+    category: "sales-and-trading",
+    subcategory: "Hedging",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "Which hedge benefits both from falling prices and rising implied volatility during a crash?",
+    hints: [
+      "Dual exposure",
+      "Downside + volatility",
+      "Crash dynamics"
+    ],
+    solution: "Long put options",
+    solutionSteps: [
+      "Negative delta",
+      "Positive vega",
+      "Crash typically increases volatility"
+    ],
+    commonMistakes: [
+      "Using futures only",
+      "Ignoring volatility effect"
+    ],
+    skills: ["options", "crash hedging"],
+    tags: ["sales-and-trading", "extreme", "hedging"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Short futures" },
+      { id: "b", label: "Long put options" },
+      { id: "c", label: "Covered call" },
+      { id: "d", label: "Sell volatility" }
+    ],
+    correctAnswerId: "b",
+    firm: "JPMorgan"
+  },
+  {
+    id: "st126",
+    title: "Range Trading I – Neutral View",
+    category: "sales-and-trading",
+    subcategory: "Trading Strategies",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "You expect the market to remain range-bound with low realized volatility. Which strategy monetizes this view?",
+    hints: [
+      "Low volatility",
+      "Time decay",
+      "No strong direction"
+    ],
+    solution: "Short straddle",
+    solutionSteps: [
+      "Collects premium",
+      "Profits from time decay",
+      "Loses on large moves"
+    ],
+    commonMistakes: [
+      "Buying volatility",
+      "Ignoring tail risk"
+    ],
+    skills: ["volatility", "theta"],
+    tags: ["sales-and-trading", "hard", "strategy"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Long straddle" },
+      { id: "b", label: "Short straddle" },
+      { id: "c", label: "Long call" },
+      { id: "d", label: "Buy forward" }
+    ],
+    correctAnswerId: "b",
+    firm: "Optiver"
+  },
+  {
+    id: "st127",
+    title: "Range Trading II – Defined Risk",
+    category: "sales-and-trading",
+    subcategory: "Trading Strategies",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "You expect low volatility but want to strictly cap worst-case losses. Which strategy is most appropriate?",
+    hints: [
+      "Volatility selling",
+      "Defined risk",
+      "Premium income"
+    ],
+    solution: "Iron condor",
+    solutionSteps: [
+      "Short strangle core",
+      "Long wings cap losses",
+      "Risk is bounded"
+    ],
+    commonMistakes: [
+      "Selling naked options",
+      "Ignoring tail exposure"
+    ],
+    skills: ["options strategies", "risk control"],
+    tags: ["sales-and-trading", "extreme", "strategy"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Short straddle" },
+      { id: "b", label: "Iron condor" },
+      { id: "c", label: "Long straddle" },
+      { id: "d", label: "Calendar spread" }
+    ],
+    correctAnswerId: "b",
+    firm: "Jane Street"
+  },
+  {
+    id: "st128",
+    title: "Hedging I – Delta Neutrality",
+    category: "sales-and-trading",
+    subcategory: "Hedging",
+    difficulty: 5,
+    requiresPaid: true,
+    content: "Which position is delta neutral at inception?",
+    hints: [
+      "Opposite deltas",
+      "Same maturity",
+      "Symmetry"
+    ],
+    solution: "Long straddle",
+    solutionSteps: [
+      "Call delta positive",
+      "Put delta negative",
+      "Net delta approximately zero"
+    ],
+    commonMistakes: [
+      "Assuming strangle is neutral",
+      "Ignoring moneyness"
+    ],
+    skills: ["delta hedging", "options"],
+    tags: ["sales-and-trading", "hard", "hedging"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Long call" },
+      { id: "b", label: "Long straddle" },
+      { id: "c", label: "Short put" },
+      { id: "d", label: "Covered call" }
+    ],
+    correctAnswerId: "b",
+    firm: "Morgan Stanley"
+  },
+  {
+    id: "st129",
+    title: "Hedging II – Gamma Exposure",
+    category: "sales-and-trading",
+    subcategory: "Hedging",
+    difficulty: 8,
+    requiresPaid: true,
+    content: "A portfolio is delta hedged but losing money in volatile sideways markets. What is the most likely explanation?",
+    hints: [
+      "Higher-order Greeks",
+      "Volatility realized",
+      "Hedging frequency"
+    ],
+    solution: "The portfolio is short gamma",
+    solutionSteps: [
+      "Delta hedging removes first-order risk",
+      "Volatile oscillations hurt short gamma",
+      "Losses accumulate through rebalancing"
+    ],
+    commonMistakes: [
+      "Blaming delta",
+      "Ignoring gamma"
+    ],
+    skills: ["gamma", "dynamic hedging"],
+    tags: ["sales-and-trading", "extreme", "hedging"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Portfolio is long vega" },
+      { id: "b", label: "Portfolio is short gamma" },
+      { id: "c", label: "Interest rates moved" },
+      { id: "d", label: "Dividend mispricing" }
+    ],
+    correctAnswerId: "b",
+    firm: "Citadel"
+  },
+  {
+    id: "st130",
+    title: "Macro Hedge I – Equity Portfolio",
+    category: "sales-and-trading",
+    subcategory: "Hedging",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "You manage a diversified equity portfolio and want fast, liquid downside protection. What is the most efficient hedge?",
+    hints: [
+      "Liquidity",
+      "Index exposure",
+      "Speed"
+    ],
+    solution: "Short equity index futures",
+    solutionSteps: [
+      "High liquidity",
+      "Broad market exposure",
+      "Low transaction costs"
+    ],
+    commonMistakes: [
+      "Hedging stock-by-stock",
+      "Using illiquid options"
+    ],
+    skills: ["macro hedging", "futures"],
+    tags: ["sales-and-trading", "hard", "hedging"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Buy single-stock puts" },
+      { id: "b", label: "Short equity index futures" },
+      { id: "c", label: "Sell covered calls" },
+      { id: "d", label: "Buy FX options" }
+    ],
+    correctAnswerId: "b",
+    firm: "HSBC"
+  },
+  {
+    id: "st131",
+    title: "Volatility Strategy I – Event Risk",
+    category: "sales-and-trading",
+    subcategory: "Trading Strategies",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "Ahead of a major earnings announcement, which strategy best captures event-driven volatility?",
+    hints: [
+      "Direction uncertain",
+      "Large move expected",
+      "Short horizon"
+    ],
+    solution: "Long straddle",
+    solutionSteps: [
+      "Direction-agnostic",
+      "High gamma",
+      "Profits from large move"
+    ],
+    commonMistakes: [
+      "Selling volatility",
+      "Directional bias"
+    ],
+    skills: ["event trading", "volatility"],
+    tags: ["sales-and-trading", "extreme", "strategy"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Short straddle" },
+      { id: "b", label: "Long straddle" },
+      { id: "c", label: "Covered call" },
+      { id: "d", label: "Buy forward" }
+    ],
+    correctAnswerId: "b",
+    firm: "IMC"
+  },
+  {
+    id: "st132",
+    title: "Volatility Strategy II – Post-Event",
+    category: "sales-and-trading",
+    subcategory: "Trading Strategies",
+    difficulty: 8,
+    requiresPaid: true,
+    content: "Immediately after an earnings release, implied volatility collapses. Which position benefits most?",
+    hints: [
+      "Vol crush",
+      "Premium decay",
+      "Post-event"
+    ],
+    solution: "Short volatility positions",
+    solutionSteps: [
+      "Implied volatility falls",
+      "Options lose extrinsic value",
+      "Short vol profits"
+    ],
+    commonMistakes: [
+      "Buying options post-event",
+      "Ignoring IV dynamics"
+    ],
+    skills: ["volatility", "event trading"],
+    tags: ["sales-and-trading", "extreme", "strategy"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Long straddle" },
+      { id: "b", label: "Short straddle" },
+      { id: "c", label: "Buy gamma" },
+      { id: "d", label: "Long variance swap" }
+    ],
+    correctAnswerId: "b",
+    firm: "SIG"
+  },
+  {
+    id: "st133",
+    title: "Carry Strategy I – Volatility",
+    category: "sales-and-trading",
+    subcategory: "Trading Strategies",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "Which strategy typically earns positive carry in calm markets but suffers during spikes?",
+    hints: [
+      "Premium seller",
+      "Negative convexity",
+      "Volatility exposure"
+    ],
+    solution: "Short volatility strategies",
+    solutionSteps: [
+      "Theta income accrues",
+      "Calm markets favor sellers",
+      "Spikes cause losses"
+    ],
+    commonMistakes: [
+      "Assuming carry is risk-free",
+      "Ignoring tail risk"
+    ],
+    skills: ["carry", "volatility"],
+    tags: ["sales-and-trading", "hard", "strategy"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Long volatility strategies" },
+      { id: "b", label: "Short volatility strategies" },
+      { id: "c", label: "Long bonds" },
+      { id: "d", label: "FX carry trades" }
+    ],
+    correctAnswerId: "b",
+    firm: "BNP Paribas"
+  },
+  {
+    id: "st134",
+    title: "Dynamic Hedging Failure",
+    category: "sales-and-trading",
+    subcategory: "Hedging",
+    difficulty: 9,
+    requiresPaid: true,
+    content: "Why can delta hedging fail catastrophically during market gaps?",
+    hints: [
+      "Discrete hedging",
+      "Jump risk",
+      "Model assumptions"
+    ],
+    solution: "Because hedging assumes continuous price paths",
+    solutionSteps: [
+      "Delta hedging relies on infinitesimal moves",
+      "Gaps skip hedge adjustments",
+      "Losses cannot be offset"
+    ],
+    commonMistakes: [
+      "Assuming higher frequency solves everything",
+      "Ignoring jump risk"
+    ],
+    skills: ["dynamic hedging", "model risk"],
+    tags: ["sales-and-trading", "extreme", "hedging"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Because volatility drops" },
+      { id: "b", label: "Because delta becomes zero" },
+      { id: "c", label: "Because prices move discontinuously" },
+      { id: "d", label: "Because interest rates shift" }
+    ],
+    correctAnswerId: "c",
+    firm: "QRT"
+  },
+  {
+    id: "st135",
+    title: "Protective Put Strategy",
+    category: "sales-and-trading",
+    subcategory: "Hedging",
+    difficulty: 4,
+    requiresPaid: true,
+    content: "What is the primary purpose of a protective put strategy?",
+    hints: [
+      "Downside insurance",
+      "Keep upside",
+      "Portfolio protection"
+    ],
+    solution: "Limit downside while retaining upside",
+    solutionSteps: [
+      "Put caps losses",
+      "Stock keeps upside",
+      "Insurance-like payoff"
+    ],
+    commonMistakes: [
+      "Expecting profit in all cases",
+      "Ignoring premium cost"
+    ],
+    skills: ["options", "portfolio hedging"],
+    tags: ["sales-and-trading", "hard", "hedging"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Generate income" },
+      { id: "b", label: "Eliminate volatility" },
+      { id: "c", label: "Limit downside while keeping upside" },
+      { id: "d", label: "Increase leverage" }
+    ],
+    correctAnswerId: "c",
+    firm: "BlackRock"
+  },
+  {
+    id: "st136",
+    title: "Trend Following Hedge",
+    category: "sales-and-trading",
+    subcategory: "Trading Strategies",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "Why do trend-following strategies often perform well during crises?",
+    hints: [
+      "Convex payoff",
+      "Persistent moves",
+      "Crisis dynamics"
+    ],
+    solution: "Because they benefit from sustained directional moves",
+    solutionSteps: [
+      "Crises create strong trends",
+      "Trend followers add exposure",
+      "Convex returns emerge"
+    ],
+    commonMistakes: [
+      "Assuming they predict crises",
+      "Ignoring whipsaw risk"
+    ],
+    skills: ["trend following", "crisis trading"],
+    tags: ["sales-and-trading", "extreme", "strategy"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Because volatility disappears" },
+      { id: "b", label: "Because they hedge delta" },
+      { id: "c", label: "Because trends persist in crises" },
+      { id: "d", label: "Because correlations fall" }
+    ],
+    correctAnswerId: "c",
+    firm: "AQR"
+  },
+  {
+    id: "st137",
+    title: "Gamma Hedging Frequency",
+    category: "sales-and-trading",
+    subcategory: "Hedging",
+    difficulty: 8,
+    requiresPaid: true,
+    content: "Which factor most increases the cost of gamma hedging?",
+    hints: [
+      "Rebalancing",
+      "Market conditions",
+      "Transaction costs"
+    ],
+    solution: "High realized volatility",
+    solutionSteps: [
+      "Higher volatility requires frequent rebalancing",
+      "Transaction costs accumulate",
+      "Hedging becomes expensive"
+    ],
+    commonMistakes: [
+      "Blaming theta only",
+      "Ignoring trading costs"
+    ],
+    skills: ["gamma hedging", "execution"],
+    tags: ["sales-and-trading", "extreme", "hedging"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Low interest rates" },
+      { id: "b", label: "High realized volatility" },
+      { id: "c", label: "Flat markets" },
+      { id: "d", label: "Long maturity" }
+    ],
+    correctAnswerId: "b",
+    firm: "Jane Street"
+  },
+  {
+    id: "st138",
+    title: "Volatility Targeting Strategy",
+    category: "sales-and-trading",
+    subcategory: "Trading Strategies",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "What is the core mechanism behind volatility targeting strategies?",
+    hints: [
+      "Risk control",
+      "Position sizing",
+      "Feedback loop"
+    ],
+    solution: "Adjusting exposure inversely to volatility",
+    solutionSteps: [
+      "High vol → reduce exposure",
+      "Low vol → increase exposure",
+      "Stabilizes portfolio risk"
+    ],
+    commonMistakes: [
+      "Assuming alpha generation",
+      "Ignoring feedback effects"
+    ],
+    skills: ["portfolio construction", "risk management"],
+    tags: ["sales-and-trading", "hard", "strategy"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Increasing leverage in volatile markets" },
+      { id: "b", label: "Adjusting exposure inversely to volatility" },
+      { id: "c", label: "Timing market direction" },
+      { id: "d", label: "Selling options dynamically" }
+    ],
+    correctAnswerId: "b",
+    firm: "Bridgewater"
+  },
+  {
+    id: "st139",
+    title: "Cross-Asset Hedge Failure",
+    category: "sales-and-trading",
+    subcategory: "Hedging",
+    difficulty: 9,
+    requiresPaid: true,
+    content: "Why can FX hedges fail during global equity sell-offs?",
+    hints: [
+      "Correlation regimes",
+      "Funding stress",
+      "Safe-haven dynamics"
+    ],
+    solution: "Because correlations shift sharply during stress",
+    solutionSteps: [
+      "Normal correlations break",
+      "Funding currencies move unexpectedly",
+      "Hedges become ineffective"
+    ],
+    commonMistakes: [
+      "Assuming historical correlations hold",
+      "Ignoring regime changes"
+    ],
+    skills: ["cross-asset hedging", "stress risk"],
+    tags: ["sales-and-trading", "extreme", "hedging"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Because FX markets close" },
+      { id: "b", label: "Because interest rates freeze" },
+      { id: "c", label: "Because correlations break in stress" },
+      { id: "d", label: "Because volatility is too low" }
+    ],
+    correctAnswerId: "c",
+    firm: "UBS"
+  },
+  {
+    id: "st140",
+    title: "Ultimate Hedge – When It Fails",
+    category: "sales-and-trading",
+    subcategory: "Hedging",
+    difficulty: 10,
+    requiresPaid: true,
+    content: "Which scenario most likely causes even well-designed hedges to fail simultaneously?",
+    hints: [
+      "Model assumptions",
+      "Liquidity",
+      "Systemic risk"
+    ],
+    solution: "A systemic liquidity crisis",
+    solutionSteps: [
+      "Models assume tradability",
+      "Liquidity disappears",
+      "All hedges correlate to one"
+    ],
+    commonMistakes: [
+      "Blaming single asset moves",
+      "Ignoring liquidity dimension"
+    ],
+    skills: ["systemic risk", "hedging failure"],
+    tags: ["sales-and-trading", "extreme", "hedging"],
+    benchmarkTime: 150,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Gradual rate hikes" },
+      { id: "b", label: "Sector rotation" },
+      { id: "c", label: "Systemic liquidity crisis" },
+      { id: "d", label: "Earnings surprises" }
+    ],
+    correctAnswerId: "c",
+    firm: "Citadel"
+  },
+  {
+    id: "st141",
+    title: "Forward Pricing Intuition",
+    category: "sales-and-trading",
+    subcategory: "Pricing",
+    difficulty: 2,
+    requiresPaid: true,
+    content: "Why does the theoretical forward price of a non-dividend-paying stock increase with maturity?",
+    hints: [
+      "Cost of carry",
+      "Financing matters",
+      "No-arbitrage logic"
+    ],
+    solution: "Because longer maturities imply higher financing costs",
+    solutionSteps: [
+      "Forward price reflects spot grown at financing rate",
+      "Longer maturity accumulates more carry",
+      "Thus forward price increases"
+    ],
+    commonMistakes: [
+      "Attributing effect to volatility",
+      "Confusing forward with futures"
+    ],
+    skills: ["forward pricing", "arbitrage"],
+    tags: ["sales-and-trading", "easy", "pricing"],
+    benchmarkTime: 120,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Because financing costs accumulate over time" },
+      { id: "b", label: "Because volatility increases with time" },
+      { id: "c", label: "Because dividends increase" },
+      { id: "d", label: "Because demand is higher" }
+    ],
+    correctAnswerId: "a",
+    firm: "JPMorgan"
+  },
+  {
+    id: "st142",
+    title: "Option Price Lower Bound",
+    category: "sales-and-trading",
+    subcategory: "Pricing",
+    difficulty: 3,
+    requiresPaid: true,
+    content: "What is the minimum possible price of a European call option?",
+    hints: [
+      "Limited liability",
+      "No-arbitrage bound",
+      "Think payoff"
+    ],
+    solution: "Zero",
+    solutionSteps: [
+      "Call payoff is non-negative",
+      "Option holder can walk away",
+      "Lower bound is zero"
+    ],
+    commonMistakes: [
+      "Assuming intrinsic value must exist",
+      "Confusing with forward contracts"
+    ],
+    skills: ["option pricing", "bounds"],
+    tags: ["sales-and-trading", "easy", "options"],
+    benchmarkTime: 120,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Strike price" },
+      { id: "b", label: "Zero" },
+      { id: "c", label: "Spot minus strike" },
+      { id: "d", label: "Discounted payoff" }
+    ],
+    correctAnswerId: "b",
+    firm: "Goldman Sachs"
+  },
+  {
+    id: "st143",
+    title: "Put-Call Parity Interpretation",
+    category: "sales-and-trading",
+    subcategory: "Pricing",
+    difficulty: 4,
+    requiresPaid: true,
+    content: "Put-call parity primarily reflects which fundamental principle?",
+    hints: [
+      "Replication",
+      "No-arbitrage",
+      "Equivalent payoffs"
+    ],
+    solution: "Two portfolios with identical payoffs must have the same price",
+    solutionSteps: [
+      "Call-put-stock-cash replicates forward",
+      "Identical cash flows",
+      "Prices must match"
+    ],
+    commonMistakes: [
+      "Treating parity as a formula only",
+      "Ignoring replication logic"
+    ],
+    skills: ["arbitrage", "replication"],
+    tags: ["sales-and-trading", "medium", "pricing"],
+    benchmarkTime: 140,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Market expectations" },
+      { id: "b", label: "Risk premia equality" },
+      { id: "c", label: "Law of one price" },
+      { id: "d", label: "Investor sentiment" }
+    ],
+    correctAnswerId: "c",
+    firm: "Citadel"
+  },
+  {
+    id: "st144",
+    title: "Zero-Coupon Bond Pricing",
+    category: "sales-and-trading",
+    subcategory: "Pricing",
+    difficulty: 2,
+    requiresPaid: true,
+    content: "Why does a zero-coupon bond always trade below its face value before maturity (assuming positive rates)?",
+    hints: [
+      "Time value of money",
+      "Discounting",
+      "No coupons"
+    ],
+    solution: "Because future cash flows are discounted",
+    solutionSteps: [
+      "Bond pays only at maturity",
+      "Future payment is discounted",
+      "Price is below face value"
+    ],
+    commonMistakes: [
+      "Assuming bonds must trade at par",
+      "Ignoring discounting"
+    ],
+    skills: ["fixed income", "discounting"],
+    tags: ["sales-and-trading", "easy", "pricing"],
+    benchmarkTime: 120,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Because of credit risk" },
+      { id: "b", label: "Because coupons are missing" },
+      { id: "c", label: "Because liquidity is low" },
+      { id: "d", label: "Because future cash is discounted" }
+    ],
+    correctAnswerId: "d",
+    firm: "BlackRock"
+  },
+  {
+    id: "st145",
+    title: "Intrinsic vs Time Value",
+    category: "sales-and-trading",
+    subcategory: "Pricing",
+    difficulty: 3,
+    requiresPaid: true,
+    content: "An at-the-money European option has zero intrinsic value. Why can it still have a positive price?",
+    hints: [
+      "Uncertainty",
+      "Optionality",
+      "Time remaining"
+    ],
+    solution: "Because of remaining time value",
+    solutionSteps: [
+      "Future movements possible",
+      "Option provides convex payoff",
+      "Time value is positive"
+    ],
+    commonMistakes: [
+      "Equating intrinsic value with price",
+      "Ignoring volatility"
+    ],
+    skills: ["options", "valuation"],
+    tags: ["sales-and-trading", "easy", "options"],
+    benchmarkTime: 120,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Because of time value" },
+      { id: "b", label: "Because interest rates are positive" },
+      { id: "c", label: "Because delta is non-zero" },
+      { id: "d", label: "Because strike changes" }
+    ],
+    correctAnswerId: "a",
+    firm: "Morgan Stanley"
+  },
+  {
+    id: "st146",
+    title: "Risk-Neutral Pricing Logic",
+    category: "sales-and-trading",
+    subcategory: "Pricing",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "Why are expected cash flows discounted at the risk-free rate under risk-neutral pricing?",
+    hints: [
+      "Measure change",
+      "No-arbitrage",
+      "Replication"
+    ],
+    solution: "Because risk premia are embedded in probabilities, not discounting",
+    solutionSteps: [
+      "Risk-neutral probabilities adjust expectations",
+      "Discounting uses risk-free rate",
+      "Ensures no-arbitrage pricing"
+    ],
+    commonMistakes: [
+      "Using expected returns",
+      "Mixing real-world and pricing measures"
+    ],
+    skills: ["risk-neutral pricing", "theory"],
+    tags: ["sales-and-trading", "hard", "pricing"],
+    benchmarkTime: 160,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Because assets earn the risk-free rate" },
+      { id: "b", label: "Because risk premia move into probabilities" },
+      { id: "c", label: "Because volatility disappears" },
+      { id: "d", label: "Because investors are risk neutral" }
+    ],
+    correctAnswerId: "b",
+    firm: "QRT"
+  },
+  {
+    id: "st147",
+    title: "Upper Bound of a Call Option",
+    category: "sales-and-trading",
+    subcategory: "Pricing",
+    difficulty: 4,
+    requiresPaid: true,
+    content: "What is the strict upper bound of a European call option price?",
+    hints: [
+      "Compare to owning stock",
+      "No dividends",
+      "Replication"
+    ],
+    solution: "The spot price of the underlying",
+    solutionSteps: [
+      "Call payoff never exceeds stock payoff",
+      "Owning stock dominates call",
+      "Thus price ≤ spot"
+    ],
+    commonMistakes: [
+      "Using strike price as bound",
+      "Ignoring domination argument"
+    ],
+    skills: ["options", "pricing bounds"],
+    tags: ["sales-and-trading", "medium", "options"],
+    benchmarkTime: 140,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Strike price" },
+      { id: "b", label: "Infinity" },
+      { id: "c", label: "Spot price" },
+      { id: "d", label: "Discounted strike" }
+    ],
+    correctAnswerId: "c",
+    firm: "Jane Street"
+  },
+  {
+    id: "st148",
+    title: "Discount Factor Interpretation",
+    category: "sales-and-trading",
+    subcategory: "Pricing",
+    difficulty: 5,
+    requiresPaid: true,
+    content: "What does a discount factor represent in asset pricing?",
+    hints: [
+      "Time value",
+      "Unit payoff",
+      "Present value"
+    ],
+    solution: "The present value of one unit of future cash",
+    solutionSteps: [
+      "Discount factor prices a unit payoff",
+      "Encodes time value of money",
+      "Derived from interest rates"
+    ],
+    commonMistakes: [
+      "Confusing with yield",
+      "Treating as probability"
+    ],
+    skills: ["discounting", "fixed income"],
+    tags: ["sales-and-trading", "medium", "pricing"],
+    benchmarkTime: 140,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Expected return" },
+      { id: "b", label: "Probability weight" },
+      { id: "c", label: "Coupon rate" },
+      { id: "d", label: "Present value of one future unit" }
+    ],
+    correctAnswerId: "d",
+    firm: "BNP Paribas"
+  },
+  {
+    id: "st149",
+    title: "Forward Contract Initial Value",
+    category: "sales-and-trading",
+    subcategory: "Pricing",
+    difficulty: 3,
+    requiresPaid: true,
+    content: "Why does a standard forward contract have zero value at inception?",
+    hints: [
+      "Contract design",
+      "Fair forward price",
+      "No-arbitrage"
+    ],
+    solution: "Because the forward price is set to eliminate arbitrage",
+    solutionSteps: [
+      "Forward price equals theoretical price",
+      "No cash exchanged initially",
+      "Initial value is zero"
+    ],
+    commonMistakes: [
+      "Assuming forward requires premium",
+      "Confusing with options"
+    ],
+    skills: ["forwards", "pricing"],
+    tags: ["sales-and-trading", "easy", "derivatives"],
+    benchmarkTime: 120,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Because the forward price is fair" },
+      { id: "b", label: "Because volatility is zero" },
+      { id: "c", label: "Because spot equals forward" },
+      { id: "d", label: "Because cash is exchanged later" }
+    ],
+    correctAnswerId: "a",
+    firm: "HSBC"
+  },
+  {
+    id: "st150",
+    title: "Pricing vs Forecasting",
+    category: "sales-and-trading",
+    subcategory: "Pricing",
+    difficulty: 5,
+    requiresPaid: true,
+    content: "Which statement best distinguishes pricing from forecasting?",
+    hints: [
+      "Measure choice",
+      "Objective",
+      "Risk treatment"
+    ],
+    solution: "Pricing uses risk-neutral probabilities, forecasting uses real-world expectations",
+    solutionSteps: [
+      "Pricing enforces no-arbitrage",
+      "Forecasting predicts outcomes",
+      "Different probability measures"
+    ],
+    commonMistakes: [
+      "Using expected returns for pricing",
+      "Assuming pricing predicts markets"
+    ],
+    skills: ["pricing theory", "probability"],
+    tags: ["sales-and-trading", "medium", "pricing"],
+    benchmarkTime: 140,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Pricing is more accurate than forecasting" },
+      { id: "b", label: "Pricing uses risk-neutral probabilities" },
+      { id: "c", label: "Pricing ignores uncertainty" },
+      { id: "d", label: "Forecasting is arbitrage-free" }
+    ],
+    correctAnswerId: "b",
+    firm: "Citadel"
+  },
+  {
+    id: "st151",
+    title: "Replication Argument",
+    category: "sales-and-trading",
+    subcategory: "Pricing",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "Why does the ability to replicate a payoff determine its fair price?",
+    hints: [
+      "Arbitrage",
+      "Self-financing portfolios",
+      "Law of one price"
+    ],
+    solution: "Because any deviation would create arbitrage opportunities",
+    solutionSteps: [
+      "Replicating portfolio matches payoff",
+      "Different prices imply arbitrage",
+      "Market enforces equality"
+    ],
+    commonMistakes: [
+      "Assuming subjective valuation",
+      "Ignoring trading strategies"
+    ],
+    skills: ["replication", "arbitrage"],
+    tags: ["sales-and-trading", "hard", "pricing"],
+    benchmarkTime: 160,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Because investors agree on value" },
+      { id: "b", label: "Because volatility cancels out" },
+      { id: "c", label: "Because arbitrage enforces price equality" },
+      { id: "d", label: "Because risk disappears" }
+    ],
+    correctAnswerId: "c",
+    firm: "Optiver"
+  },
+  {
+    id: "st152",
+    title: "Effect of Volatility on Option Price",
+    category: "sales-and-trading",
+    subcategory: "Pricing",
+    difficulty: 4,
+    requiresPaid: true,
+    content: "Holding all else equal, what is the effect of higher volatility on a European option price?",
+    hints: [
+      "Convex payoff",
+      "Limited downside",
+      "Upside potential"
+    ],
+    solution: "Option price increases",
+    solutionSteps: [
+      "Convex payoff benefits from dispersion",
+      "Downside limited",
+      "Higher uncertainty increases value"
+    ],
+    commonMistakes: [
+      "Thinking volatility hurts buyers",
+      "Ignoring convexity"
+    ],
+    skills: ["options", "volatility"],
+    tags: ["sales-and-trading", "medium", "options"],
+    benchmarkTime: 140,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Option price decreases" },
+      { id: "b", label: "Option price stays constant" },
+      { id: "c", label: "Effect depends on direction" },
+      { id: "d", label: "Option price increases" }
+    ],
+    correctAnswerId: "d",
+    firm: "SIG"
+  },
+  {
+    id: "st153",
+    title: "Pricing Digital Options",
+    category: "sales-and-trading",
+    subcategory: "Pricing",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "Why are digital options particularly sensitive to small pricing errors?",
+    hints: [
+      "Discontinuous payoff",
+      "Sharp Greeks",
+      "Strike behavior"
+    ],
+    solution: "Because small probability errors translate into large payoff changes",
+    solutionSteps: [
+      "Payoff jumps at strike",
+      "Pricing relies on precise probabilities",
+      "Errors are amplified"
+    ],
+    commonMistakes: [
+      "Treating digitals like vanillas",
+      "Ignoring payoff discontinuity"
+    ],
+    skills: ["exotics", "pricing risk"],
+    tags: ["sales-and-trading", "hard", "exotics"],
+    benchmarkTime: 170,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Because payoff is discontinuous" },
+      { id: "b", label: "Because volatility is high" },
+      { id: "c", label: "Because delta is constant" },
+      { id: "d", label: "Because maturity is short" }
+    ],
+    correctAnswerId: "a",
+    firm: "Société Générale"
+  },
+  {
+    id: "st154",
+    title: "Forward vs Futures Pricing",
+    category: "sales-and-trading",
+    subcategory: "Pricing",
+    difficulty: 8,
+    requiresPaid: true,
+    content: "Why can futures prices differ from forward prices when interest rates are stochastic?",
+    hints: [
+      "Mark-to-market",
+      "Convexity",
+      "Reinvestment effect"
+    ],
+    solution: "Because daily settlement creates a convexity adjustment",
+    solutionSteps: [
+      "Futures are marked to market",
+      "Gains reinvested at uncertain rates",
+      "Price differs from forward"
+    ],
+    commonMistakes: [
+      "Assuming they are always equal",
+      "Ignoring rate volatility"
+    ],
+    skills: ["futures", "convexity"],
+    tags: ["sales-and-trading", "extreme", "pricing"],
+    benchmarkTime: 170,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Because forwards have credit risk" },
+      { id: "b", label: "Because of convexity from daily settlement" },
+      { id: "c", label: "Because volatility is mispriced" },
+      { id: "d", label: "Because of margin requirements" }
+    ],
+    correctAnswerId: "b",
+    firm: "CME Group"
+  },
+  {
+    id: "st155",
+    title: "Model-Free Pricing Idea",
+    category: "sales-and-trading",
+    subcategory: "Pricing",
+    difficulty: 9,
+    requiresPaid: true,
+    content: "Why can a variance swap be priced without assuming a specific stochastic volatility model?",
+    hints: [
+      "Replication",
+      "Static hedging",
+      "Option strips"
+    ],
+    solution: "Because it can be replicated using a continuum of options",
+    solutionSteps: [
+      "Variance payoff decomposed into options",
+      "Static replication holds",
+      "No model assumption needed"
+    ],
+    commonMistakes: [
+      "Assuming volatility model is required",
+      "Ignoring replication results"
+    ],
+    skills: ["variance swaps", "model-free pricing"],
+    tags: ["sales-and-trading", "extreme", "pricing"],
+    benchmarkTime: 180,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Because volatility is observable" },
+      { id: "b", label: "Because historical data is sufficient" },
+      { id: "c", label: "Because static replication exists" },
+      { id: "d", label: "Because risk-neutral drift cancels out" }
+    ],
+    correctAnswerId: "c",
+    firm: "QRT"
+  },
+  {
+    id: "st156",
+    title: "Early Exercise Pricing Insight",
+    category: "sales-and-trading",
+    subcategory: "Pricing",
+    difficulty: 6,
+    requiresPaid: true,
+    content: "Why does early exercise increase the value of an American option relative to a European option?",
+    hints: [
+      "Optionality",
+      "Cash flow timing",
+      "Flexibility"
+    ],
+    solution: "Because it provides additional exercise flexibility",
+    solutionSteps: [
+      "Holder chooses optimal timing",
+      "Can capture dividends or rates",
+      "Value weakly increases"
+    ],
+    commonMistakes: [
+      "Assuming early exercise always optimal",
+      "Ignoring optionality value"
+    ],
+    skills: ["american options", "pricing"],
+    tags: ["sales-and-trading", "hard", "options"],
+    benchmarkTime: 160,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Because volatility is higher" },
+      { id: "b", label: "Because strike is lower" },
+      { id: "c", label: "Because payoff is larger" },
+      { id: "d", label: "Because exercise flexibility adds value" }
+    ],
+    correctAnswerId: "d",
+    firm: "Barclays"
+  },
+  {
+    id: "st157",
+    title: "Pricing Consistency",
+    category: "sales-and-trading",
+    subcategory: "Pricing",
+    difficulty: 4,
+    requiresPaid: true,
+    content: "Why must two assets with identical future cash flows have the same price today?",
+    hints: [
+      "No-arbitrage",
+      "Replication",
+      "Trading strategy"
+    ],
+    solution: "Otherwise arbitrage would exist",
+    solutionSteps: [
+      "Buy cheap asset",
+      "Sell expensive one",
+      "Lock in riskless profit"
+    ],
+    commonMistakes: [
+      "Assuming markets tolerate mispricing",
+      "Ignoring trading ability"
+    ],
+    skills: ["arbitrage", "pricing logic"],
+    tags: ["sales-and-trading", "medium", "pricing"],
+    benchmarkTime: 140,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Otherwise arbitrage opportunities arise" },
+      { id: "b", label: "Because investors agree on value" },
+      { id: "c", label: "Because volatility is the same" },
+      { id: "d", label: "Because regulations enforce it" }
+    ],
+    correctAnswerId: "a",
+    firm: "UBS"
+  },
+  {
+    id: "st158",
+    title: "Pricing with Negative Rates",
+    category: "sales-and-trading",
+    subcategory: "Pricing",
+    difficulty: 7,
+    requiresPaid: true,
+    content: "If interest rates are negative, what happens to the forward price of a non-dividend-paying stock relative to spot?",
+    hints: [
+      "Cost of carry",
+      "Discounting vs compounding",
+      "Sign of rates"
+    ],
+    solution: "The forward price can be below spot",
+    solutionSteps: [
+      "Negative carry reduces future value",
+      "Forward reflects financing benefit",
+      "Forward < spot possible"
+    ],
+    commonMistakes: [
+      "Assuming forward always above spot",
+      "Ignoring sign of rates"
+    ],
+    skills: ["forwards", "rates"],
+    tags: ["sales-and-trading", "hard", "pricing"],
+    benchmarkTime: 160,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Forward always exceeds spot" },
+      { id: "b", label: "Forward can be below spot" },
+      { id: "c", label: "Forward equals spot" },
+      { id: "d", label: "Forward becomes undefined" }
+    ],
+    correctAnswerId: "b",
+    firm: "Deutsche Bank"
+  },
+  {
+    id: "st159",
+    title: "Pricing Error Source",
+    category: "sales-and-trading",
+    subcategory: "Pricing",
+    difficulty: 8,
+    requiresPaid: true,
+    content: "Which assumption is most critical in continuous-time option pricing models?",
+    hints: [
+      "Hedging frequency",
+      "Market completeness",
+      "Path behavior"
+    ],
+    solution: "Continuous trading without jumps",
+    solutionSteps: [
+      "Delta hedging assumes continuous paths",
+      "Jumps break replication",
+      "Pricing errors arise"
+    ],
+    commonMistakes: [
+      "Blaming volatility only",
+      "Ignoring jump risk"
+    ],
+    skills: ["model risk", "hedging"],
+    tags: ["sales-and-trading", "extreme", "pricing"],
+    benchmarkTime: 180,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Constant interest rates" },
+      { id: "b", label: "Lognormal returns" },
+      { id: "c", label: "Continuous trading without jumps" },
+      { id: "d", label: "Zero transaction costs" }
+    ],
+    correctAnswerId: "c",
+    firm: "Jane Street"
+  },
+  {
+    id: "st160",
+    title: "Ultimate Pricing Constraint",
+    category: "sales-and-trading",
+    subcategory: "Pricing",
+    difficulty: 10,
+    requiresPaid: true,
+    content: "What is the most fundamental constraint that any pricing model must satisfy?",
+    hints: [
+      "Trading strategies",
+      "Replication",
+      "Market logic"
+    ],
+    solution: "Absence of arbitrage",
+    solutionSteps: [
+      "Arbitrage allows free profit",
+      "Markets eliminate such opportunities",
+      "Pricing must prevent it"
+    ],
+    commonMistakes: [
+      "Focusing on realism",
+      "Overfitting models"
+    ],
+    skills: ["pricing theory", "arbitrage"],
+    tags: ["sales-and-trading", "extreme", "pricing"],
+    benchmarkTime: 180,
+    answerType: "mcq",
+    mcqOptions: [
+      { id: "a", label: "Accurate forecasting" },
+      { id: "b", label: "Market efficiency" },
+      { id: "c", label: "Statistical fit" },
+      { id: "d", label: "No-arbitrage condition" }
+    ],
+    correctAnswerId: "d",
+    firm: "Citadel"
   }
 ];
 

@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { Brain, Loader2 } from 'lucide-react';
+import { Brain, Loader2, ArrowUpRight } from 'lucide-react';
 
 const emailSchema = z.string().email('Please enter a valid email address');
 const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
@@ -19,6 +19,8 @@ export default function Auth() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [defaultTab, setDefaultTab] = useState<'signin' | 'signup'>('signin');
+  const [activeTab, setActiveTab] = useState<'signin' | 'signup'>(defaultTab);
+  const [focusedInput, setFocusedInput] = useState<string | null>(null);
   
   // Check URL params for tab
   useEffect(() => {
@@ -26,6 +28,7 @@ export default function Auth() {
     const tab = params.get('tab');
     if (tab === 'signup') {
       setDefaultTab('signup');
+      setActiveTab('signup');
     }
   }, []);
   
@@ -135,6 +138,14 @@ export default function Auth() {
       </div>
 
       <Card className="w-full max-w-lg glass relative z-10">
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+          className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition"
+          aria-label="Close"
+        >
+          <ArrowUpRight className="h-4 w-4" />
+        </button>
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <div className="w-16 h-16 rounded-2xl gradient-primary flex items-center justify-center glow">
@@ -146,7 +157,7 @@ export default function Auth() {
         </CardHeader>
         
         <CardContent>
-          <Tabs defaultValue={defaultTab} className="w-full">
+          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'signin' | 'signup')} className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -162,6 +173,13 @@ export default function Auth() {
                     placeholder="you@example.com"
                     value={signInEmail}
                     onChange={(e) => setSignInEmail(e.target.value)}
+                    onFocus={() => setFocusedInput('signin-email')}
+                    onBlur={() => setFocusedInput(null)}
+                    className={`transition-all focus-visible:outline-none ${
+                      focusedInput === 'signin-email'
+                        ? 'border border-green-400 ring-2 ring-green-400 shadow-[0_0_20px_rgba(34,197,94,0.6)]'
+                        : ''
+                    }`}
                     required
                   />
                 </div>
@@ -173,6 +191,13 @@ export default function Auth() {
                     placeholder="••••••••"
                     value={signInPassword}
                     onChange={(e) => setSignInPassword(e.target.value)}
+                    onFocus={() => setFocusedInput('signin-password')}
+                    onBlur={() => setFocusedInput(null)}
+                    className={`transition-all focus-visible:outline-none ${
+                      focusedInput === 'signin-password'
+                        ? 'border border-green-400 ring-2 ring-green-400 shadow-[0_0_20px_rgba(34,197,94,0.6)]'
+                        : ''
+                    }`}
                     required
                   />
                 </div>
@@ -191,11 +216,7 @@ export default function Auth() {
                     Don't have an account?{' '}
                     <button
                       type="button"
-                      onClick={() => {
-                        const tabsList = document.querySelector('[role="tablist"]') as HTMLElement;
-                        const signupTab = document.querySelector('[value="signup"]') as HTMLElement;
-                        if (signupTab) signupTab.click();
-                      }}
+                      onClick={() => setActiveTab('signup')}
                       className="text-primary hover:underline font-medium"
                     >
                       Create an account now
@@ -215,6 +236,13 @@ export default function Auth() {
                     placeholder="Your name"
                     value={signUpName}
                     onChange={(e) => setSignUpName(e.target.value)}
+                    onFocus={() => setFocusedInput('signup-name')}
+                    onBlur={() => setFocusedInput(null)}
+                    className={`transition-all focus-visible:outline-none ${
+                      focusedInput === 'signup-name'
+                        ? 'border border-green-400 ring-2 ring-green-400 shadow-[0_0_20px_rgba(34,197,94,0.6)]'
+                        : ''
+                    }`}
                   />
                 </div>
                 <div className="space-y-2">
@@ -225,6 +253,13 @@ export default function Auth() {
                     placeholder="you@example.com"
                     value={signUpEmail}
                     onChange={(e) => setSignUpEmail(e.target.value)}
+                    onFocus={() => setFocusedInput('signup-email')}
+                    onBlur={() => setFocusedInput(null)}
+                    className={`transition-all focus-visible:outline-none ${
+                      focusedInput === 'signup-email'
+                        ? 'border border-green-400 ring-2 ring-green-400 shadow-[0_0_20px_rgba(34,197,94,0.6)]'
+                        : ''
+                    }`}
                     required
                   />
                 </div>
@@ -236,6 +271,13 @@ export default function Auth() {
                     placeholder="••••••••"
                     value={signUpPassword}
                     onChange={(e) => setSignUpPassword(e.target.value)}
+                    onFocus={() => setFocusedInput('signup-password')}
+                    onBlur={() => setFocusedInput(null)}
+                    className={`transition-all focus-visible:outline-none ${
+                      focusedInput === 'signup-password'
+                        ? 'border border-green-400 ring-2 ring-green-400 shadow-[0_0_20px_rgba(34,197,94,0.6)]'
+                        : ''
+                    }`}
                     required
                   />
                 </div>
@@ -247,6 +289,13 @@ export default function Auth() {
                     placeholder="••••••••"
                     value={signUpPasswordConfirm}
                     onChange={(e) => setSignUpPasswordConfirm(e.target.value)}
+                    onFocus={() => setFocusedInput('signup-password-confirm')}
+                    onBlur={() => setFocusedInput(null)}
+                    className={`transition-all focus-visible:outline-none ${
+                      focusedInput === 'signup-password-confirm'
+                        ? 'border border-green-400 ring-2 ring-green-400 shadow-[0_0_20px_rgba(34,197,94,0.6)]'
+                        : ''
+                    }`}
                     required
                   />
                 </div>
@@ -277,6 +326,18 @@ export default function Auth() {
                     'Create Account'
                   )}
                 </Button>
+                <div className="text-center mt-4">
+                  <p className="text-sm text-muted-foreground">
+                    Already have an account?{' '}
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('signin')}
+                      className="text-primary hover:underline font-medium"
+                    >
+                      Sign in
+                    </button>
+                  </p>
+                </div>
               </form>
             </TabsContent>
           </Tabs>

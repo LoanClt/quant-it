@@ -51,7 +51,7 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
             <button
               onClick={() => navigate('/practice', { replace: false })}
               className="text-muted-foreground hover:text-foreground transition-colors"
