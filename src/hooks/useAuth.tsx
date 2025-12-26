@@ -8,6 +8,7 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string, displayName?: string, studyLevel?: string) => Promise<{ error: Error | null }>;
+  signInWithGoogle: () => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -161,12 +162,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const signInWithGoogle = async () => {
+    const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+    const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+    
+    if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+      return { 
+        error: new Error('Authentication service is not configured. Please contact support.') 
+      };
+    }
+    
+    try {
+      const siteUrl = import.meta.env.VITE_SITE_URL;
+      const redirectUrl = siteUrl ? `${siteUrl}/auth/callback` : `${window.location.origin}/auth/callback`;
+      
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+        },
+      });
+      
+      if (error) {
+        return { error };
+      }
+      
+      // OAuth redirect will happen, so we return no error
+      return { error: null };
+    } catch (err) {
+      return { 
+        error: err instanceof Error 
+          ? err 
+          : new Error('An unexpected error occurred during Google sign in.') 
+      };
+    }
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signInWithGoogle, signOut }}>
       {children}
     </AuthContext.Provider>
   );
